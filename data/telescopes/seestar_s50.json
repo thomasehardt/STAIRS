@@ -1,0 +1,8 @@
+{
+  "name"           :  "Seestar S50",
+  "aperture_mm"    :  50,
+  "focal_length_mm":  250,
+  "sensor_x"       :  1920,
+  "sensor_y"       :  1080,
+  "pixel_pitch_um" :  2.9
+}

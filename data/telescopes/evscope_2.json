@@ -1,0 +1,8 @@
+{
+  "name"           :  "eVscope 2",
+  "aperture_mm"    :  114,
+  "focal_length_mm":  450,
+  "sensor_x"       :  4056,
+  "sensor_y"       :  3040,
+  "pixel_pitch_um" :  1.55
+}

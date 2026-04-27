@@ -1,0 +1,23 @@
+services:
+  api:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+    container_name: stairs-api
+    user: "${UID:-1000}:${GID:-1000}"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./services/api/src:/app/src
+      - ./data:/app/data:ro
+      - ./cache:/app_data/cache
+      - ./logs:/app_data/logs
+      - ./config.yaml:/app/config.yaml
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
+      - LOG_DIR=/app_data/logs
+      - CACHE_DIR=/app_data/cache
+      - HOME=/tmp
+    command: [ "uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    restart: unless-stopped

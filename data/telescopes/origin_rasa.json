@@ -1,0 +1,8 @@
+{
+  "name"           :  "Origin (RASA)",
+  "aperture_mm"    :  152,
+  "focal_length_mm":  335,
+  "sensor_x"       :  3096,
+  "sensor_y"       :  2080,
+  "pixel_pitch_um" :  2.4
+}

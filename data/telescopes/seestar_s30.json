@@ -1,0 +1,8 @@
+{
+  "name"           :  "Seestar S30",
+  "aperture_mm"    :  30,
+  "focal_length_mm":  150,
+  "sensor_x"       :  1080,
+  "sensor_y"       :  1920,
+  "pixel_pitch_um" :  2.9
+}

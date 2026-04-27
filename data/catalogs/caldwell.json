@@ -1,0 +1,2364 @@
+{
+  "catalog_id": "caldwell",
+  "name": "Caldwell Catalog",
+  "metadata": {
+    "description": {
+      "summary": "109 deep-sky objects compiled by Patrick Moore",
+      "author": "Patrick Moore",
+      "source": "AstroPixels (Fred Espenak)",
+      "url": "https://astropixels.com/caldwell/caldwellcat.html"
+    }
+  },
+  "records": [
+    {
+      "identifier": "C1",
+      "right_ascension": 0.74,
+      "declination": 85.3333,
+      "identifiers": [
+        "188"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 8.1,
+      "size": [
+        14.0,
+        14.0
+      ],
+      "distance": 4800.0,
+      "constellation": "Cepheus",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C2",
+      "right_ascension": 0.2167,
+      "declination": 72.5333,
+      "identifiers": [
+        "40"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 11.6,
+      "size": [
+        0.6,
+        0.6
+      ],
+      "distance": 3500.0,
+      "constellation": "Cepheus",
+      "season": [
+        "autumn"
+      ],
+      "common_name": [
+        "Bow Tie Nebula"
+      ]
+    },
+    {
+      "identifier": "C3",
+      "right_ascension": 12.2783,
+      "declination": 69.4667,
+      "identifiers": [
+        "4236"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral Galaxy (Intermediate)",
+      "magnitude": 9.7,
+      "size": [
+        21.0,
+        7.0
+      ],
+      "distance": null,
+      "constellation": "Draco",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C4",
+      "right_ascension": 21.03,
+      "declination": 68.2,
+      "identifiers": [
+        "7023"
+      ],
+      "type": "Nebula",
+      "sub_type": "Emission",
+      "magnitude": 6.8,
+      "size": [
+        18.0,
+        18.0
+      ],
+      "distance": 1400.0,
+      "constellation": "Cepheus",
+      "season": [
+        "autumn"
+      ],
+      "common_name": [
+        "Iris Nebula"
+      ]
+    },
+    {
+      "identifier": "C5",
+      "right_ascension": 3.78,
+      "declination": 68.1,
+      "identifiers": [
+        "IC 342"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 9.2,
+      "size": [
+        18.0,
+        17.0
+      ],
+      "distance": null,
+      "constellation": "Camelopardalis",
+      "season": [
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C6",
+      "right_ascension": 17.9767,
+      "declination": 66.6333,
+      "identifiers": [
+        "6543"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 8.8,
+      "size": null,
+      "distance": 3000.0,
+      "constellation": "Draco",
+      "season": [
+        "summer"
+      ],
+      "common_name": [
+        "Cat's Eye Nebula"
+      ]
+    },
+    {
+      "identifier": "C7",
+      "right_ascension": 7.615,
+      "declination": 65.6,
+      "identifiers": [
+        "2403"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 8.9,
+      "size": [
+        18.0,
+        10.0
+      ],
+      "distance": null,
+      "constellation": "Camelopardalis",
+      "season": [
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C8",
+      "right_ascension": 1.4917,
+      "declination": 63.3,
+      "identifiers": [
+        "559"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 9.5,
+      "size": [
+        4.0,
+        4.0
+      ],
+      "distance": 3700.0,
+      "constellation": "Cassiopeia",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C9",
+      "right_ascension": 22.9467,
+      "declination": 62.6167,
+      "identifiers": [
+        "Sh2-155"
+      ],
+      "type": "Nebula",
+      "sub_type": "Emission",
+      "magnitude": 7.7,
+      "size": [
+        50.0,
+        10.0
+      ],
+      "distance": 2800.0,
+      "constellation": "Cepheus",
+      "season": [
+        "autumn"
+      ],
+      "common_name": [
+        "Cave Nebula"
+      ]
+    },
+    {
+      "identifier": "C10",
+      "right_ascension": 1.7667,
+      "declination": 61.25,
+      "identifiers": [
+        "663"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 7.1,
+      "size": [
+        16.0,
+        16.0
+      ],
+      "distance": 7200.0,
+      "constellation": "Cassiopeia",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C11",
+      "right_ascension": 23.345,
+      "declination": 61.2,
+      "identifiers": [
+        "7635"
+      ],
+      "type": "Nebula",
+      "sub_type": "Emission",
+      "magnitude": 7.0,
+      "size": [
+        15.0,
+        8.0
+      ],
+      "distance": 7100.0,
+      "constellation": "Cassiopeia",
+      "season": [
+        "autumn"
+      ],
+      "common_name": [
+        "Bubble nebula"
+      ]
+    },
+    {
+      "identifier": "C12",
+      "right_ascension": 20.58,
+      "declination": 60.15,
+      "identifiers": [
+        "6946"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 9.7,
+      "size": [
+        11.0,
+        9.0
+      ],
+      "distance": null,
+      "constellation": "Cepheus",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C13",
+      "right_ascension": 1.3183,
+      "declination": 58.3333,
+      "identifiers": [
+        "457"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 6.4,
+      "size": [
+        13.0,
+        13.0
+      ],
+      "distance": null,
+      "constellation": "Cassiopeia",
+      "season": [
+        "autumn"
+      ],
+      "common_name": [
+        "Owl or E.T. Cluster"
+      ]
+    },
+    {
+      "identifier": "C14",
+      "right_ascension": 2.3333,
+      "declination": 57.1333,
+      "identifiers": [
+        "869/884"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 4.3,
+      "size": null,
+      "distance": 7300.0,
+      "constellation": "Perseus",
+      "season": [
+        "autumn"
+      ],
+      "common_name": [
+        "Double Cluster, h & chi Persei"
+      ]
+    },
+    {
+      "identifier": "C15",
+      "right_ascension": 19.7467,
+      "declination": 50.5167,
+      "identifiers": [
+        "6826"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 9.8,
+      "size": null,
+      "distance": 2200.0,
+      "constellation": "Cygnus",
+      "season": [
+        "summer"
+      ],
+      "common_name": [
+        "Blinking Planetary"
+      ]
+    },
+    {
+      "identifier": "C16",
+      "right_ascension": 22.255,
+      "declination": 49.8833,
+      "identifiers": [
+        "7243"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 6.4,
+      "size": [
+        21.0,
+        21.0
+      ],
+      "distance": 2500.0,
+      "constellation": "Lacerta",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C17",
+      "right_ascension": 0.5533,
+      "declination": 48.5,
+      "identifiers": [
+        "147"
+      ],
+      "type": "Other",
+      "sub_type": "El",
+      "magnitude": 9.3,
+      "size": [
+        13.0,
+        8.0
+      ],
+      "distance": 2300000.0,
+      "constellation": "Cassiopeia",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C18",
+      "right_ascension": 0.65,
+      "declination": 48.3333,
+      "identifiers": [
+        "185"
+      ],
+      "type": "Other",
+      "sub_type": "El",
+      "magnitude": 9.2,
+      "size": [
+        12.0,
+        9.0
+      ],
+      "distance": 2300000.0,
+      "constellation": "Cassiopeia",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C19",
+      "right_ascension": 21.8917,
+      "declination": 47.2667,
+      "identifiers": [
+        "IC 5146"
+      ],
+      "type": "Nebula",
+      "sub_type": "Emission",
+      "magnitude": 10.0,
+      "size": [
+        12.0,
+        12.0
+      ],
+      "distance": 3300.0,
+      "constellation": "Cygnus",
+      "season": [
+        "autumn"
+      ],
+      "common_name": [
+        "Cocoon Nebula"
+      ]
+    },
+    {
+      "identifier": "C20",
+      "right_ascension": 20.98,
+      "declination": 44.3333,
+      "identifiers": [
+        "7000"
+      ],
+      "type": "Nebula",
+      "sub_type": "Emission",
+      "magnitude": 6.0,
+      "size": [
+        120.0,
+        100.0
+      ],
+      "distance": 1800.0,
+      "constellation": "Cygnus",
+      "season": [
+        "summer"
+      ],
+      "common_name": [
+        "North America Nebula"
+      ]
+    },
+    {
+      "identifier": "C21",
+      "right_ascension": 12.47,
+      "declination": 44.1,
+      "identifiers": [
+        "4449"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Irregular",
+      "magnitude": 9.4,
+      "size": [
+        5.0,
+        3.0
+      ],
+      "distance": null,
+      "constellation": "Canes Venatici",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C22",
+      "right_ascension": 23.4317,
+      "declination": 42.55,
+      "identifiers": [
+        "7662"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 9.2,
+      "size": null,
+      "distance": 3200.0,
+      "constellation": "Andromeda",
+      "season": [
+        "autumn"
+      ],
+      "common_name": [
+        "Blue Snowball"
+      ]
+    },
+    {
+      "identifier": "C23",
+      "right_ascension": 2.3767,
+      "declination": 42.35,
+      "identifiers": [
+        "891"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral Galaxy (Intermediate)",
+      "magnitude": 9.9,
+      "size": [
+        14.0,
+        2.0
+      ],
+      "distance": null,
+      "constellation": "Andromeda",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C24",
+      "right_ascension": 3.33,
+      "declination": 41.5167,
+      "identifiers": [
+        "1275"
+      ],
+      "type": "Other",
+      "sub_type": "Sx",
+      "magnitude": 11.6,
+      "size": [
+        2.6,
+        1.0
+      ],
+      "distance": null,
+      "constellation": "Perseus",
+      "season": [
+        "winter"
+      ],
+      "common_name": [
+        "Perseus A"
+      ]
+    },
+    {
+      "identifier": "C25",
+      "right_ascension": 7.635,
+      "declination": 38.8833,
+      "identifiers": [
+        "2419"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 10.4,
+      "size": [
+        4.1,
+        4.1
+      ],
+      "distance": 275000.0,
+      "constellation": "Lynx",
+      "season": [
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C26",
+      "right_ascension": 12.2917,
+      "declination": 37.8167,
+      "identifiers": [
+        "4244"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 10.6,
+      "size": [
+        16.0,
+        2.5
+      ],
+      "distance": null,
+      "constellation": "Canes Venatici",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C27",
+      "right_ascension": 20.2,
+      "declination": 38.35,
+      "identifiers": [
+        "6888"
+      ],
+      "type": "Nebula",
+      "sub_type": "Emission",
+      "magnitude": 7.5,
+      "size": [
+        20.0,
+        10.0
+      ],
+      "distance": 4700.0,
+      "constellation": "Cygnus",
+      "season": [
+        "summer"
+      ],
+      "common_name": [
+        "Crescent Nebula"
+      ]
+    },
+    {
+      "identifier": "C28",
+      "right_ascension": 1.9633,
+      "declination": 37.6833,
+      "identifiers": [
+        "752"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 5.7,
+      "size": [
+        50.0,
+        50.0
+      ],
+      "distance": 1200.0,
+      "constellation": "Andromeda",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C29",
+      "right_ascension": 13.1817,
+      "declination": 37.05,
+      "identifiers": [
+        "5005"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral Galaxy (Intermediate)",
+      "magnitude": 9.8,
+      "size": [
+        5.4,
+        2.0
+      ],
+      "distance": null,
+      "constellation": "Canes Venatici",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C30",
+      "right_ascension": 22.6183,
+      "declination": 34.4167,
+      "identifiers": [
+        "7331"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral Galaxy (Intermediate)",
+      "magnitude": 9.5,
+      "size": [
+        11.0,
+        4.0
+      ],
+      "distance": null,
+      "constellation": "Pegasus",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C31",
+      "right_ascension": 5.27,
+      "declination": 34.2667,
+      "identifiers": [
+        "IC 405"
+      ],
+      "type": "Nebula",
+      "sub_type": "Emission",
+      "magnitude": 6.0,
+      "size": [
+        30.0,
+        19.0
+      ],
+      "distance": 1600.0,
+      "constellation": "Auriga",
+      "season": [
+        "winter"
+      ],
+      "common_name": [
+        "Flaming Star Nebula"
+      ]
+    },
+    {
+      "identifier": "C32",
+      "right_ascension": 12.7017,
+      "declination": 32.5333,
+      "identifiers": [
+        "4631"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 9.3,
+      "size": [
+        15.0,
+        3.0
+      ],
+      "distance": null,
+      "constellation": "Canes Venatici",
+      "season": [
+        "spring"
+      ],
+      "common_name": [
+        "Whale Galaxy"
+      ]
+    },
+    {
+      "identifier": "C33",
+      "right_ascension": 20.94,
+      "declination": 31.7167,
+      "identifiers": [
+        "6992/5"
+      ],
+      "type": "Nebula",
+      "sub_type": "Supernova Remnant",
+      "magnitude": null,
+      "size": [
+        60.0,
+        8.0
+      ],
+      "distance": 2500.0,
+      "constellation": "Cygnus",
+      "season": [
+        "summer"
+      ],
+      "common_name": [
+        "East Veil Nebula"
+      ]
+    },
+    {
+      "identifier": "C34",
+      "right_ascension": 20.7617,
+      "declination": 30.7167,
+      "identifiers": [
+        "6960"
+      ],
+      "type": "Nebula",
+      "sub_type": "Supernova Remnant",
+      "magnitude": null,
+      "size": [
+        70.0,
+        6.0
+      ],
+      "distance": 2500.0,
+      "constellation": "Cygnus",
+      "season": [
+        "summer"
+      ],
+      "common_name": [
+        "West Veil Nebula"
+      ]
+    },
+    {
+      "identifier": "C35",
+      "right_ascension": 13.0017,
+      "declination": 27.9833,
+      "identifiers": [
+        "4889"
+      ],
+      "type": "Other",
+      "sub_type": "El",
+      "magnitude": 11.4,
+      "size": [
+        3.0,
+        2.0
+      ],
+      "distance": null,
+      "constellation": "Coma Berenices",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C36",
+      "right_ascension": 12.6,
+      "declination": 27.9667,
+      "identifiers": [
+        "4559"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 9.8,
+      "size": [
+        10.0,
+        4.0
+      ],
+      "distance": null,
+      "constellation": "Coma Berenices",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C37",
+      "right_ascension": 20.2,
+      "declination": 26.4833,
+      "identifiers": [
+        "6885"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 5.7,
+      "size": [
+        7.0,
+        7.0
+      ],
+      "distance": 1950.0,
+      "constellation": "Vulpecula",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C38",
+      "right_ascension": 12.605,
+      "declination": 25.9833,
+      "identifiers": [
+        "4565"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral Galaxy (Intermediate)",
+      "magnitude": 9.6,
+      "size": [
+        16.0,
+        3.0
+      ],
+      "distance": null,
+      "constellation": "Coma Berenices",
+      "season": [
+        "spring"
+      ],
+      "common_name": [
+        "Needle Galaxy"
+      ]
+    },
+    {
+      "identifier": "C39",
+      "right_ascension": 7.4867,
+      "declination": 20.9167,
+      "identifiers": [
+        "2392"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 9.9,
+      "size": null,
+      "distance": 4000.0,
+      "constellation": "Gemini",
+      "season": [
+        "winter"
+      ],
+      "common_name": [
+        "Eskimo or Clown Nebula"
+      ]
+    },
+    {
+      "identifier": "C40",
+      "right_ascension": 11.335,
+      "declination": 18.35,
+      "identifiers": [
+        "3626"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral Galaxy (Intermediate)",
+      "magnitude": 10.9,
+      "size": [
+        3.0,
+        2.0
+      ],
+      "distance": null,
+      "constellation": "Leo",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C41",
+      "right_ascension": 4.45,
+      "declination": 16.0,
+      "identifiers": [],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 1.0,
+      "size": [
+        330.0,
+        330.0
+      ],
+      "distance": 151.0,
+      "constellation": "Taurus",
+      "season": [
+        "winter"
+      ],
+      "common_name": [
+        "Hyades"
+      ]
+    },
+    {
+      "identifier": "C42",
+      "right_ascension": 21.025,
+      "declination": 16.1833,
+      "identifiers": [
+        "7006"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 10.6,
+      "size": [
+        2.8,
+        2.8
+      ],
+      "distance": 135000.0,
+      "constellation": "Delphinus",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C43",
+      "right_ascension": 0.055,
+      "declination": 16.15,
+      "identifiers": [
+        "7814"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral Galaxy (Intermediate)",
+      "magnitude": 10.5,
+      "size": [
+        6.0,
+        2.0
+      ],
+      "distance": null,
+      "constellation": "Pegasus",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C44",
+      "right_ascension": 23.0817,
+      "declination": 12.3167,
+      "identifiers": [
+        "7479"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral Galaxy (Intermediate)",
+      "magnitude": 11.0,
+      "size": [
+        4.0,
+        3.0
+      ],
+      "distance": null,
+      "constellation": "Pegasus",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C45",
+      "right_ascension": 13.625,
+      "declination": 8.8833,
+      "identifiers": [
+        "5248"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 10.2,
+      "size": [
+        6.0,
+        4.0
+      ],
+      "distance": null,
+      "constellation": "Bo\u00f6tes",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C46",
+      "right_ascension": 6.6533,
+      "declination": 8.7333,
+      "identifiers": [
+        "2261"
+      ],
+      "type": "Nebula",
+      "sub_type": "Emission",
+      "magnitude": 10.0,
+      "size": [
+        2.0,
+        1.0
+      ],
+      "distance": 2500.0,
+      "constellation": "Monoceros",
+      "season": [
+        "winter"
+      ],
+      "common_name": [
+        "Hubble's Variable Nebula"
+      ]
+    },
+    {
+      "identifier": "C47",
+      "right_ascension": 20.57,
+      "declination": 7.4,
+      "identifiers": [
+        "6934"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 8.9,
+      "size": [
+        5.9,
+        5.9
+      ],
+      "distance": 57000.0,
+      "constellation": "Delphinus",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C48",
+      "right_ascension": 9.1717,
+      "declination": 7.0333,
+      "identifiers": [
+        "2775"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 10.3,
+      "size": [
+        4.5,
+        3.0
+      ],
+      "distance": null,
+      "constellation": "Can",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C49",
+      "right_ascension": 6.5383,
+      "declination": 5.05,
+      "identifiers": [
+        "2237-9"
+      ],
+      "type": "Nebula",
+      "sub_type": "Emission",
+      "magnitude": null,
+      "size": [
+        80.0,
+        60.0
+      ],
+      "distance": 4900.0,
+      "constellation": "Monoceros",
+      "season": [
+        "winter"
+      ],
+      "common_name": [
+        "Rosette Nebula"
+      ]
+    },
+    {
+      "identifier": "C50",
+      "right_ascension": 6.54,
+      "declination": 4.8667,
+      "identifiers": [
+        "2244"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 4.8,
+      "size": [
+        24.0,
+        24.0
+      ],
+      "distance": 4900.0,
+      "constellation": "Monoceros",
+      "season": [
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C51",
+      "right_ascension": 1.08,
+      "declination": 2.1167,
+      "identifiers": [
+        "IC 1613"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Irregular",
+      "magnitude": 9.0,
+      "size": [
+        12.0,
+        11.0
+      ],
+      "distance": 2300000.0,
+      "constellation": "Cetus",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C52",
+      "right_ascension": 12.81,
+      "declination": -5.8,
+      "identifiers": [
+        "4697"
+      ],
+      "type": "Other",
+      "sub_type": "El",
+      "magnitude": 9.3,
+      "size": [
+        6.0,
+        3.0
+      ],
+      "distance": null,
+      "constellation": "Virgo",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C53",
+      "right_ascension": 10.0867,
+      "declination": -7.7167,
+      "identifiers": [
+        "3115"
+      ],
+      "type": "Other",
+      "sub_type": "El",
+      "magnitude": 9.1,
+      "size": [
+        8.0,
+        3.0
+      ],
+      "distance": null,
+      "constellation": "Sextans",
+      "season": [
+        "spring"
+      ],
+      "common_name": [
+        "Spindle Galaxy"
+      ]
+    },
+    {
+      "identifier": "C54",
+      "right_ascension": 8.0033,
+      "declination": -10.7833,
+      "identifiers": [
+        "2506"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 7.6,
+      "size": [
+        7.0,
+        7.0
+      ],
+      "distance": 10000.0,
+      "constellation": "Monoceros",
+      "season": [
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C55",
+      "right_ascension": 21.07,
+      "declination": -11.3667,
+      "identifiers": [
+        "7009"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 8.3,
+      "size": null,
+      "distance": 1400.0,
+      "constellation": "Aquarius",
+      "season": [
+        "autumn"
+      ],
+      "common_name": [
+        "Saturn Nebula"
+      ]
+    },
+    {
+      "identifier": "C56",
+      "right_ascension": 0.7833,
+      "declination": -11.8833,
+      "identifiers": [
+        "246"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 8.0,
+      "size": [
+        3.8,
+        3.8
+      ],
+      "distance": 1600.0,
+      "constellation": "Cetus",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C57",
+      "right_ascension": 19.7483,
+      "declination": -14.8,
+      "identifiers": [
+        "6822"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Irregular",
+      "magnitude": 9.3,
+      "size": [
+        10.0,
+        9.0
+      ],
+      "distance": 2300000.0,
+      "constellation": "Sagittarius",
+      "season": [
+        "summer"
+      ],
+      "common_name": [
+        "Barnard's Galaxy"
+      ]
+    },
+    {
+      "identifier": "C58",
+      "right_ascension": 7.2967,
+      "declination": -15.6167,
+      "identifiers": [
+        "2360"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 7.2,
+      "size": [
+        13.0,
+        13.0
+      ],
+      "distance": 3700.0,
+      "constellation": "Canis Major",
+      "season": [
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C59",
+      "right_ascension": 10.4133,
+      "declination": -18.6333,
+      "identifiers": [
+        "3242"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 8.6,
+      "size": null,
+      "distance": 1400.0,
+      "constellation": "Hydra",
+      "season": [
+        "spring"
+      ],
+      "common_name": [
+        "Ghost of Jupiter"
+      ]
+    },
+    {
+      "identifier": "C60",
+      "right_ascension": 12.0317,
+      "declination": -18.8667,
+      "identifiers": [
+        "4038"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 11.3,
+      "size": [
+        2.6,
+        1.8
+      ],
+      "distance": null,
+      "constellation": "Corvus",
+      "season": [
+        "spring"
+      ],
+      "common_name": [
+        "Antennae Galaxies"
+      ]
+    },
+    {
+      "identifier": "C61",
+      "right_ascension": 12.0317,
+      "declination": -18.8833,
+      "identifiers": [
+        "4039"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 13.0,
+      "size": [
+        3.2,
+        2.2
+      ],
+      "distance": null,
+      "constellation": "Corvus",
+      "season": [
+        "spring"
+      ],
+      "common_name": [
+        "Antennae Galaxies"
+      ]
+    },
+    {
+      "identifier": "C62",
+      "right_ascension": 0.785,
+      "declination": -20.7667,
+      "identifiers": [
+        "247"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 8.9,
+      "size": [
+        20.0,
+        7.0
+      ],
+      "distance": 6800000.0,
+      "constellation": "Cetus",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C63",
+      "right_ascension": 22.4933,
+      "declination": -20.8,
+      "identifiers": [
+        "7293"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 6.5,
+      "size": [
+        13.0,
+        13.0
+      ],
+      "distance": 522.0,
+      "constellation": "Aquarius",
+      "season": [
+        "autumn"
+      ],
+      "common_name": [
+        "Helix Nebula"
+      ]
+    },
+    {
+      "identifier": "C64",
+      "right_ascension": 7.3133,
+      "declination": -24.95,
+      "identifiers": [
+        "2362"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 4.1,
+      "size": [
+        8.0,
+        8.0
+      ],
+      "distance": 5100.0,
+      "constellation": "Canis Major",
+      "season": [
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C65",
+      "right_ascension": 0.7933,
+      "declination": -25.2833,
+      "identifiers": [
+        "253"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 7.1,
+      "size": [
+        25.0,
+        7.0
+      ],
+      "distance": 9800000.0,
+      "constellation": "Sculptor",
+      "season": [
+        "autumn"
+      ],
+      "common_name": [
+        "Sculptor Galaxy"
+      ]
+    },
+    {
+      "identifier": "C66",
+      "right_ascension": 14.66,
+      "declination": -26.5333,
+      "identifiers": [
+        "5694"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 10.2,
+      "size": [
+        3.6,
+        3.6
+      ],
+      "distance": 113000.0,
+      "constellation": "Hydra",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C67",
+      "right_ascension": 2.7717,
+      "declination": -30.2833,
+      "identifiers": [
+        "1097"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral Galaxy (Intermediate)",
+      "magnitude": 9.2,
+      "size": [
+        9.0,
+        6.0
+      ],
+      "distance": null,
+      "constellation": "Fornax",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C68",
+      "right_ascension": 19.0317,
+      "declination": -36.95,
+      "identifiers": [
+        "6729"
+      ],
+      "type": "Nebula",
+      "sub_type": "Emission",
+      "magnitude": 9.7,
+      "size": [
+        1.0,
+        1.0
+      ],
+      "distance": 424.0,
+      "constellation": "Corona Australis",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C69",
+      "right_ascension": 17.2283,
+      "declination": -37.1,
+      "identifiers": [
+        "6302"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 12.8,
+      "size": [
+        0.8,
+        0.8
+      ],
+      "distance": 5200.0,
+      "constellation": "Scorpius",
+      "season": [
+        "summer"
+      ],
+      "common_name": [
+        "Bug Nebula"
+      ]
+    },
+    {
+      "identifier": "C70",
+      "right_ascension": 0.915,
+      "declination": -37.6833,
+      "identifiers": [
+        "300"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 8.1,
+      "size": [
+        20.0,
+        13.0
+      ],
+      "distance": 3900000.0,
+      "constellation": "Sculptor",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C71",
+      "right_ascension": 7.8717,
+      "declination": -38.55,
+      "identifiers": [
+        "2477"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 5.8,
+      "size": [
+        27.0,
+        27.0
+      ],
+      "distance": 3700.0,
+      "constellation": "Puppis",
+      "season": [
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C72",
+      "right_ascension": 0.2483,
+      "declination": -39.1833,
+      "identifiers": [
+        "55"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral Galaxy (Intermediate)",
+      "magnitude": 8.2,
+      "size": [
+        32.0,
+        6.0
+      ],
+      "distance": 4200000.0,
+      "constellation": "Sculptor",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C73",
+      "right_ascension": 5.235,
+      "declination": -40.05,
+      "identifiers": [
+        "1851"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 7.3,
+      "size": [
+        11.0,
+        11.0
+      ],
+      "distance": 39400.0,
+      "constellation": "Columba",
+      "season": [
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C74",
+      "right_ascension": 10.1283,
+      "declination": -40.4333,
+      "identifiers": [
+        "3132"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 8.2,
+      "size": [
+        0.8,
+        0.8
+      ],
+      "distance": 2000.0,
+      "constellation": "Vela",
+      "season": [
+        "spring"
+      ],
+      "common_name": [
+        "Eight Burst Nebula"
+      ]
+    },
+    {
+      "identifier": "C75",
+      "right_ascension": 16.4267,
+      "declination": -40.6667,
+      "identifiers": [
+        "6124"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 5.8,
+      "size": [
+        29.0,
+        29.0
+      ],
+      "distance": 1500.0,
+      "constellation": "Scorpius",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C76",
+      "right_ascension": 16.9,
+      "declination": -41.8,
+      "identifiers": [
+        "6231"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 2.6,
+      "size": [
+        15.0,
+        15.0
+      ],
+      "distance": 6000.0,
+      "constellation": "Scorpius",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C77",
+      "right_ascension": 13.425,
+      "declination": -43.0167,
+      "identifiers": [
+        "5128"
+      ],
+      "type": "Other",
+      "sub_type": "Px",
+      "magnitude": 7.0,
+      "size": [
+        18.0,
+        14.0
+      ],
+      "distance": null,
+      "constellation": "Centaurus",
+      "season": [
+        "spring"
+      ],
+      "common_name": [
+        "Centaurus A"
+      ]
+    },
+    {
+      "identifier": "C78",
+      "right_ascension": 18.1333,
+      "declination": -43.7,
+      "identifiers": [
+        "6541"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 6.6,
+      "size": [
+        13.0,
+        13.0
+      ],
+      "distance": 22300.0,
+      "constellation": "Corona Australis",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C79",
+      "right_ascension": 10.2933,
+      "declination": -46.4167,
+      "identifiers": [
+        "3201"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 6.7,
+      "size": [
+        18.0,
+        18.0
+      ],
+      "distance": 17000.0,
+      "constellation": "Vela",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C80",
+      "right_ascension": 13.4467,
+      "declination": -47.4833,
+      "identifiers": [
+        "5139"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 3.6,
+      "size": [
+        36.0,
+        36.0
+      ],
+      "distance": 17300.0,
+      "constellation": "Centaurus",
+      "season": [
+        "spring"
+      ],
+      "common_name": [
+        "Omega Centauri"
+      ]
+    },
+    {
+      "identifier": "C81",
+      "right_ascension": 17.425,
+      "declination": -48.4167,
+      "identifiers": [
+        "6352"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 8.1,
+      "size": [
+        7.0,
+        7.0
+      ],
+      "distance": 18600.0,
+      "constellation": "Ara",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C82",
+      "right_ascension": 16.6883,
+      "declination": -48.7667,
+      "identifiers": [
+        "6193"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 5.2,
+      "size": [
+        15.0,
+        15.0
+      ],
+      "distance": 4300.0,
+      "constellation": "Ara",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C83",
+      "right_ascension": 13.09,
+      "declination": -49.4667,
+      "identifiers": [
+        "4945"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 9.5,
+      "size": [
+        20.0,
+        4.0
+      ],
+      "distance": null,
+      "constellation": "Centaurus",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C84",
+      "right_ascension": 13.7733,
+      "declination": -51.3667,
+      "identifiers": [
+        "5286"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 7.6,
+      "size": [
+        9.0,
+        9.0
+      ],
+      "distance": 36000.0,
+      "constellation": "Centaurus",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C85",
+      "right_ascension": 8.67,
+      "declination": -53.0667,
+      "identifiers": [
+        "IC 2391"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 2.5,
+      "size": [
+        50.0,
+        50.0
+      ],
+      "distance": 500.0,
+      "constellation": "Vela",
+      "season": [
+        "winter"
+      ],
+      "common_name": [
+        "Omicron Vel Cluster"
+      ]
+    },
+    {
+      "identifier": "C86",
+      "right_ascension": 17.6783,
+      "declination": -53.6667,
+      "identifiers": [
+        "6397"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 5.6,
+      "size": [
+        26.0,
+        26.0
+      ],
+      "distance": 7500.0,
+      "constellation": "Ara",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C87",
+      "right_ascension": 3.205,
+      "declination": -55.2167,
+      "identifiers": [
+        "1261"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 8.4,
+      "size": [
+        7.0,
+        7.0
+      ],
+      "distance": 55500.0,
+      "constellation": "Horologium",
+      "season": [
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C88",
+      "right_ascension": 15.095,
+      "declination": -55.6,
+      "identifiers": [
+        "5823"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 7.9,
+      "size": [
+        10.0,
+        10.0
+      ],
+      "distance": 3400.0,
+      "constellation": "Circinus",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C89",
+      "right_ascension": 16.315,
+      "declination": -57.9,
+      "identifiers": [
+        "6087"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 5.4,
+      "size": [
+        12.0,
+        12.0
+      ],
+      "distance": 3300.0,
+      "constellation": "Norma",
+      "season": [
+        "summer"
+      ],
+      "common_name": [
+        "S Norma Cluster"
+      ]
+    },
+    {
+      "identifier": "C90",
+      "right_ascension": 9.3567,
+      "declination": -58.3167,
+      "identifiers": [
+        "2867"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 9.7,
+      "size": [
+        0.2,
+        0.2
+      ],
+      "distance": 5500.0,
+      "constellation": "Carina",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C91",
+      "right_ascension": 11.1067,
+      "declination": -58.6667,
+      "identifiers": [
+        "3532"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 3.0,
+      "size": [
+        55.0,
+        55.0
+      ],
+      "distance": 1600.0,
+      "constellation": "Carina",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C92",
+      "right_ascension": 10.73,
+      "declination": -59.8667,
+      "identifiers": [
+        "3372"
+      ],
+      "type": "Nebula",
+      "sub_type": "Emission",
+      "magnitude": 6.2,
+      "size": [
+        120.0,
+        120.0
+      ],
+      "distance": 7500.0,
+      "constellation": "Carina",
+      "season": [
+        "spring"
+      ],
+      "common_name": [
+        "Eta Carinae Nebula"
+      ]
+    },
+    {
+      "identifier": "C93",
+      "right_ascension": 19.1817,
+      "declination": -59.9833,
+      "identifiers": [
+        "6752"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 5.4,
+      "size": [
+        20.0,
+        20.0
+      ],
+      "distance": 13000.0,
+      "constellation": "Pavo",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C94",
+      "right_ascension": 12.8933,
+      "declination": -60.3333,
+      "identifiers": [
+        "4755"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 4.2,
+      "size": [
+        10.0,
+        10.0
+      ],
+      "distance": 4900.0,
+      "constellation": "Crux",
+      "season": [
+        "spring"
+      ],
+      "common_name": [
+        "Jewel Box"
+      ]
+    },
+    {
+      "identifier": "C95",
+      "right_ascension": 16.0617,
+      "declination": -60.5,
+      "identifiers": [
+        "6025"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 5.1,
+      "size": [
+        12.0,
+        12.0
+      ],
+      "distance": 2500.0,
+      "constellation": "Triangulum Australe",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C96",
+      "right_ascension": 7.9717,
+      "declination": -60.8667,
+      "identifiers": [
+        "2516"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 3.8,
+      "size": [
+        30.0,
+        30.0
+      ],
+      "distance": 1300.0,
+      "constellation": "Carina",
+      "season": [
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C97",
+      "right_ascension": 11.6017,
+      "declination": -61.6167,
+      "identifiers": [
+        "3766"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 5.3,
+      "size": [
+        12.0,
+        12.0
+      ],
+      "distance": 5800.0,
+      "constellation": "Centaurus",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C98",
+      "right_ascension": 12.705,
+      "declination": -62.9667,
+      "identifiers": [
+        "4609"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 6.9,
+      "size": [
+        5.0,
+        5.0
+      ],
+      "distance": 4200.0,
+      "constellation": "Crux",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C99",
+      "right_ascension": 12.8833,
+      "declination": -63.0,
+      "identifiers": [],
+      "type": "Other",
+      "sub_type": "Dark",
+      "magnitude": null,
+      "size": [
+        400.0,
+        300.0
+      ],
+      "distance": 610.0,
+      "constellation": "Crux",
+      "season": [
+        "spring"
+      ],
+      "common_name": [
+        "Coalsack Nebula"
+      ]
+    },
+    {
+      "identifier": "C100",
+      "right_ascension": 11.61,
+      "declination": -63.0333,
+      "identifiers": [
+        "IC 2944"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 4.5,
+      "size": [
+        15.0,
+        15.0
+      ],
+      "distance": 6000.0,
+      "constellation": "Centaurus",
+      "season": [
+        "spring"
+      ],
+      "common_name": [
+        "Lambda Centauri Nebula"
+      ]
+    },
+    {
+      "identifier": "C101",
+      "right_ascension": 19.1633,
+      "declination": -63.85,
+      "identifiers": [
+        "6744"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral Galaxy (Intermediate)",
+      "magnitude": 9.0,
+      "size": [
+        16.0,
+        10.0
+      ],
+      "distance": null,
+      "constellation": "Pavo",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C102",
+      "right_ascension": 10.72,
+      "declination": -64.4,
+      "identifiers": [
+        "IC 2602"
+      ],
+      "type": "Other",
+      "sub_type": "Oc",
+      "magnitude": 1.9,
+      "size": [
+        50.0,
+        50.0
+      ],
+      "distance": 492.0,
+      "constellation": "Carina",
+      "season": [
+        "spring"
+      ],
+      "common_name": [
+        "Theta Car Cluster"
+      ]
+    },
+    {
+      "identifier": "C103",
+      "right_ascension": 5.645,
+      "declination": -69.1,
+      "identifiers": [
+        "2070"
+      ],
+      "type": "Nebula",
+      "sub_type": "Emission",
+      "magnitude": 1.0,
+      "size": [
+        40.0,
+        25.0
+      ],
+      "distance": 170000.0,
+      "constellation": "Dorado",
+      "season": [
+        "winter"
+      ],
+      "common_name": [
+        "Tarantula Nebula"
+      ]
+    },
+    {
+      "identifier": "C104",
+      "right_ascension": 1.0533,
+      "declination": -70.85,
+      "identifiers": [
+        "362"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 6.6,
+      "size": [
+        13.0,
+        13.0
+      ],
+      "distance": 27700.0,
+      "constellation": "Tucana",
+      "season": [
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C105",
+      "right_ascension": 12.9933,
+      "declination": -70.8833,
+      "identifiers": [
+        "4833"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 7.3,
+      "size": [
+        14.0,
+        14.0
+      ],
+      "distance": 19600.0,
+      "constellation": "Musca",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C106",
+      "right_ascension": 0.4017,
+      "declination": -72.0833,
+      "identifiers": [
+        "104"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 4.0,
+      "size": [
+        31.0,
+        31.0
+      ],
+      "distance": 14700.0,
+      "constellation": "Tucana",
+      "season": [
+        "autumn"
+      ],
+      "common_name": [
+        "47 Tucanae"
+      ]
+    },
+    {
+      "identifier": "C107",
+      "right_ascension": 16.43,
+      "declination": -72.2,
+      "identifiers": [
+        "6101"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 9.3,
+      "size": [
+        11.0,
+        11.0
+      ],
+      "distance": 49900.0,
+      "constellation": "Apus",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C108",
+      "right_ascension": 12.43,
+      "declination": -72.6667,
+      "identifiers": [
+        "4372"
+      ],
+      "type": "Other",
+      "sub_type": "Globular",
+      "magnitude": 7.8,
+      "size": [
+        19.0,
+        19.0
+      ],
+      "distance": 18900.0,
+      "constellation": "Musca",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "C109",
+      "right_ascension": 10.1583,
+      "declination": -80.8667,
+      "identifiers": [
+        "3195"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 11.6,
+      "size": [
+        4035.0,
+        4035.0
+      ],
+      "distance": 5400.0,
+      "constellation": "Chamaeleon",
+      "season": [
+        "spring"
+      ],
+      "common_name": []
+    }
+  ]
+}

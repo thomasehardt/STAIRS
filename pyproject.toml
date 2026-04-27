@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "STAIRS-Monorepo-Dev"
+version = "0.1.0"
+description = "Development configuration for the STAIRS monorepo"
+authors = [{ name = "Thomas Ehardt", email = "thomas.ehardt@gmail.com" }]
+requires-python = ">=3.14"
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "black",
+    "mypy",
+    "pytest",
+    "pytest-cov",
+]
+
+[tool.setuptools]
+# Exclude everything from the root "package" to avoid discovery errors.
+# This pyproject.toml is primarily for dev tool configuration.
+packages = []
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "PL", "ANN"]
+ignore = []
+
+[tool.black]
+line-length = 100
+
+[tool.mypy]
+python_version = "3.14"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+strict_equality = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "services/",
+]
+pythonpath = [
+    "services/api",
+]

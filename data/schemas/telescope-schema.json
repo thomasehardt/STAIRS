@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Telescope",
+  "description": "A smart telescope configuration",
+  "type": "object",
+  "required": ["name", "aperture_mm", "focal_length_mm", "sensor_x", "sensor_y", "pixel_pitch_um"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Telescope model name"
+    },
+    "aperture_mm": {
+      "type": "number",
+      "description": "Aperture diameter in millimeters",
+      "minimum": 0
+    },
+    "focal_length_mm": {
+      "type": "number",
+      "description": "Focal length in millimeters",
+      "minimum": 0
+    },
+    "sensor_x": {
+      "type": "integer",
+      "description": "Sensor width in pixels",
+      "minimum": 1
+    },
+    "sensor_y": {
+      "type": "integer",
+      "description": "Sensor height in pixels",
+      "minimum": 1
+    },
+    "pixel_pitch_um": {
+      "type": "number",
+      "description": "Pixel pitch in micrometers",
+      "minimum": 0
+    }
+  }
+}

@@ -1,0 +1,37 @@
+locations:
+- name: Nashville, TN, USA
+  default: true
+  latitude: 36.16
+  longitude: -86.78
+  elevation_m: 163
+  bortle_scale: 8
+- name: Pogue Creek Canyon
+  latitude: 36.28
+  longitude: -84.92
+  elevation_m: 0
+  bortle_scale: 2
+- name: Obed Scenic River
+  latitude: 36.1
+  longitude: -84.72
+  elevation_m: 393
+  bortle_scale: 3
+
+planning:
+  default_telescope: Seestar S50
+  min_altitude: 30.0
+  max_altitude: 75.0
+  min_duration_minutes: 60
+  block_size_minutes: 60
+  min_top_threshold: 50.0
+
+integrations:
+  weather:
+    enabled: true
+    provider: open-meteo
+    api_key: null
+
+logging:
+  level: INFO
+  max_size_mb: 10
+  backup_count: 5
+

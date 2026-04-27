@@ -1,0 +1,2116 @@
+{
+  "catalog_id": "messier",
+  "name": "Messier Catalog",
+  "metadata": {
+    "description": {
+      "summary": "110 deep-sky objects compiled by Charles Messier",
+      "author": "Charles Messier",
+      "source": "lgbouma/obs GitHub",
+      "url": "https://github.com/lgbouma/obs"
+    }
+  },
+  "records": [
+    {
+      "identifier": "M1",
+      "right_ascension": 5.567,
+      "declination": 22.0,
+      "identifiers": [
+        "NGC1952"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 8.4,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter",
+        "spring"
+      ],
+      "common_name": [
+        "Crab nebula"
+      ]
+    },
+    {
+      "identifier": "M2",
+      "right_ascension": 21.55,
+      "declination": -0.817,
+      "identifiers": [
+        "NGC7089"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 6.5,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "autumn",
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M3",
+      "right_ascension": 13.7,
+      "declination": 28.367,
+      "identifiers": [
+        "NGC5272"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 6.4,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M4",
+      "right_ascension": 16.383,
+      "declination": -26.517,
+      "identifiers": [
+        "NGC6121"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 5.9,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M5",
+      "right_ascension": 15.3,
+      "declination": 2.067,
+      "identifiers": [
+        "NGC5904"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 5.8,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M6",
+      "right_ascension": 17.667,
+      "declination": -32.253,
+      "identifiers": [
+        "NGC6405"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 4.2,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": [
+        "Butterfly cluster"
+      ]
+    },
+    {
+      "identifier": "M7",
+      "right_ascension": 17.883,
+      "declination": -34.793,
+      "identifiers": [
+        "NGC6475"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 3.3,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M8",
+      "right_ascension": 18.05,
+      "declination": -24.387,
+      "identifiers": [
+        "NGC6523"
+      ],
+      "type": "Other",
+      "sub_type": "Dn",
+      "magnitude": 5.8,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": [
+        "Lagoon nebula"
+      ]
+    },
+    {
+      "identifier": "M9",
+      "right_ascension": 17.317,
+      "declination": -18.5,
+      "identifiers": [
+        "NGC6333"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 7.9,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M10",
+      "right_ascension": 16.95,
+      "declination": -4.1,
+      "identifiers": [
+        "NGC6254"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 6.6,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M11",
+      "right_ascension": 18.85,
+      "declination": -6.27,
+      "identifiers": [
+        "NGC6705"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 5.8,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": [
+        "Wild duck cluster"
+      ]
+    },
+    {
+      "identifier": "M12",
+      "right_ascension": 16.783,
+      "declination": -1.933,
+      "identifiers": [
+        "NGC6218"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 6.6,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M13",
+      "right_ascension": 16.683,
+      "declination": 36.45,
+      "identifiers": [
+        "NGC6205"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 5.9,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": [
+        "Hercules cluster"
+      ]
+    },
+    {
+      "identifier": "M14",
+      "right_ascension": 17.617,
+      "declination": -3.233,
+      "identifiers": [
+        "NGC6402"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 7.6,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M15",
+      "right_ascension": 21.483,
+      "declination": 12.167,
+      "identifiers": [
+        "NGC7078"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 6.4,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "autumn",
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M16",
+      "right_ascension": 18.3,
+      "declination": -13.807,
+      "identifiers": [
+        "NGC6611"
+      ],
+      "type": "Other",
+      "sub_type": "Dn",
+      "magnitude": 6.0,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": [
+        "Eagle nebula"
+      ]
+    },
+    {
+      "identifier": "M17",
+      "right_ascension": 18.333,
+      "declination": -16.172,
+      "identifiers": [
+        "NGC6618"
+      ],
+      "type": "Other",
+      "sub_type": "Dn",
+      "magnitude": 7.0,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": [
+        "Omega nebula"
+      ]
+    },
+    {
+      "identifier": "M18",
+      "right_ascension": 18.317,
+      "declination": -17.102,
+      "identifiers": [
+        "NGC6613"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 6.9,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M19",
+      "right_ascension": 17.033,
+      "declination": -26.267,
+      "identifiers": [
+        "NGC6273"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 7.2,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M20",
+      "right_ascension": 18.033,
+      "declination": -22.972,
+      "identifiers": [
+        "NGC6514"
+      ],
+      "type": "Other",
+      "sub_type": "Dn",
+      "magnitude": 8.5,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": [
+        "Trifid nebula"
+      ]
+    },
+    {
+      "identifier": "M21",
+      "right_ascension": 18.067,
+      "declination": -22.49,
+      "identifiers": [
+        "NGC6531"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 5.9,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M22",
+      "right_ascension": 18.6,
+      "declination": -23.9,
+      "identifiers": [
+        "NGC6656"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 5.1,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": [
+        "Excellent"
+      ]
+    },
+    {
+      "identifier": "M23",
+      "right_ascension": 17.95,
+      "declination": -18.985,
+      "identifiers": [
+        "NGC6494"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 5.5,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M24",
+      "right_ascension": 18.28,
+      "declination": -18.55,
+      "identifiers": [
+        "NGC6603"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 4.5,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M25",
+      "right_ascension": 18.517,
+      "declination": -19.117,
+      "identifiers": [],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 4.6,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M26",
+      "right_ascension": 18.75,
+      "declination": -9.383,
+      "identifiers": [
+        "NGC6694"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 8.0,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M27",
+      "right_ascension": 19.983,
+      "declination": 22.717,
+      "identifiers": [
+        "NGC6853"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 8.1,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": [
+        "Dumbbell nebula"
+      ]
+    },
+    {
+      "identifier": "M28",
+      "right_ascension": 18.4,
+      "declination": -24.867,
+      "identifiers": [
+        "NGC6626"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 6.9,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M29",
+      "right_ascension": 20.383,
+      "declination": 38.523,
+      "identifiers": [
+        "NGC6913"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 6.6,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "autumn",
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M30",
+      "right_ascension": 21.667,
+      "declination": -23.167,
+      "identifiers": [
+        "NGC7099"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 7.5,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "autumn",
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M31",
+      "right_ascension": 0.7,
+      "declination": 41.267,
+      "identifiers": [
+        "NGC224"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 3.4,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter"
+      ],
+      "common_name": [
+        "Andromeda galaxy"
+      ]
+    },
+    {
+      "identifier": "M32",
+      "right_ascension": 0.7,
+      "declination": 40.85,
+      "identifiers": [
+        "NGC221"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Elliptical",
+      "magnitude": 8.2,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M33",
+      "right_ascension": 1.55,
+      "declination": 30.65,
+      "identifiers": [
+        "NGC598"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 5.7,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter"
+      ],
+      "common_name": [
+        "Pinwheel galaxy"
+      ]
+    },
+    {
+      "identifier": "M34",
+      "right_ascension": 2.7,
+      "declination": 42.762,
+      "identifiers": [
+        "NGC1039"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 5.2,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M35",
+      "right_ascension": 6.133,
+      "declination": 24.333,
+      "identifiers": [
+        "NGC2168"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 5.1,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter",
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M36",
+      "right_ascension": 5.6,
+      "declination": 34.14,
+      "identifiers": [
+        "NGC1960"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 6.0,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter",
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M37",
+      "right_ascension": 5.867,
+      "declination": 32.553,
+      "identifiers": [
+        "NGC2099"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 5.6,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter",
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M38",
+      "right_ascension": 5.467,
+      "declination": 35.855,
+      "identifiers": [
+        "NGC1912"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 6.4,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter",
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M39",
+      "right_ascension": 21.517,
+      "declination": 48.433,
+      "identifiers": [
+        "NGC7092"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 4.6,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "autumn",
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M40",
+      "right_ascension": 12.367,
+      "declination": 58.067,
+      "identifiers": [],
+      "type": "Other",
+      "sub_type": "Dbl",
+      "magnitude": 8.0,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": [
+        "Two separated faint stars"
+      ]
+    },
+    {
+      "identifier": "M41",
+      "right_ascension": 6.767,
+      "declination": -20.757,
+      "identifiers": [
+        "NGC2287"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 4.5,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter",
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M42",
+      "right_ascension": 5.583,
+      "declination": -5.383,
+      "identifiers": [
+        "NGC1976"
+      ],
+      "type": "Other",
+      "sub_type": "Dn",
+      "magnitude": 4.0,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter",
+        "spring"
+      ],
+      "common_name": [
+        "Great Orion nebula"
+      ]
+    },
+    {
+      "identifier": "M43",
+      "right_ascension": 5.583,
+      "declination": -5.27,
+      "identifiers": [
+        "NGC1982"
+      ],
+      "type": "Other",
+      "sub_type": "Dn",
+      "magnitude": 9.0,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter",
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M44",
+      "right_ascension": 8.667,
+      "declination": 19.667,
+      "identifiers": [
+        "NGC2632"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 3.1,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "spring",
+        "summer"
+      ],
+      "common_name": [
+        "Beehive cluster"
+      ]
+    },
+    {
+      "identifier": "M45",
+      "right_ascension": 3.783,
+      "declination": 24.117,
+      "identifiers": [],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 1.2,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter"
+      ],
+      "common_name": [
+        "Pleiades"
+      ]
+    },
+    {
+      "identifier": "M46",
+      "right_ascension": 7.683,
+      "declination": -14.81,
+      "identifiers": [
+        "NGC2437"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 6.1,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter",
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M47",
+      "right_ascension": 7.6,
+      "declination": -14.483,
+      "identifiers": [
+        "NGC2422"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 4.4,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter",
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M48",
+      "right_ascension": 8.217,
+      "declination": -5.75,
+      "identifiers": [
+        "NGC2548"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 5.8,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "spring",
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M49",
+      "right_ascension": 12.483,
+      "declination": 8.0,
+      "identifiers": [
+        "NGC4472"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Elliptical",
+      "magnitude": 8.4,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M50",
+      "right_ascension": 7.033,
+      "declination": -8.333,
+      "identifiers": [
+        "NGC2323"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 5.9,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter",
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M51",
+      "right_ascension": 13.483,
+      "declination": 47.183,
+      "identifiers": [
+        "NGC5194"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 8.1,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": [
+        "Whirlpool galaxy"
+      ]
+    },
+    {
+      "identifier": "M52",
+      "right_ascension": 23.4,
+      "declination": 61.593,
+      "identifiers": [
+        "NGC7654"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 6.9,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "autumn",
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M53",
+      "right_ascension": 13.2,
+      "declination": 18.167,
+      "identifiers": [
+        "NGC5024"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 7.7,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M54",
+      "right_ascension": 18.917,
+      "declination": -30.467,
+      "identifiers": [
+        "NGC6715"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 7.7,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M55",
+      "right_ascension": 19.65,
+      "declination": -30.95,
+      "identifiers": [
+        "NGC6809"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 7.0,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M56",
+      "right_ascension": 19.267,
+      "declination": 30.183,
+      "identifiers": [
+        "NGC6779"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 8.2,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M57",
+      "right_ascension": 18.883,
+      "declination": 33.017,
+      "identifiers": [
+        "NGC6720"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 9.0,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": [
+        "Ring nebula"
+      ]
+    },
+    {
+      "identifier": "M58",
+      "right_ascension": 12.617,
+      "declination": 11.817,
+      "identifiers": [
+        "NGC4579"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 9.8,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M59",
+      "right_ascension": 12.7,
+      "declination": 11.633,
+      "identifiers": [
+        "NGC4621"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Elliptical",
+      "magnitude": 9.8,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M60",
+      "right_ascension": 12.717,
+      "declination": 11.55,
+      "identifiers": [
+        "NGC4649"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Elliptical",
+      "magnitude": 8.8,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M61",
+      "right_ascension": 12.35,
+      "declination": 4.467,
+      "identifiers": [
+        "NGC4303"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 9.7,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M62",
+      "right_ascension": 17.017,
+      "declination": -30.1,
+      "identifiers": [
+        "NGC6266"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 6.6,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M63",
+      "right_ascension": 13.25,
+      "declination": 42.017,
+      "identifiers": [
+        "NGC5055"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 8.6,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": [
+        "Sunflower galaxy"
+      ]
+    },
+    {
+      "identifier": "M64",
+      "right_ascension": 12.933,
+      "declination": 21.667,
+      "identifiers": [
+        "NGC4826"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 8.5,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": [
+        "Black eye galaxy"
+      ]
+    },
+    {
+      "identifier": "M65",
+      "right_ascension": 11.3,
+      "declination": 13.083,
+      "identifiers": [
+        "NGC3623"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 9.3,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "spring",
+        "summer"
+      ],
+      "common_name": [
+        "Leo"
+      ]
+    },
+    {
+      "identifier": "M66",
+      "right_ascension": 11.333,
+      "declination": 12.983,
+      "identifiers": [
+        "NGC3627"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 9.0,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "spring",
+        "summer"
+      ],
+      "common_name": [
+        "Leo"
+      ]
+    },
+    {
+      "identifier": "M67",
+      "right_ascension": 8.85,
+      "declination": 11.8,
+      "identifiers": [
+        "NGC2682"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 6.9,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "spring",
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M68",
+      "right_ascension": 12.65,
+      "declination": -26.733,
+      "identifiers": [
+        "NGC4590"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 8.2,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M69",
+      "right_ascension": 18.517,
+      "declination": -32.333,
+      "identifiers": [
+        "NGC6637"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 7.7,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M70",
+      "right_ascension": 18.717,
+      "declination": -32.283,
+      "identifiers": [
+        "NGC6681"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 8.1,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M71",
+      "right_ascension": 19.883,
+      "declination": 18.767,
+      "identifiers": [
+        "NGC6838"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 8.3,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M72",
+      "right_ascension": 20.883,
+      "declination": -12.533,
+      "identifiers": [
+        "NGC6981"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 9.4,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "autumn",
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M73",
+      "right_ascension": 20.983,
+      "declination": -12.633,
+      "identifiers": [
+        "NGC6994"
+      ],
+      "type": "Other",
+      "sub_type": "Ast",
+      "magnitude": 10.0,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "autumn",
+        "winter"
+      ],
+      "common_name": [
+        "Very difficult"
+      ]
+    },
+    {
+      "identifier": "M74",
+      "right_ascension": 1.6,
+      "declination": 15.783,
+      "identifiers": [
+        "NGC628"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 9.2,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M75",
+      "right_ascension": 20.1,
+      "declination": -21.917,
+      "identifiers": [
+        "NGC6864"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 8.6,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "autumn",
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M76",
+      "right_ascension": 1.7,
+      "declination": 51.567,
+      "identifiers": [
+        "NGC650"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 11.5,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter"
+      ],
+      "common_name": [
+        "Cork nebula"
+      ]
+    },
+    {
+      "identifier": "M77",
+      "right_ascension": 2.7,
+      "declination": -0.013,
+      "identifiers": [
+        "NGC1068"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 8.8,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M78",
+      "right_ascension": 5.767,
+      "declination": 0.067,
+      "identifiers": [
+        "NGC2068"
+      ],
+      "type": "Other",
+      "sub_type": "Dn",
+      "magnitude": 8.0,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter",
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M79",
+      "right_ascension": 5.4,
+      "declination": -24.517,
+      "identifiers": [
+        "NGC1904"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 8.0,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter",
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M80",
+      "right_ascension": 16.283,
+      "declination": -22.967,
+      "identifiers": [
+        "NGC6093"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 7.2,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M81",
+      "right_ascension": 9.917,
+      "declination": 69.05,
+      "identifiers": [
+        "NGC3031"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 6.8,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "spring",
+        "summer"
+      ],
+      "common_name": [
+        "Bodes nebula"
+      ]
+    },
+    {
+      "identifier": "M82",
+      "right_ascension": 9.917,
+      "declination": 69.667,
+      "identifiers": [
+        "NGC3034"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Irregular",
+      "magnitude": 8.4,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "spring",
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M83",
+      "right_ascension": 13.617,
+      "declination": -29.85,
+      "identifiers": [
+        "NGC5236"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 7.6,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M84",
+      "right_ascension": 12.417,
+      "declination": 12.883,
+      "identifiers": [
+        "NGC4374"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Elliptical",
+      "magnitude": 9.3,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M85",
+      "right_ascension": 12.417,
+      "declination": 18.183,
+      "identifiers": [
+        "NGC4382"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Elliptical",
+      "magnitude": 9.2,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M86",
+      "right_ascension": 12.433,
+      "declination": 12.933,
+      "identifiers": [
+        "NGC4406"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Elliptical",
+      "magnitude": 9.2,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M87",
+      "right_ascension": 12.5,
+      "declination": 12.383,
+      "identifiers": [
+        "NGC4486"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Elliptical",
+      "magnitude": 8.6,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": [
+        "Virgo A"
+      ]
+    },
+    {
+      "identifier": "M88",
+      "right_ascension": 12.517,
+      "declination": 14.417,
+      "identifiers": [
+        "NGC4501"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 9.5,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M89",
+      "right_ascension": 12.583,
+      "declination": 12.55,
+      "identifiers": [
+        "NGC4552"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Elliptical",
+      "magnitude": 9.8,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M90",
+      "right_ascension": 12.6,
+      "declination": 13.15,
+      "identifiers": [
+        "NGC4569"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 9.5,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M91",
+      "right_ascension": 12.583,
+      "declination": 14.483,
+      "identifiers": [
+        "NGC4548"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 10.2,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M92",
+      "right_ascension": 17.283,
+      "declination": 43.133,
+      "identifiers": [
+        "NGC6341"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 6.5,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M93",
+      "right_ascension": 7.733,
+      "declination": -23.857,
+      "identifiers": [
+        "NGC2447"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 6.2,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter",
+        "spring"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M94",
+      "right_ascension": 12.833,
+      "declination": 41.117,
+      "identifiers": [
+        "NGC4736"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 8.1,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M95",
+      "right_ascension": 10.717,
+      "declination": 11.7,
+      "identifiers": [
+        "NGC3351"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 9.7,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "spring",
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M96",
+      "right_ascension": 10.767,
+      "declination": 11.817,
+      "identifiers": [
+        "NGC3368"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 9.2,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "spring",
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M97",
+      "right_ascension": 11.233,
+      "declination": 55.017,
+      "identifiers": [
+        "NGC3587"
+      ],
+      "type": "Nebula",
+      "sub_type": "Planetary",
+      "magnitude": 11.2,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "spring",
+        "summer"
+      ],
+      "common_name": [
+        "Owl nebula"
+      ]
+    },
+    {
+      "identifier": "M98",
+      "right_ascension": 12.217,
+      "declination": 14.9,
+      "identifiers": [
+        "NGC4192"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 10.1,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M99",
+      "right_ascension": 12.3,
+      "declination": 14.4,
+      "identifiers": [
+        "NGC4254"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 9.8,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": [
+        "Pin Wheel Galaxy"
+      ]
+    },
+    {
+      "identifier": "M100",
+      "right_ascension": 12.367,
+      "declination": 15.817,
+      "identifiers": [
+        "NGC4321"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 9.4,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M101",
+      "right_ascension": 14.05,
+      "declination": 54.333,
+      "identifiers": [
+        "NGC5457"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 7.7,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M102",
+      "right_ascension": 15.1,
+      "declination": 55.75,
+      "identifiers": [
+        "NGC5457"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 7.7,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M103",
+      "right_ascension": 1.55,
+      "declination": 60.65,
+      "identifiers": [
+        "NGC581"
+      ],
+      "type": "Star Cluster",
+      "sub_type": "Open",
+      "magnitude": 7.4,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M104",
+      "right_ascension": 12.65,
+      "declination": -11.617,
+      "identifiers": [
+        "NGC4594"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 8.3,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": [
+        "Sombrero galaxy"
+      ]
+    },
+    {
+      "identifier": "M105",
+      "right_ascension": 10.783,
+      "declination": 12.567,
+      "identifiers": [
+        "NGC3379"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Elliptical",
+      "magnitude": 9.3,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "spring",
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M106",
+      "right_ascension": 12.3,
+      "declination": 47.3,
+      "identifiers": [
+        "NGC4258"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 8.3,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M107",
+      "right_ascension": 16.533,
+      "declination": -13.05,
+      "identifiers": [
+        "NGC6171"
+      ],
+      "type": "Other",
+      "sub_type": "Gc",
+      "magnitude": 8.1,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "summer",
+        "autumn"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M108",
+      "right_ascension": 11.183,
+      "declination": 55.667,
+      "identifiers": [
+        "NGC3556"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 10.0,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "spring",
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M109",
+      "right_ascension": 11.95,
+      "declination": 53.367,
+      "identifiers": [
+        "NGC3992"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Spiral",
+      "magnitude": 9.8,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "spring",
+        "summer"
+      ],
+      "common_name": []
+    },
+    {
+      "identifier": "M110",
+      "right_ascension": 0.667,
+      "declination": 41.683,
+      "identifiers": [
+        "NGC205"
+      ],
+      "type": "Galaxy",
+      "sub_type": "Elliptical",
+      "magnitude": 8.0,
+      "size": null,
+      "distance": null,
+      "constellation": "",
+      "season": [
+        "winter"
+      ],
+      "common_name": []
+    }
+  ]
+}

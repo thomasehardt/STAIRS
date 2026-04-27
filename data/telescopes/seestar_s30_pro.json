@@ -1,0 +1,8 @@
+{
+  "name"           :  "Seestar S30 Pro",
+  "aperture_mm"    :  30,
+  "focal_length_mm":  160,
+  "sensor_x"       :  3840,
+  "sensor_y"       :  2160,
+  "pixel_pitch_um" :  2.9
+}
