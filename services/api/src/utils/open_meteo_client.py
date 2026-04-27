@@ -13,7 +13,8 @@ class OpenMeteoWeatherApiClient:
     def __init__(self, api_key: str | None = None) -> None:
         if not api_key:
             logger.info(
-                "No OpenMeteo API key provided, using default API which might have fewer features"
+                "No OpenMeteo API key provided, using default API "
+                "which might have fewer features"
             )
         self.api_key = api_key
 
@@ -28,14 +29,19 @@ class OpenMeteoWeatherApiClient:
         params = {
             "latitude": latitude,
             "longitude": longitude,
-            "hourly": ",".join([
-                "temperature_2m",
-                "relative_humidity_2m",
-                "precipitation",
-                "cloud_cover",
-                "wind_speed_10m",
-                "wind_direction_10m",
-            ]),
+            "hourly": ",".join(
+                [
+                    "temperature_2m",
+                    "relative_humidity_2m",
+                    "precipitation",
+                    "cloud_cover",
+                    "cloud_cover_low",
+                    "cloud_cover_mid",
+                    "cloud_cover_high",
+                    "wind_speed_10m",
+                    "wind_direction_10m",
+                ]
+            ),
             "timezone": "UTC",
             "forecast_days": 14,
         }
@@ -44,13 +50,17 @@ class OpenMeteoWeatherApiClient:
             response = httpx.get(BASE_URL, params=params, timeout=10.0)
             response.raise_for_status()
             data = response.json()
+            logger.debug(f"OpenMeteo response: {data}")
 
             hourly = data.get("hourly", [])
             times = hourly.get("time", [])
             temps = hourly.get("temperature_2m", [])
             humidities = hourly.get("relative_humidity_2m", [])
             precipitations = hourly.get("precipitation", [])
-            clouds = hourly.get("cloud_cover", [])
+            clouds_total = hourly.get("cloud_cover", [])
+            clouds_low = hourly.get("cloud_cover_low", [])
+            clouds_mid = hourly.get("cloud_cover_mid", [])
+            clouds_high = hourly.get("cloud_cover_high", [])
             wind_speeds = hourly.get("wind_speed_10m", [])
             wind_directions = hourly.get("wind_direction_10m", [])
 
@@ -60,11 +70,21 @@ class OpenMeteoWeatherApiClient:
                 # note: open-meteo uses UTC without specifying as such
                 forecast_dt = datetime.fromisoformat(times[i]).replace(tzinfo=UTC)
 
+                # calculate a 'pessimistic' cloud cover by taking the max of all layers
+                # this is safer for astrophotography than the aggregate 'total'
+                layers = [
+                    clouds_total[i] if i < len(clouds_total) else 0,
+                    clouds_low[i] if i < len(clouds_low) else 0,
+                    clouds_mid[i] if i < len(clouds_mid) else 0,
+                    clouds_high[i] if i < len(clouds_high) else 0,
+                ]
+                cloud_pct = float(max(layers))
+
                 processed_forecasts.append(
                     ForecastData(
                         timestamp=forecast_dt,
                         temperature_c=temps[i] if i < len(temps) else None,
-                        cloud_cover_pct=(float(clouds[i]) if i < len(clouds) else None),
+                        cloud_cover_pct=cloud_pct,
                         precipitation_prob=None,  # open-meteo doesn't provide this
                         precipitation_mm_per_hour=float(precipitations[i])
                         if i < len(precipitations)

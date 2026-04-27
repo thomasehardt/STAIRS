@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from typing import Any
 
 import astropy.units as u
 import numpy as np
@@ -15,6 +16,21 @@ contains logic related to the viewer at a point in time (i.e., a location + time
 
 logger = logging.getLogger(__name__)
 iers.conf.auto_download = False
+
+
+def safe_round(val: Any, decimals: int = 1) -> float:
+    """
+    Safely rounds a value to a given number of decimals, handling None and NaN.
+    """
+    if val is None:
+        return 0.0
+    try:
+        fval = float(val)
+        if np.isnan(fval):
+            return 0.0
+        return round(fval, decimals)
+    except (ValueError, TypeError):
+        return 0.0
 
 
 def get_astronomical_day_for_date(
@@ -56,7 +72,7 @@ def find_horizon_crossings(
     observer: Observer, start_dt: datetime, direction: str = "setting"
 ) -> Time | None:
     astronomical_twilight_alt = -18
-    test_time = start_dt
+    test_time = Time(start_dt)
 
     found = False
     # search for the first crossing of the horizon in the next year
@@ -215,7 +231,8 @@ def get_peak_altitudes(
     observer: Observer, targets: SkyCoord, time_range: tuple[Time, Time]
 ) -> npt.NDArray[np.float64]:
     """
-    vectorized coarse filter to find the max altitude each target reaches in the given timeframe
+    vectorized coarse filter to find the max altitude each target reaches
+    in the given timeframe
     :param observer:
     :param targets:
     :param time_range:

@@ -23,16 +23,8 @@ dev = [
 # This pyproject.toml is primarily for dev tool configuration.
 packages = []
 
-[tool.ruff]
-line-length = 100
-target-version = "py314"
-
-[tool.ruff.lint]
-select = ["E", "F", "W", "I", "UP", "PL", "ANN"]
-ignore = []
-
 [tool.black]
-line-length = 100
+line-length = 88
 
 [tool.mypy]
 python_version = "3.14"

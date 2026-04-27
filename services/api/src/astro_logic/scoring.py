@@ -78,13 +78,13 @@ def calculate_weather_score_vectorized(
     humidity_arr = np.atleast_1d(humidity)
 
     cloud_multipliers = np.ones_like(clouds_arr, dtype=float)
-    mask_cloud_zero = clouds_arr > 50
-    mask_cloud_linear = (clouds_arr > 10) & (clouds_arr <= 50)
+    mask_cloud_zero = clouds_arr > 90
+    mask_cloud_linear = (clouds_arr > 20) & (clouds_arr <= 90)
 
     cloud_multipliers[mask_cloud_zero] = 0.0
     cloud_multipliers[mask_cloud_linear] = 1.0 - (
-        clouds_arr[mask_cloud_linear] - 10
-    ) / (50 - 10)
+        clouds_arr[mask_cloud_linear] - 20
+    ) / (90 - 20)
 
     humidity_multipliers = np.ones_like(humidity_arr, dtype=float)
     humidity_multipliers[humidity_arr > 85] = 0.85

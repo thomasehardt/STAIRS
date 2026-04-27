@@ -29,12 +29,12 @@ class TelescopeProfile(BaseModel):
     represents a hardware configuration for a smart telescope
     """
 
-    name: str = NonEmptyStr
-    aperture_mm: int = PositiveInt
-    focal_length_mm: int = PositiveInt
-    sensor_x: int = PositiveInt
-    sensor_y: int = PositiveInt
-    pixel_pitch_um: float = PositiveFloat
+    name: NonEmptyStr
+    aperture_mm: PositiveInt
+    focal_length_mm: PositiveInt
+    sensor_x: PositiveInt
+    sensor_y: PositiveInt
+    pixel_pitch_um: PositiveFloat
 
     def calculate_fov(self) -> tuple[float, float]:
         """
@@ -179,9 +179,7 @@ AngularSize = tuple[()] | tuple[Degrees] | tuple[Degrees, Degrees]
 
 
 class TargetRecord(BaseModel):
-    model_config = ConfigDict(
-        extra="ignore", populate_by_name=True
-    )
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
     identifier: str = Field(..., min_length=1)
     right_ascension: Hours = Field(..., ge=0, lt=24)
     declination: Degrees = Field(..., ge=-90, le=90)
@@ -240,6 +238,7 @@ class TargetRecord(BaseModel):
             if pd.isna(v):
                 return None
         except (ImportError, TypeError):
+            # something other than isna - we just assume it's skippable
             pass
         return v
 
@@ -258,7 +257,7 @@ class TargetRecord(BaseModel):
             v = v.tolist()
         if isinstance(v, list) and len(v) == 0:
             return ()
-        if not isinstance(v, (list, tuple)):
+        if not isinstance(v, list | tuple):
             raise ValueError(f"size must be a tuple or list, got {type(v).__name__}")
         if len(v) > 2:
             raise ValueError(f"size must be a tuple or list of length 2, got {len(v)}")
@@ -275,7 +274,7 @@ class TargetRecord(BaseModel):
         if not isinstance(v, str) or not v:
             return "Other"
 
-        normalized = v.replace("ö", "o")
+        normalized = v.replace("\u00f6", "o")
         allowed = get_args(Constellation)
         if normalized not in allowed:
             return "Other"
@@ -342,7 +341,8 @@ class ObjectCatalog(BaseModel):
                 valid_records.append(TargetRecord.model_validate(record))
             except Exception as e:
                 logging.error(
-                    f"validation error in {catalog_id} [{record.get('identifier', 'UNKNOWN')}]: {e}"
+                    f"validation error in {catalog_id} "
+                    f"[{record.get('identifier', 'UNKNOWN')}]: {e}"
                 )
 
         return cls(

@@ -58,10 +58,22 @@
           "sub_type": {
             "type": "string",
             "enum": [
-              "Spiral", "Barred Spiral", "Elliptical", "Lenticular", "Irregular", "Starburst",
-              "Emission", "Reflection", "Dark", "Planetary", "Supernova Remnant",
-              "Open", "Globular",
-              "Asterism", "Single Star", "Double Star"
+              "Spiral",
+              "Barred Spiral",
+              "Elliptical",
+              "Lenticular",
+              "Irregular",
+              "Starburst",
+              "Emission",
+              "Reflection",
+              "Dark",
+              "Planetary",
+              "Supernova Remnant",
+              "Open",
+              "Globular",
+              "Asterism",
+              "Single Star",
+              "Double Star"
             ]
           },
           "magnitude": { "type": "number" },

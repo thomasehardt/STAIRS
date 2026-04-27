@@ -29,6 +29,7 @@ def get_plan_example() -> dict:
         "bortle_scale": default_loc.get("bortle_scale"),
     }
 
+
 class PlanRequest(BaseModel):
     latitude: float | None = None
     longitude: float | None = None
@@ -38,6 +39,7 @@ class PlanRequest(BaseModel):
     min_alt: float = 30.0
     location_name: str | None = None
     bortle_scale: int | None = None
+    include_targets: list[str] = []
 
     model_config = ConfigDict(json_schema_extra={"example": get_plan_example()})
 
@@ -45,6 +47,8 @@ class PlanRequest(BaseModel):
 class ObservationBlock(BaseModel):
     target_id: str
     common_name: str | None = None
+    target_type: str | None = None
+    constellation: str | None = None
     start_time: datetime
     end_time: datetime
     oss_score: float
@@ -54,6 +58,9 @@ class ObservationBlock(BaseModel):
 class TargetRecommendation(BaseModel):
     target_id: str
     common_name: str | None = None
+    target_type: str
+    constellation: str
+    magnitude: float | None = None
     oss_score: float  # Suitability score
     aqs_score: float | None = None  # Absolute Quality Score
     sqs_score: float  # Sky quality score
@@ -76,11 +83,34 @@ class TargetSearchItem(BaseModel):
     target_type: str
     constellation: str
     magnitude: float | None = None
+    angular_size: list[float] | None = None
+    season: str | None = None
 
 
 class TargetSearchResponse(BaseModel):
     results: list[TargetSearchItem]
     total_found: int
+
+
+class PositionPoint(BaseModel):
+    time: datetime
+    alt_deg: float
+    az_deg: float
+
+
+class SkyStatusPoint(BaseModel):
+    time: datetime
+    moon_alt: float
+    moon_az: float
+    moon_phase: float
+    sky_quality_rel: float
+    sky_quality_abs: float
+    target_positions: dict[str, PositionPoint]
+
+
+class SkyViewResponse(BaseModel):
+    location_name: str
+    timeline: list[SkyStatusPoint]
 
 
 class CatalogItem(BaseModel):
@@ -139,6 +169,7 @@ class TargetDetail(BaseModel):
     last_observed: date | None = None
     observation_count: int | None = None
 
+
 class ForecastDay(BaseModel):
     date: str  # ISO-8601 format
     astronomical_night_start: datetime | None = None
@@ -150,15 +181,10 @@ class ForecastDay(BaseModel):
     absolute_quality: float = 0.0
     note: str | None = None
 
+
 class ForecastResponse(BaseModel):
     location_name: str
     days: list[ForecastDay]
-
-
-class PositionPoint(BaseModel):
-    time: datetime
-    alt_deg: float
-    az_deg: float
 
 
 class TargetPositionSeries(BaseModel):
@@ -242,11 +268,14 @@ class WeatherSettings(BaseModel):
     enabled: bool = False
     provider: str = "dummy"
     api_key: str | None = None
+    units: str = "C"
+
 
 class LoggingSettings(BaseModel):
     level: str = "INFO"
     max_size_mb: int = 10
     backup_count: int = 5
+
 
 class IntegrationsSettings(BaseModel):
     weather: WeatherSettings
@@ -266,6 +295,7 @@ class SettingsUpdate(BaseModel):
     integrations: IntegrationsSettings | None = None
     logging: LoggingSettings | None = None
 
+
 class ForecastData(TypedDict):
     """
     defines the structure of a single weather forecast data point for a specific
@@ -283,4 +313,14 @@ class ForecastData(TypedDict):
     seeing: float | None
 
 
+class QualityPoint(BaseModel):
+    time: datetime
+    score: float  # 0 - 100, final combined score
+    moon_mult: float
+    weather_mult: float
+    seeing_mult: float | None = 1.0
 
+
+class QualitySeriesResponse(BaseModel):
+    location_name: str
+    points: list[QualityPoint]

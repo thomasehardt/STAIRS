@@ -18,7 +18,8 @@ def resolve_location(
     bortle_scale: int | None = None,
 ) -> ObservationLocation:
     """
-    creates an ObservationLocation object from provided parameters or retrieves from database if name is provided
+    creates an ObservationLocation object from provided parameters or
+    retrieves from database if name is provided
     :param db:
     :param latitude:
     :param longitude:

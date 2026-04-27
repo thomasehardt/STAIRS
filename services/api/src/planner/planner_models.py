@@ -1,18 +1,64 @@
 from __future__ import annotations
 
+import logging
+from datetime import datetime
+
 import astropy.units as u
 import numpy as np
 import numpy.typing as npt
+import pandas as pd
 import pytz
 from astroplan import Observer
 from astropy.coordinates import EarthLocation
+from astropy.time import Time
 from pydantic import BaseModel, Field, field_validator, model_validator
 from src.utils.geo import get_tz_name
+
+logger = logging.getLogger(__name__)
+
+
+def astropy_time_to_datetime(self: Observer, t: Time) -> datetime | None:
+    """
+    Converts an astropy Time object to a localized python datetime object
+    using the observer's timezone.
+    Handles masked arrays or arrays with a single element.
+    """
+    if t is None:
+        return None
+
+    try:
+        # If it's a masked array or has a mask attribute
+        if hasattr(t, "mask") and np.any(t.mask):
+            return None
+
+        dt = t.to_datetime(timezone=self.timezone)
+
+        # If it returned an array (e.g. from a length-1 Time object)
+        if isinstance(dt, np.ndarray | list):
+            if len(dt) > 0:
+                # Handle masked numpy array of objects
+                val = dt[0]
+                if pd.isna(val):
+                    return None
+                return val
+            return None
+
+        if pd.isna(dt):
+            return None
+
+        return dt
+    except Exception:
+        return None
+
+
+# Monkey-patch astroplan.Observer to include our utility method
+Observer.astropy_time_to_datetime = astropy_time_to_datetime
 
 
 class ObservationLocation(BaseModel):
     """
-    Represents a location for astronomical observations, including latitude, longitude, and timezone, backed by our database
+    Represents a location for astronomical observations, including
+    latitude, longitude, and timezone, backed by our database
     """
 
     id: int | None = None
@@ -28,7 +74,9 @@ class ObservationLocation(BaseModel):
     @model_validator(mode="after")
     def resolve_missing_timezone(self) -> ObservationLocation:
         if not self.timezone:
-            self.timezone = get_tz_name(latitude=self.latitude, longitude=self.longitude)
+            self.timezone = get_tz_name(
+                latitude=self.latitude, longitude=self.longitude
+            )
         return self
 
     @field_validator("timezone")
@@ -56,7 +104,9 @@ class ObservationLocation(BaseModel):
             height=self.elevation_m * u.m,
         )
 
-        tz = self.timezone or get_tz_name(latitude=self.latitude, longitude=self.longitude)
+        tz = self.timezone or get_tz_name(
+            latitude=self.latitude, longitude=self.longitude
+        )
         return Observer(location=location, name=self.name, timezone=tz)
 
     def is_blocked(self, az: float, alt: float) -> bool:

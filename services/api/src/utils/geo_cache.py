@@ -50,7 +50,8 @@ class GeoCacheService:
         self, latitude: float, longitude: float, fetch_date: date | None = None
     ) -> Path:
         """
-        returns the path for a 15-day weather forecast cache file for the given location,
+        returns the path for a 15-day weather forecast
+        cache file for the given location,
         partitioned by location and the "as_of" fetch date
         :param latitude:
         :param longitude:
@@ -69,7 +70,8 @@ class GeoCacheService:
 
     def get_latest_weather_path(self, latitude: float, longitude: float) -> Path | None:
         """
-        returns the path for the latest weather forecast cache file for the given location,
+        returns the path for the latest weather forecast
+        cache file for the given location,
         partitioned by location and the "as_of" fetch date
         :param latitude:
         :param longitude:
@@ -92,7 +94,8 @@ class GeoCacheService:
         self, latitude: float, longitude: float, forecasts: list[ForecastData]
     ) -> None:
         """
-        saves the given weather forecasts to the cache, partitioned by location and the "as_of" fetch date
+        saves the given weather forecasts to the cache,
+        partitioned by location and the "as_of" fetch date
         :param latitude:
         :param longitude:
         :param forecasts:
@@ -112,7 +115,8 @@ class GeoCacheService:
         self, latitude: float, longitude: float, ttl_seconds: int = 3600
     ) -> pd.DataFrame | None:
         """
-        returns the latest weather forecast for the given location, if it is within the given ttl_seconds
+        returns the latest weather forecast for the given
+        location, if it is within the given ttl_seconds
         :param latitude:
         :param longitude:
         :param ttl_seconds:
@@ -125,7 +129,9 @@ class GeoCacheService:
         # TTL Check
         mtime = path.stat().st_mtime
         if (time.time() - mtime) > ttl_seconds:
-            logger.debug(f"weather forecast for {latitude}, {longitude} is stale, removing")
+            logger.debug(
+                f"weather forecast for {latitude}, {longitude} is stale, removing"
+            )
             # TODO: should we also delete the file(s)?
             return None
 
@@ -167,12 +173,14 @@ class GeoCacheService:
                     if as_of_date < cutoff_date:
                         try:
                             logger.info(
-                                f"removing stale weather forecast cache for {loc_dir.name} as of {as_of_date}"
+                                "removing stale weather forecast cache for "
+                                f"{loc_dir.name} as of {as_of_date}"
                             )
                             shutil.rmtree(as_of_dir)
-                        except Exception as e:
+                        except Exception:
                             logger.error(
-                                f"error removing stale weather forecast cache for {loc_dir.name} as of {as_of_date}: {e}"
+                                "removing stale weather forecast cache for "
+                                f"{loc_dir.name} as of {as_of_date}"
                             )
                 except (IndexError, ValueError):
                     logger.warning(

@@ -10,11 +10,11 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
+# dist/  <-- Commented out to allow JS dist folders if needed, or manage per-service
 downloads/
 eggs/
 .eggs/
-lib/
+# lib/   <-- Removed to prevent ignoring JS src/lib folders
 lib64/
 parts/
 sdist/
@@ -182,9 +182,9 @@ cython_debug/
 .abstra/
 
 # Visual Studio Code
-#  Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore 
+#  Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore
 #  that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
-#  and can be added to the global gitignore or merged into this file. However, if you prefer, 
+#  and can be added to the global gitignore or merged into this file. However, if you prefer,
 #  you could uncomment the following to ignore the entire vscode folder
 # .vscode/
 
@@ -208,3 +208,13 @@ __marimo__/
 config.yaml
 **/uv.lock
 scratch/
+mockups/
+
+# Project Documentation (Local Only)
+/*.md
+!/README.md
+
+# Database Files
+stairs.db
+**/stairs.db
+*.db

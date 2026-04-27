@@ -46,20 +46,25 @@ class DuckSession:
 
     def _refresh_views(self) -> None:
         """
-        refreshes the views in the database to ensure they point to the latest parquet files
+        refreshes the views in the database to ensure they point to the
+        latest parquet files
         :return:
         """
         self.conn.execute(
-            f"CREATE OR REPLACE VIEW targets AS SELECT * FROM read_parquet('{TARGETS_PATHS}')"
+            "CREATE OR REPLACE VIEW targets AS "
+            f"SELECT * FROM read_parquet('{TARGETS_PATHS}')"
         )
         self.conn.execute(
-            f"CREATE OR REPLACE VIEW profiles AS SELECT * FROM read_parquet('{TELESCOPE_PROFILES_PATH}')"
+            "CREATE OR REPLACE VIEW profiles AS "
+            f"SELECT * FROM read_parquet('{TELESCOPE_PROFILES_PATH}')"
         )
         self.conn.execute(
-            f"CREATE OR REPLACE VIEW catalog_metadata AS SELECT * FROM read_parquet('{METADATA_PATH}')"
+            "CREATE OR REPLACE VIEW catalog_metadata AS "
+            f"SELECT * FROM read_parquet('{METADATA_PATH}')"
         )
         self.conn.execute(
-            f"CREATE OR REPLACE VIEW locations AS SELECT * FROM read_parquet('{LOCATIONS_PATH}')"
+            "CREATE OR REPLACE VIEW locations AS "
+            f"SELECT * FROM read_parquet('{LOCATIONS_PATH}')"
         )
 
     def get_connection(self) -> DuckDBPyConnection:

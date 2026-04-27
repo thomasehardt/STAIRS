@@ -1,7 +1,10 @@
-import astropy.units as u
-import duckdb
+from datetime import UTC
+
 import numpy as np
+import pandas as pd
+from astropy import units as u
 from astropy.time import Time
+from duckdb import DuckDBPyConnection
 from fastapi import APIRouter, Depends, HTTPException
 from src.api.schemas import (
     FovFit,
@@ -11,6 +14,7 @@ from src.api.schemas import (
     TargetSearchItem,
     TargetSearchResponse,
 )
+from src.astro_logic.visibility import safe_round
 from src.catalog.catalog_models import TargetRecord
 from src.catalog.duck_service import DuckCatalogService
 from src.db.duck_session import get_duck_db
@@ -21,22 +25,37 @@ router = APIRouter()
 
 @router.get("/search", response_model=TargetSearchResponse)
 async def search_targets(
-    q: str, limit: int = 50, db: duckdb.DuckDBPyConnection = Depends(get_duck_db)
+    q: str = "",
+    target_type: str | None = None,
+    constellation: str | None = None,
+    max_magnitude: float | None = None,
+    limit: int = 50,
+    db: DuckDBPyConnection = Depends(get_duck_db),
 ) -> TargetSearchResponse:
-    """Search for targets by name or identifier."""
+    """Search for targets by name or identifier with optional filters."""
     service = DuckCatalogService(db)
-    df = service.search_targets(q, limit)
+    df = service.search_targets(
+        query=q,
+        target_type=target_type,
+        constellation=constellation,
+        max_magnitude=max_magnitude,
+        limit=limit,
+    )
 
-    results = [
-        TargetSearchItem(
-            identifier=row["identifier"],
-            common_name=row["common_name"],
-            target_type=row["target_type"],
-            constellation=row["constellation"],
-            magnitude=row["magnitude"],
-        )
-        for _, row in df.iterrows()
-    ]
+    # More robust NaN handling
+    results = []
+    for _, row in df.iterrows():
+        # Convert row to dict and replace NaN with None safely
+        row_dict = row.to_dict()
+        d = {}
+        for k, v in row_dict.items():
+            if isinstance(v, list | np.ndarray):
+                d[k] = v
+            elif pd.isna(v):
+                d[k] = None
+            else:
+                d[k] = v
+        results.append(TargetSearchItem(**d))
 
     return TargetSearchResponse(results=results, total_found=len(results))
 
@@ -45,7 +64,7 @@ async def search_targets(
 async def get_target_detail(
     target_id: str,
     profile_name: str | None = None,
-    db: duckdb.DuckDBPyConnection = Depends(get_duck_db),
+    db: DuckDBPyConnection = Depends(get_duck_db),
 ) -> TargetDetail:
     """Get detailed information for a single target."""
     service = DuckCatalogService(db)
@@ -58,7 +77,8 @@ async def get_target_detail(
 
     # get our observation history for this object
     history_df = db.execute(
-        "SELECT COUNT(*) as count, MAX(session_date) as last_date FROM observation_logs WHERE target_id = ?",
+        "SELECT COUNT(*) as count, MAX(session_date) as last_date "
+        "FROM observation_log WHERE target_id = ?",
         [target_id],
     ).df()
 
@@ -124,7 +144,7 @@ async def get_target_position(
     longitude: float,
     start_time: str,
     hours: float = 8.0,
-    db: duckdb.DuckDBPyConnection = Depends(get_duck_db),
+    db: DuckDBPyConnection = Depends(get_duck_db),
 ) -> TargetPositionSeries:
     """Generate a time-series of positions (Alt/Az) for a target."""
     service = DuckCatalogService(db)
@@ -155,11 +175,16 @@ async def get_target_position(
 
     altaz = observer.altaz(times, target_coord)
 
-    positions = [
-        PositionPoint(
-            time=t.to_datetime(timezone=UTC), alt_deg=round(aa.alt.deg, 2), az_deg=round(aa.az.deg, 2)
-        )
-        for t, aa in zip(times, altaz, strict=False)
-    ]
+    positions = []
+    for t, aa in zip(times, altaz, strict=False):
+        dt = observer.astropy_time_to_datetime(t)
+        if dt:
+            positions.append(
+                PositionPoint(
+                    time=dt,
+                    alt_deg=safe_round(aa.alt.deg, 2),
+                    az_deg=safe_round(aa.az.deg, 2),
+                )
+            )
 
     return TargetPositionSeries(identifier=target_id, positions=positions)

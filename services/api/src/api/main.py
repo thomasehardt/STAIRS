@@ -4,6 +4,7 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from src.api.routers import (
     catalogs,
@@ -43,6 +44,20 @@ app = FastAPI(
     description="REST API for deep-sky photography planning and scheduling.",
     version="0.1.0",
     lifespan=lifespan,
+)
+
+# Configure CORS
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # allow EVERYTHING for local dev
+    allow_credentials=False,  # this MUST be False if using "*" above
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(planner.router, prefix="/plan", tags=["planner"])

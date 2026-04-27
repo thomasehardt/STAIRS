@@ -3,7 +3,14 @@
   "title": "Telescope",
   "description": "A smart telescope configuration",
   "type": "object",
-  "required": ["name", "aperture_mm", "focal_length_mm", "sensor_x", "sensor_y", "pixel_pitch_um"],
+  "required": [
+    "name",
+    "aperture_mm",
+    "focal_length_mm",
+    "sensor_x",
+    "sensor_y",
+    "pixel_pitch_um"
+  ],
   "properties": {
     "name": {
       "type": "string",

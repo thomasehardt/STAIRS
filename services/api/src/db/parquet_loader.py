@@ -81,6 +81,15 @@ def load_data_to_parquet() -> None:
 
         if all_targets:
             df = pd.DataFrame(all_targets)
+
+            # ensure angular_size is always float list to avoid schema mismatch
+            if "angular_size" in df.columns:
+                df["angular_size"] = df["angular_size"].apply(
+                    lambda x: (
+                        [float(v) for v in x] if isinstance(x, list | tuple) else []
+                    )
+                )
+
             df.to_parquet(TARGETS_OUT, partition_cols=["catalog_id"], engine="pyarrow")
         else:
             empty_df = pd.DataFrame(
@@ -122,7 +131,9 @@ def load_data_to_parquet() -> None:
                 telescope_profiles.append(profile.model_dump())
 
         if telescope_profiles:
-            pd.DataFrame(telescope_profiles).to_parquet(TELESCOPES_OUT, engine="pyarrow")
+            pd.DataFrame(telescope_profiles).to_parquet(
+                TELESCOPES_OUT, engine="pyarrow"
+            )
         else:
             pd.DataFrame(
                 columns=[
@@ -164,7 +175,8 @@ def load_data_to_parquet() -> None:
                     raw_locations[0]["is_default"] = True
                     if len(raw_locations) > 1:
                         logger.warning(
-                            f"no default location specified, using first location in config file ({raw_locations[0]['name']})"
+                            "no default location specified, using first location "
+                            f"in config file ({raw_locations[0]['name']})"
                         )
 
                 for location in raw_locations:
@@ -178,7 +190,9 @@ def load_data_to_parquet() -> None:
                         logger.error(f"error loading location from config file: {e}")
 
         if validated_locations:
-            pd.DataFrame(validated_locations).to_parquet(LOCATIONS_OUT, engine="pyarrow")
+            pd.DataFrame(validated_locations).to_parquet(
+                LOCATIONS_OUT, engine="pyarrow"
+            )
         else:
             # write an empty file
             pd.DataFrame(
