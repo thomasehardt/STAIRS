@@ -1,0 +1,8 @@
+{
+  "name"           :  "DWARF 3",
+  "aperture_mm"    :  35,
+  "focal_length_mm":  150,
+  "sensor_x"       :  3840,
+  "sensor_y"       :  2160,
+  "pixel_pitch_um" :  2.0
+}

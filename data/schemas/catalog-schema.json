@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Normalized Sky Catalog Schema",
+  "type": "object",
+  "required": ["catalog_id", "name", "metadata", "records"],
+  "properties": {
+    "catalog_id": { "type": "string" },
+    "name": { "type": "string" },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "object",
+          "properties": {
+            "summary": { "type": "string" },
+            "author": { "type": "string" },
+            "source": { "type": "string" },
+            "url": { "type": "string", "format": "uri" }
+          }
+        }
+      }
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "identifier",
+          "right_ascension",
+          "declination",
+          "type",
+          "sub_type",
+          "magnitude",
+          "size",
+          "distance",
+          "constellation",
+          "season",
+          "common_name"
+        ],
+        "properties": {
+          "identifier": { "type": "string" },
+          "right_ascension": {
+            "type": "number",
+            "description": "Right Ascension in decimal hours (J2000)."
+          },
+          "declination": {
+            "type": "number",
+            "description": "Declination in decimal degrees (J2000)."
+          },
+          "identifiers": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "type": {
+            "type": "string",
+            "enum": ["Galaxy", "Nebula", "Star Cluster", "Star", "Other"]
+          },
+          "sub_type": {
+            "type": "string",
+            "enum": [
+              "Spiral", "Barred Spiral", "Elliptical", "Lenticular", "Irregular", "Starburst",
+              "Emission", "Reflection", "Dark", "Planetary", "Supernova Remnant",
+              "Open", "Globular",
+              "Asterism", "Single Star", "Double Star"
+            ]
+          },
+          "magnitude": { "type": "number" },
+          "size": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": { "type": "number" },
+            "description": "Dimensions in arcminutes."
+          },
+          "distance": { "type": "number", "description": "Light Years." },
+          "constellation": { "type": "string" },
+          "season": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": ["spring", "summer", "autumn", "winter"]
+            },
+            "description": "Seasons where the object is prominently visible in the evening sky."
+          },
+          "common_name": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

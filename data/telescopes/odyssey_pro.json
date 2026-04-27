@@ -1,0 +1,8 @@
+{
+  "name"           :  "Odyssey / Pro",
+  "aperture_mm"    :  85,
+  "focal_length_mm":  320,
+  "sensor_x"       :  2704,
+  "sensor_y"       :  1520,
+  "pixel_pitch_um" :  1.45
+}

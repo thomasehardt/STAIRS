@@ -1,0 +1,8 @@
+{
+  "name"           :  "DWARF II",
+  "aperture_mm"    :  24,
+  "focal_length_mm":  100,
+  "sensor_x"       :  3840,
+  "sensor_y"       :  2160,
+  "pixel_pitch_um" :  1.45
+}

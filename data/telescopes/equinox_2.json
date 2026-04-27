@@ -1,0 +1,8 @@
+{
+  "name"           :  "eQuinox 2",
+  "aperture_mm"    :  114,
+  "focal_length_mm":  450,
+  "sensor_x"       :  3072,
+  "sensor_y"       :  2048,
+  "pixel_pitch_um" :  2.9
+}
