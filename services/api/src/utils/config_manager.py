@@ -76,8 +76,8 @@ class ConfigManager:
                 continue
 
             if key in ["planning", "integrations", "logging"]:
-                # planning, integrations and logging are special cases, where we want to merge
-                # the entire section
+                # planning, integrations and logging are special cases,
+                # where we want to merge the entire section
                 if isinstance(value, dict):
                     # ensure the section already exists
                     if key not in current_config or not isinstance(

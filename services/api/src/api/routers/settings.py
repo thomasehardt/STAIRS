@@ -21,7 +21,8 @@ async def get_settings() -> AppConfig:
 @router.patch("/", response_model=AppConfig)
 async def update_settings(update: SettingsUpdate) -> AppConfig:
     """
-    updates the application configuration, triggering a lakehouse refresh if locations are modified
+    updates the application configuration, triggering a lakehouse refresh
+    if locations are modified
     :param update: the fields to update
     :return: the updated application configuration
     """

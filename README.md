@@ -28,31 +28,30 @@ A lot of apps will tell you _what_ is in the sky, but not how to build an effici
 
 ### Installation
 
-1. Clone the repository:  
+1. Clone the repository:
     git clone https://github.com/thomasehardt/STAIRS.git
-1. navigate to the directory  
+1. navigate to the directory
     cd STAIRS
-1. Create your own configuration file  
+1. Create your own configuration file
     cp .config.yaml.EXAMPLE config.yaml
 1. Edit config.yaml and update the information accordingly (the example config is well-documented)
 
 ### Running the application
 
-1. Start the API layer  
+1. Start the API layer
     docker compose up -d
-2. Run the cli (note: this will spin up a container and exit it once done) 
+2. Run the cli (note: this will spin up a container and exit it once done)
     docker compose run --rm -it cli
 
 ## Usage
 
 Once started, the API layer will initialize a cache to store ephemeris and weather data. If you go to http://localhost:8000, you will be presented with the Swagger API page. This can be used to test and verify the application is working.
 
-Alternatively, you can check the status (among many other things) with the cli:  
+Alternatively, you can check the status (among many other things) with the cli:
     docker compose run --rm -it cli status
 
-For help with the cli application, there's a very useful help function:  
+For help with the cli application, there's a very useful help function:
     docker compose run --rm -it cli --help
 
-It is recommended that you create an alias for running the cli ... on Mac/Linux:  
+It is recommended that you create an alias for running the cli ... on Mac/Linux:
     alias stairs-cli="docker compose run --rm -it cli"
-

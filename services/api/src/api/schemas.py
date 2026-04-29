@@ -29,6 +29,7 @@ def get_plan_example() -> dict:
         "bortle_scale": default_loc.get("bortle_scale"),
     }
 
+
 class PlanRequest(BaseModel):
     latitude: float | None = None
     longitude: float | None = None
@@ -139,6 +140,7 @@ class TargetDetail(BaseModel):
     last_observed: date | None = None
     observation_count: int | None = None
 
+
 class ForecastDay(BaseModel):
     date: str  # ISO-8601 format
     astronomical_night_start: datetime | None = None
@@ -149,6 +151,7 @@ class ForecastDay(BaseModel):
     relative_quality: float = 0.0
     absolute_quality: float = 0.0
     note: str | None = None
+
 
 class ForecastResponse(BaseModel):
     location_name: str
@@ -243,10 +246,12 @@ class WeatherSettings(BaseModel):
     provider: str = "dummy"
     api_key: str | None = None
 
+
 class LoggingSettings(BaseModel):
     level: str = "INFO"
     max_size_mb: int = 10
     backup_count: int = 5
+
 
 class IntegrationsSettings(BaseModel):
     weather: WeatherSettings
@@ -266,6 +271,7 @@ class SettingsUpdate(BaseModel):
     integrations: IntegrationsSettings | None = None
     logging: LoggingSettings | None = None
 
+
 class ForecastData(TypedDict):
     """
     defines the structure of a single weather forecast data point for a specific
@@ -281,6 +287,3 @@ class ForecastData(TypedDict):
     wind_direction_deg: float | None
     humidity_pct: float | None
     seeing: float | None
-
-
-

@@ -12,7 +12,8 @@ from src.utils.geo import get_tz_name
 
 class ObservationLocation(BaseModel):
     """
-    Represents a location for astronomical observations, including latitude, longitude, and timezone, backed by our database
+    Represents a location for astronomical observations, including
+    latitude, longitude, and timezone, backed by our database
     """
 
     id: int | None = None
@@ -28,7 +29,9 @@ class ObservationLocation(BaseModel):
     @model_validator(mode="after")
     def resolve_missing_timezone(self) -> ObservationLocation:
         if not self.timezone:
-            self.timezone = get_tz_name(latitude=self.latitude, longitude=self.longitude)
+            self.timezone = get_tz_name(
+                latitude=self.latitude, longitude=self.longitude
+            )
         return self
 
     @field_validator("timezone")
@@ -56,7 +59,9 @@ class ObservationLocation(BaseModel):
             height=self.elevation_m * u.m,
         )
 
-        tz = self.timezone or get_tz_name(latitude=self.latitude, longitude=self.longitude)
+        tz = self.timezone or get_tz_name(
+            latitude=self.latitude, longitude=self.longitude
+        )
         return Observer(location=location, name=self.name, timezone=tz)
 
     def is_blocked(self, az: float, alt: float) -> bool:

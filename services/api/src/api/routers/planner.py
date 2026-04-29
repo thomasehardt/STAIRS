@@ -234,7 +234,10 @@ async def get_target_opportunity_series(
     db: duckdb.DuckDBPyConnection = Depends(get_duck_db),
     weather_service: WeatherService | None = Depends(get_weather_service),
 ) -> TargetOpportunitySeries:
-    """Generate a high-resolution time-series of altitude and quality scores for a target."""
+    """
+    Generate a high-resolution time-series of altitude and quality scores
+    for a target.
+    """
     catalog_service = DuckCatalogService(db)
 
     profile = catalog_service.get_profile_by_name(telescope_profile_name)
@@ -285,7 +288,6 @@ async def get_target_opportunity_series(
             end_dt=n_end.to_datetime(timezone=UTC),
         )
 
-
     from src.astro_logic.scoring import (
         calculate_oss_vectorized,
         calculate_sqs_vectorized,
@@ -313,7 +315,8 @@ async def get_target_opportunity_series(
             past = [
                 p
                 for p in weather_range
-                if pd.to_datetime(p["timestamp"]).tz_localize(None).replace(tzinfo=UTC) <= mid_dt
+                if pd.to_datetime(p["timestamp"]).tz_localize(None).replace(tzinfo=UTC)
+                <= mid_dt
             ]
             weather_point = past[-1] if past else weather_range[0]
             w_mult = calculate_weather_score_vectorized(
