@@ -44,6 +44,7 @@ class OpenMeteoWeatherApiClient:
             response = httpx.get(BASE_URL, params=params, timeout=10.0)
             response.raise_for_status()
             data = response.json()
+            logger.debug(f"OpenMeteo response: {data}")
 
             hourly = data.get("hourly", [])
             times = hourly.get("time", [])
