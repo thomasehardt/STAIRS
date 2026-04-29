@@ -1,7 +1,9 @@
-import astropy.units as u
-import duckdb
+from datetime import UTC
+
 import numpy as np
+from astropy import units as u
 from astropy.time import Time
+from duckdb import DuckDBPyConnection
 from fastapi import APIRouter, Depends, HTTPException
 from src.api.schemas import (
     FovFit,
@@ -21,7 +23,7 @@ router = APIRouter()
 
 @router.get("/search", response_model=TargetSearchResponse)
 async def search_targets(
-    q: str, limit: int = 50, db: duckdb.DuckDBPyConnection = Depends(get_duck_db)
+    q: str, limit: int = 50, db: DuckDBPyConnection = Depends(get_duck_db)
 ) -> TargetSearchResponse:
     """Search for targets by name or identifier."""
     service = DuckCatalogService(db)
@@ -45,7 +47,7 @@ async def search_targets(
 async def get_target_detail(
     target_id: str,
     profile_name: str | None = None,
-    db: duckdb.DuckDBPyConnection = Depends(get_duck_db),
+    db: DuckDBPyConnection = Depends(get_duck_db),
 ) -> TargetDetail:
     """Get detailed information for a single target."""
     service = DuckCatalogService(db)
@@ -58,7 +60,8 @@ async def get_target_detail(
 
     # get our observation history for this object
     history_df = db.execute(
-        "SELECT COUNT(*) as count, MAX(session_date) as last_date FROM observation_logs WHERE target_id = ?",
+        "SELECT COUNT(*) as count, MAX(session_date) as last_date "
+        "FROM observation_logs WHERE target_id = ?",
         [target_id],
     ).df()
 
@@ -124,7 +127,7 @@ async def get_target_position(
     longitude: float,
     start_time: str,
     hours: float = 8.0,
-    db: duckdb.DuckDBPyConnection = Depends(get_duck_db),
+    db: DuckDBPyConnection = Depends(get_duck_db),
 ) -> TargetPositionSeries:
     """Generate a time-series of positions (Alt/Az) for a target."""
     service = DuckCatalogService(db)
@@ -157,7 +160,9 @@ async def get_target_position(
 
     positions = [
         PositionPoint(
-            time=t.to_datetime(timezone=UTC), alt_deg=round(aa.alt.deg, 2), az_deg=round(aa.az.deg, 2)
+            time=t.to_datetime(timezone=UTC),
+            alt_deg=round(aa.alt.deg, 2),
+            az_deg=round(aa.az.deg, 2),
         )
         for t, aa in zip(times, altaz, strict=False)
     ]

@@ -47,7 +47,8 @@ class WeatherService:
 
         if df is None:
             logger.info(
-                f"no cached weather forecast found for {latitude}, {longitude}, calling API"
+                "no cached weather forecast found for {latitude}, {longitude}, "
+                "calling API"
             )
             try:
                 forecasts = self.weather_api_client.fetch_forecast(
@@ -65,7 +66,9 @@ class WeatherService:
                 if "timestamp" in df.columns:
                     df["timestamp"] = pd.to_datetime(df["timestamp"])
             except Exception as e:
-                logger.error(f"error fetching weather forecast for {latitude}, {longitude}: {e}")
+                logger.error(
+                    f"error fetching weather forecast for {latitude}, {longitude}: {e}"
+                )
                 return None
 
         # update our in-memory cache
@@ -104,7 +107,8 @@ class WeatherService:
         if past_points.empty:
             best_row = df.iloc[0]
             logger.warning(
-                f"requested timestamp {dt} is before any forecast data, using first available"
+                "requested timestamp {dt} is before any forecast data, "
+                "using first available"
             )
         else:
             best_row = past_points.iloc[-1]
@@ -133,7 +137,9 @@ class WeatherService:
             logger.warning(f"timezone not set for {end_dt}, setting to UTC")
             end_dt = end_dt.replace(tzinfo=UTC)
 
-        df = self._get_active_forecast_df(latitude=latitude, longitude=longitude, dt=start_dt)
+        df = self._get_active_forecast_df(
+            latitude=latitude, longitude=longitude, dt=start_dt
+        )
         if df is None or df.empty:
             return []
 
@@ -143,7 +149,9 @@ class WeatherService:
 
         if range_df.empty:
             # try to get at least the single point for the start_time
-            point = self.get_forecast(latitude=latitude, longitude=longitude, dt=start_dt)
+            point = self.get_forecast(
+                latitude=latitude, longitude=longitude, dt=start_dt
+            )
             return [point] if point else []
 
         return range_df.to_dict(orient="records")

@@ -13,7 +13,8 @@ class OpenMeteoWeatherApiClient:
     def __init__(self, api_key: str | None = None) -> None:
         if not api_key:
             logger.info(
-                "No OpenMeteo API key provided, using default API which might have fewer features"
+                "No OpenMeteo API key provided, using default API "
+                "which might have fewer features"
             )
         self.api_key = api_key
 
@@ -28,14 +29,16 @@ class OpenMeteoWeatherApiClient:
         params = {
             "latitude": latitude,
             "longitude": longitude,
-            "hourly": ",".join([
-                "temperature_2m",
-                "relative_humidity_2m",
-                "precipitation",
-                "cloud_cover",
-                "wind_speed_10m",
-                "wind_direction_10m",
-            ]),
+            "hourly": ",".join(
+                [
+                    "temperature_2m",
+                    "relative_humidity_2m",
+                    "precipitation",
+                    "cloud_cover",
+                    "wind_speed_10m",
+                    "wind_direction_10m",
+                ]
+            ),
             "timezone": "UTC",
             "forecast_days": 14,
         }

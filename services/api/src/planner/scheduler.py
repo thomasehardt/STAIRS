@@ -37,7 +37,9 @@ class NightScheduler:
         night_window = get_astronomical_night(observer, start_time)
         if not night_window:
             logger.warning(
-                f"no night window found for latitude/longitude {self.location.latitude}, {self.location.longitude} at {start_time}"
+                "no night window found for latitude/longitude "
+                f"{self.location.latitude}, {self.location.longitude} "
+                f"at {start_time}"
             )
             return {
                 "astronomical_night_start": None,
@@ -52,14 +54,18 @@ class NightScheduler:
         targets_df = self.catalog_service.conn.execute("SELECT * FROM targets").df()
 
         latitude = self.location.latitude
-        targets_df["theoretical_max_alt"] = 90.0 - np.abs(latitude - targets_df["dec_deg"])
+        targets_df["theoretical_max_alt"] = 90.0 - np.abs(
+            latitude - targets_df["dec_deg"]
+        )
         targets_df = targets_df[
             targets_df["theoretical_max_alt"] > (min_alt - 5.0)
         ].copy()
 
         if targets_df.empty:
             logger.warning(
-                f"no targets found for latitude/longitude {self.location.latitude}, {self.location.longitude} at {start_time}"
+                "no targets found for latitude/longitude "
+                f"{self.location.latitude}, {self.location.longitude} "
+                f"at {start_time}"
             )
             return {
                 "astronomical_night_start": night_start.to_datetime(),
@@ -144,7 +150,10 @@ class NightScheduler:
                 past = [
                     p
                     for p in weather_range
-                    if pd.to_datetime(p["timestamp"]).tz_localize(None).replace(tzinfo=UTC) <= mid_dt
+                    if pd.to_datetime(p["timestamp"])
+                    .tz_localize(None)
+                    .replace(tzinfo=UTC)
+                    <= mid_dt
                 ]
                 weather_point = past[-1] if past else weather_range[0]
                 w_mult = calculate_weather_score_vectorized(
@@ -260,8 +269,12 @@ class NightScheduler:
                     "aqs_score": round(float(data["aqs"]), 1),
                     "sqs_score": round(float(data["sqs"]), 1),
                     "final_score": round(float(data["final"]), 1),
-                    "visible_start": window[0].to_datetime(timezone=UTC) if window else None,
-                    "visible_end": window[1].to_datetime(timezone=UTC) if window else None,
+                    "visible_start": window[0].to_datetime(timezone=UTC)
+                    if window
+                    else None,
+                    "visible_end": window[1].to_datetime(timezone=UTC)
+                    if window
+                    else None,
                 }
             )
 

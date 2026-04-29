@@ -1,18 +1,18 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 
 import httpx
 import pytz
 import typer
+from cli.config import API_URL
 from rich.console import Console
 from rich.table import Table
-
-from cli.config import API_URL
 
 app = typer.Typer(
     help="STAIRS CLI",
     add_completion=False,
 )
 console = Console()
+
 
 @app.command()
 def status():
@@ -25,12 +25,16 @@ def status():
             response.raise_for_status()
 
         console.print(
-            f"[bold green]\u2713[/bold green] API is online at {API_URL} (Status: {response.status_code})"
+            f"[bold green]✓[/bold green] API is online at {API_URL} "
+            f"(Status: {response.status_code})"
         )
     except Exception as e:
-        console.print(f"[bold red]\u2717[/bold red] Could not connect to API on {API_URL}")
+        console.print(
+            f"[bold red]\u2717[/bold red] Could not connect to API on {API_URL}"
+        )
         console.print(f"[red]Error: {str(e)}[/red]")
         raise typer.Exit(code=1)
+
 
 @app.command()
 def version():
@@ -38,6 +42,7 @@ def version():
     Show the version of the CLI
     """
     console.print("STAIRS CLI [bold cyan]v0.1.0[/bold cyan]")
+
 
 @app.command()
 def locations():
@@ -82,6 +87,7 @@ def locations():
 
     console.print(table)
 
+
 @app.command()
 def telescopes():
     """
@@ -121,6 +127,7 @@ def telescopes():
 
     console.print(table)
 
+
 @app.command()
 def catalogs():
     """
@@ -157,13 +164,22 @@ def catalogs():
 
     console.print(table)
 
+
 @app.command()
 def weather(
     days: int = typer.Option(
-        1, "--days", "-d", help="Number of days to forecast.", min=1, max=14,
+        1,
+        "--days",
+        "-d",
+        help="Number of days to forecast.",
+        min=1,
+        max=14,
     ),
     location: str | None = typer.Option(
-        None, "--location", "-l", help="Name of the location to use (overrides default)",
+        None,
+        "--location",
+        "-l",
+        help="Name of the location to use (overrides default)",
     ),
 ):
     """
@@ -181,13 +197,16 @@ def weather(
         if location:
             target_loc = next(
                 (
-                    loc for loc in locations if loc.get("name").lower() == location.lower()
+                    loc
+                    for loc in locations
+                    if loc.get("name").lower() == location.lower()
                 ),
                 None,
             )
             if not target_loc:
                 console.print(
-                    f"[bold red]Error:[/bold red] Location '{location}' not found in settings."
+                    f"[bold red]Error:[/bold red] Location '{location}' "
+                    "not found in settings."
                 )
                 raise typer.Exit(code=1)
         else:
@@ -196,9 +215,12 @@ def weather(
                 if locations:
                     target_loc = locations[0]
                 else:
-                    console.print("[bold red]Error:[/bold red] No locations configured in settings.")
+                    console.print(
+                        "[bold red]Error:[/bold red] No locations configured "
+                        "in settings."
+                    )
                     raise type.Exit(code=1)
-                    
+
         latitude = target_loc["latitude"]
         longitude = target_loc["longitude"]
         name = target_loc["name"]
@@ -211,9 +233,15 @@ def weather(
             )
             tz_name = loc_detail.get("timezone", "UTC")
 
-        console.print(f"Fetching [bold cyan]{days}-day[/bold cyan] weather forecast for [bold cyan]{name}[/bold cyan] ({latitude}, {longitude}), [dim]Local Time[/dim]...")
+        console.print(
+            f"Fetching [bold cyan]{days}-day[/bold cyan] weather forecast for "
+            f"[bold cyan]{name}[/bold cyan] ({latitude}, {longitude}), "
+            "[dim]Local Time[/dim]..."
+            f"[bold cyan]{name}[/bold cyan] ({latitude}, {longitude}), "
+            "[dim]Local Time[/dim]..."
+        )
 
-        start = datetime.now(timezone.utc)
+        start = datetime.now(UTC)
         end = start + timedelta(days=days)
 
         with console.status("[bold green]Fetching weather forecast..."):
@@ -237,7 +265,7 @@ def weather(
         table = Table(title=f"{days}-day Weather Forecast: {name}")
         table.add_column("Date", style="dim")
         table.add_column(f"Time ({tz_name})", style="magenta")
-        table.add_column("Temp [\u00B0C]", justify="right")
+        table.add_column("Temp [\u00b0C]", justify="right")
         table.add_column("Clouds [%]", justify="right")
         table.add_column("Precip [mm/h]", justify="right")
         table.add_column("Wind [m/s]", justify="right")
@@ -249,7 +277,7 @@ def weather(
             local_dt = dt_utc.astimezone(pytz.timezone(tz_name))
 
             date_str = local_dt.strftime("%Y-%m-%d")
-            ts= local_dt.strftime("%H:%M")
+            ts = local_dt.strftime("%H:%M")
 
             if last_date and date_str != last_date:
                 table.add_section()
@@ -281,8 +309,6 @@ def weather(
         raise typer.Exit(code=1)
 
 
-
-
 def format_local_time(dt_str: str | datetime | None, tz_name: str | None) -> str:
     """
     converts timestamps to local time in HH:MM format for displaying in a table
@@ -297,7 +323,7 @@ def format_local_time(dt_str: str | datetime | None, tz_name: str | None) -> str
 
     # if dt has no timezone, it "must" be UTC right?
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
+        dt = dt.replace(tzinfo=UTC)
 
     if tz_name:
         try:
@@ -313,13 +339,23 @@ def format_local_time(dt_str: str | datetime | None, tz_name: str | None) -> str
 @app.command()
 def imaging_forecast(
     days: int = typer.Option(
-        7, "--days", "-d", help="Number of nights to forecast.", min=1, max=30,
+        7,
+        "--days",
+        "-d",
+        help="Number of nights to forecast.",
+        min=1,
+        max=30,
     ),
     location: list[str] = typer.Option(
-        None, "--location", "-l", help="Name of the location(s) to use. Use 'all' for all configured locations.",
+        None,
+        "--location",
+        "-l",
+        help="Name of the location(s) to use. Use 'all' for all configured locations.",
     ),
     date: str | None = typer.Option(
-        None, "--date", help="Start date for the forecast (YYYY-MM-DD). Defaults to current date.",
+        None,
+        "--date",
+        help="Start date for the forecast (YYYY-MM-DD). Defaults to current date.",
     ),
 ):
     """
@@ -336,20 +372,27 @@ def imaging_forecast(
             loc_resp = httpx.get(f"{API_URL}/locations/")
             loc_resp.raise_for_status()
             loc_tz_map = {
-                loc["name"]: loc.get("timezone", "UTC") for loc in loc_resp.json()["locations"]
+                loc["name"]: loc.get("timezone", "UTC")
+                for loc in loc_resp.json()["locations"]
             }
 
         target_names = []
         if not location:
             default_loc = next(
                 (
-                    loc["name"] for loc in settings.get("locations", []) if loc.get("default")
+                    loc["name"]
+                    for loc in settings.get("locations", [])
+                    if loc.get("default")
                 ),
-                None
+                None,
             )
 
             target_names = (
-                [default_loc] if default_loc else [next(iter(all_locs.keys()))] if all_locs else []
+                [default_loc]
+                if default_loc
+                else [next(iter(all_locs.keys()))]
+                if all_locs
+                else []
             )
         elif "all" in [loc_name.lower() for loc_name in location]:
             target_names = list(all_locs.keys())
@@ -362,17 +405,17 @@ def imaging_forecast(
                     target_names.append(actual_name)
                 else:
                     console.print(
-                        f"[bold red]Warning:[/bold red] Location '{loc_name}' not found."
+                        f"[bold red]Warning:[/bold red] Location '{loc_name}' "
+                        "not found."
                     )
 
         if not target_names:
             console.print("[bold red]Error:[/bold red] No valid locations selected.")
             raise typer.Exit(code=1)
 
-        console.print(f"[bold green]Locations Chosen[/bold green]:")
+        console.print("[bold green]Locations Chosen[/bold green]:")
         for tn in target_names:
             console.print(f"\t{tn}")
-
 
         for loc_name in target_names:
             tz_name = loc_tz_map.get(loc_name, "UTC")
@@ -411,7 +454,9 @@ def imaging_forecast(
                 )
                 end_str = format_local_time(d.get("astronomical_night_end"), tz_name)
 
-                relative_score = d.get("relative_quality", float(d.get("quality_score", 0)))
+                relative_score = d.get(
+                    "relative_quality", float(d.get("quality_score", 0))
+                )
                 absolute_score = d.get("absolute_quality", 0.0)
 
                 relative_str = f"{relative_score:.0f}%"
@@ -427,7 +472,6 @@ def imaging_forecast(
                     absolute_str = f"[bold green]{absolute_str}[/bold green]"
                 elif absolute_score < 30:
                     absolute_str = f"[bold red]{absolute_str}[/bold red]"
-
 
                 notes = []
                 api_note = d.get("note")
@@ -458,9 +502,11 @@ def imaging_forecast(
 
             console.print(table)
             console.print()
-                    
+
         console.print(
-            "[dim]* Eff. Hrs (Effective Hours) accounts for moon phase and cloud cover.[/dim]"
+            "[dim]* Eff. Hrs (Effective Hours) accounts for moon phase "
+            "and cloud cover.[/dim]"
+            "and cloud cover.[/dim]"
         )
 
     except Exception as e:

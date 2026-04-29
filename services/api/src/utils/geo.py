@@ -16,6 +16,9 @@ def get_tz_name(latitude: float, longitude: float) -> str:
     try:
         tz_name = tzf.timezone_at(lng=longitude, lat=latitude)
         return tz_name or "UTC"
-    except Exception as e:
-        logger.warning(f"error getting timezone for latitude/longitude: {latitude}, {longitude}: {e}")
+    except Exception:
+        logger.warning(
+            "error getting timezone for latitude/longitude: "
+            "{latitude}, {longitude}: {e}"
+        )
         return "UTC"
