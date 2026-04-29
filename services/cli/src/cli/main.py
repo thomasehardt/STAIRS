@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 
 import httpx
 import pytz
@@ -305,6 +304,7 @@ def format_local_time(dt_str: str | datetime | None, tz_name: str | None) -> str
             local_tz = pytz.timezone(tz_name)
             dt = dt.astimezone(local_tz)
         except Exception:
+            # we cannot extract a timezone - continue anyway
             pass
 
     return dt.strftime("%H:%M")
@@ -423,10 +423,11 @@ def imaging_forecast(
                 elif relative_score < 30:
                     relative_str = f"[bold red]{relative_str}[/bold red]"
 
-                if absolute_score >= 0:
+                if absolute_score >= 70:
                     absolute_str = f"[bold green]{absolute_str}[/bold green]"
                 elif absolute_score < 30:
                     absolute_str = f"[bold red]{absolute_str}[/bold red]"
+
 
                 notes = []
                 api_note = d.get("note")

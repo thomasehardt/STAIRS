@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from astropy.coordinates import AltAz, SkyCoord, get_body
 from astropy.time import Time, TimeDelta
-from src.astro_logic.visibility import get_astronomical_night, get_peak_altitudes
+from src.astro_logic.visibility import get_astronomical_night
 from src.db.duck_session import get_duck_db
 from src.planner.planner_models import ObservationLocation
 from src.utils.geo_cache import GeoCacheService

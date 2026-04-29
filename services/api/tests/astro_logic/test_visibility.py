@@ -1,7 +1,7 @@
 from unittest import TestCase
 import astropy.units as u
 import numpy as np
-from astroplan import Observer, observer
+from astroplan import Observer
 from astropy.coordinates import SkyCoord
 from astropy.time import Time
 from src.astro_logic.visibility import (

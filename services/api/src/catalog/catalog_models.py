@@ -240,6 +240,7 @@ class TargetRecord(BaseModel):
             if pd.isna(v):
                 return None
         except (ImportError, TypeError):
+            # something other than isna - we just assume it's skippable
             pass
         return v
 
