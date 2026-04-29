@@ -34,4 +34,3 @@ logging:
   level: INFO
   max_size_mb: 10
   backup_count: 5
-

@@ -1,7 +1,8 @@
 from unittest import TestCase
+
 import astropy.units as u
 import numpy as np
-from astroplan import Observer, observer
+from astroplan import Observer
 from astropy.coordinates import SkyCoord
 from astropy.time import Time
 from src.astro_logic.visibility import (
@@ -10,11 +11,7 @@ from src.astro_logic.visibility import (
     get_peak_altitudes,
 )
 
-orion_nebula = {
-    "ra": "05h35m17s",
-    "dec": "−05d23m28s",
-    "expected_peak": 33.1
-}
+orion_nebula = {"ra": "05h35m17s", "dec": "−05d23m28s", "expected_peak": 33.1}
 
 andromeda_galaxy = {
     "ra": "00h42m44s",
@@ -33,6 +30,7 @@ london = Observer(
     longitude=0.1276 * u.deg,
 )
 
+
 class Test(TestCase):
     def test_get_peak_altitude(self) -> None:
         observer = london
@@ -42,23 +40,23 @@ class Test(TestCase):
         time_range = (start_time, end_time)
 
         targets = SkyCoord(
-            ra = [
+            ra=[
                 orion_nebula["ra"],
                 andromeda_galaxy["ra"],
                 sagittarius_cluster["ra"],
             ],
-            dec = [
+            dec=[
                 orion_nebula["dec"],
                 andromeda_galaxy["dec"],
                 sagittarius_cluster["dec"],
             ],
-            frame = "icrs",
+            frame="icrs",
         )
 
         calculated_peaks = get_peak_altitudes(
-            observer = observer,
-            time_range = time_range,
-            targets = targets,
+            observer=observer,
+            time_range=time_range,
+            targets=targets,
         )
 
         self.assertEqual(calculated_peaks.shape, (3,))
@@ -68,17 +66,15 @@ class Test(TestCase):
             np.all(calculated_peaks >= -90) and np.all(calculated_peaks <= 90)
         )
 
-        expected_peaks = np.array([
-            orion_nebula["expected_peak"],
-            andromeda_galaxy["expected_peak"],
-            sagittarius_cluster["expected_peak"],
-        ])
-
-        np.testing.assert_allclose(
-            calculated_peaks,
-            expected_peaks,
-            atol=0.5
+        expected_peaks = np.array(
+            [
+                orion_nebula["expected_peak"],
+                andromeda_galaxy["expected_peak"],
+                sagittarius_cluster["expected_peak"],
+            ]
         )
+
+        np.testing.assert_allclose(calculated_peaks, expected_peaks, atol=0.5)
 
     def test_get_peak_altitudes_single_target(self) -> None:
         observer = london
@@ -88,9 +84,9 @@ class Test(TestCase):
         time_range = (start_time, end_time)
 
         target = SkyCoord(
-            ra = orion_nebula["ra"],
-            dec = orion_nebula["dec"],
-            frame = "icrs",
+            ra=orion_nebula["ra"],
+            dec=orion_nebula["dec"],
+            frame="icrs",
         )
 
         calculated_peaks = get_peak_altitudes(
@@ -118,9 +114,9 @@ class Test(TestCase):
         time_range = (start_time, end_time)
 
         target = SkyCoord(
-            ra = orion_nebula["ra"],
-            dec = orion_nebula["dec"],
-            frame = "icrs",
+            ra=orion_nebula["ra"],
+            dec=orion_nebula["dec"],
+            frame="icrs",
         )
 
         visible_window = find_visible_window(
@@ -144,7 +140,7 @@ class Test(TestCase):
         self.assertAlmostEqual(
             visible_window[0],
             expected_start_rough,
-            delta = 15 * u.minute,
+            delta=15 * u.minute,
         )
 
         end_time = start_time + 10 * u.hour
@@ -166,9 +162,7 @@ class Test(TestCase):
         self.assertGreaterEqual(visible_start, start_time)
         self.assertLessEqual(visible_end, end_time)
         self.assertAlmostEqual(
-            visible_window[-1],
-            expected_end_rough,
-            delta = 15 * u.minute
+            visible_window[-1], expected_end_rough, delta=15 * u.minute
         )
 
     def test_get_moon_quality(self) -> None:

@@ -182,8 +182,12 @@ class MultiNightPlanner:
                     night_start, night_end, full_weather_range
                 )
 
-                day_data["date"] = night_start.to_datetime(timezone=UTC).date().isoformat()
-                day_data["astronomical_night_start"] = night_start.to_datetime(timezone=UTC)
+                day_data["date"] = (
+                    night_start.to_datetime(timezone=UTC).date().isoformat()
+                )
+                day_data["astronomical_night_start"] = night_start.to_datetime(
+                    timezone=UTC
+                )
                 day_data["astronomical_night_end"] = night_end.to_datetime(timezone=UTC)
                 forecast.append(ForecastDay(**day_data))
 

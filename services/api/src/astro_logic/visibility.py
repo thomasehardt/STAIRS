@@ -215,7 +215,8 @@ def get_peak_altitudes(
     observer: Observer, targets: SkyCoord, time_range: tuple[Time, Time]
 ) -> npt.NDArray[np.float64]:
     """
-    vectorized coarse filter to find the max altitude each target reaches in the given timeframe
+    vectorized coarse filter to find the max altitude each target reaches
+    in the given timeframe
     :param observer:
     :param targets:
     :param time_range:

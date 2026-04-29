@@ -18,9 +18,7 @@ class DummyWeatherApiClient:
     def fetch_forecast(
         self, latitude: float, longitude: float, dt: datetime
     ) -> list[ForecastData]:
-        logger.debug(
-            f"Fetching weather forecast for {latitude}, {longitude} at {dt}"
-        )
+        logger.debug(f"Fetching weather forecast for {latitude}, {longitude} at {dt}")
 
         response_data = self._generate_dummy_api_response_for_range(
             latitude, longitude, dt
@@ -32,7 +30,8 @@ class DummyWeatherApiClient:
                 ts_str = point_data.get("timestamp")
                 if not ts_str:
                     logger.warning(
-                        f"skipping forecast data due to missing timestamp in weather forecast response: {point_data}"
+                        "skipping forecast data due to missing timestamp in "
+                        "weather forecast response: {point_data}"
                     )
                     continue
 
@@ -54,9 +53,10 @@ class DummyWeatherApiClient:
                         seeing=point_data.get("seeing"),
                     )
                 )
-            except ValueError as e:
+            except ValueError:
                 logger.warning(
-                    f"skipping forecast data point due to malformed data: {point_data}, error: {e}"
+                    "skipping forecast data point due to malformed data: "
+                    "{point_data}, error: {e}"
                 )
             except Exception as e:
                 logger.error(
