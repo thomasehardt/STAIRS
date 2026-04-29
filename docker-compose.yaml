@@ -21,3 +21,15 @@ services:
       - HOME=/tmp
     command: [ "uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     restart: unless-stopped
+
+  cli:
+    build:
+      context: ./services/cli
+      dockerfile: Dockerfile
+    container_name: stairs-cli
+    volumes:
+      - ./services/cli/src:/app/src
+    environment:
+      - API_URL=http://api:8000
+    depends_on:
+      - api
