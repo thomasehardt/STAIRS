@@ -189,8 +189,6 @@ class EphemerisManager:
                 logger.info("ephemeris cache is already warm")
         except Exception as e:
             logger.error(f"error during ephemeris cache warming: {e}", exc_info=True)
-        except Exception as e:
-            logger.error(f"error during ephemeris cache warming: {e}", exc_info=True)
 
     def get_cached_peak_altitude(
         self, latitude: float, longitude: float, night_start: Time
