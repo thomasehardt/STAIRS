@@ -1,5 +1,6 @@
 import unittest
-from unittest.mock import MagicMock, TestCase
+from unittest import TestCase
+from unittest.mock import MagicMock
 
 import numpy as np
 import pandas as pd
@@ -12,9 +13,9 @@ class MockTelescopeProfile:
 
 
 class MockForecastData:
-    def __init__(self, cloud_cover_percent=0, humidity=0, seeing=None):
-        self.cloud_cover_percent = cloud_cover_percent
-        self.humidity = humidity
+    def __init__(self, cloud_cover_pct=0, humidity_pct=0, seeing=None):
+        self.cloud_cover_pct = cloud_cover_pct
+        self.humidity_pct = humidity_pct
         self.seeing = seeing
 
     def get(self, key, default=None):
@@ -227,12 +228,12 @@ class TestScoring(TestCase):
         self.assertEqual(scoring.calculate_weather_score(None), 1.0)
 
         weather_data_good = MockForecastData(
-            cloud_cover_percent=10, humidity=50, seeing=1.0
+            cloud_cover_pct=10, humidity_pct=50, seeing=1.0
         )
         self.assertAlmostEqual(scoring.calculate_weather_score(weather_data_good), 1.0)
 
         weather_data_bad = MockForecastData(
-            cloud_cover_percent=60, humidity=90, seeing=3.0
+            cloud_cover_pct=60, humidity_pct=90, seeing=3.0
         )
         self.assertAlmostEqual(scoring.calculate_weather_score(weather_data_bad), 0.0)
 
@@ -297,7 +298,7 @@ class TestScoring(TestCase):
 
         mock_altaz_low = MockAltAz(alt_deg=87.0, az_deg=180.0)
         weather_data_bad = MockForecastData(
-            cloud_cover_percent=70, humidity=90, seeing=3.0
+            cloud_cover_pct=70, humidity_pct=90, seeing=3.0
         )
         self.assertAlmostEqual(
             scoring.calculate_sqs(
@@ -309,7 +310,7 @@ class TestScoring(TestCase):
         )
 
         weather_data_good = MockForecastData(
-            cloud_cover_percent=10, humidity=50, seeing=1.0
+            cloud_cover_pct=10, humidity_pct=50, seeing=1.0
         )
         self.assertAlmostEqual(
             scoring.calculate_sqs(
@@ -503,7 +504,7 @@ class TestScoring(TestCase):
             max_altitude,
             min_target_altitude,
             MockAltAz(alt_deg=45.0, az_deg=90.0),
-            MockForecastData(cloud_cover_percent=10, humidity=50, seeing=1.0),
+            MockForecastData(cloud_cover_pct=10, humidity_pct=50, seeing=1.0),
             bortle_scale=None,
             moon_multiplier=moon_multiplier,
         )
@@ -516,7 +517,7 @@ class TestScoring(TestCase):
             max_altitude,
             min_target_altitude,
             MockAltAz(alt_deg=87.0, az_deg=180.0),
-            MockForecastData(cloud_cover_percent=60, humidity=90, seeing=3.0),
+            MockForecastData(cloud_cover_pct=60, humidity_pct=90, seeing=3.0),
             bortle_scale=None,
             moon_multiplier=1.0,
         )
@@ -529,7 +530,7 @@ class TestScoring(TestCase):
             max_altitude,
             min_target_altitude,
             MockAltAz(alt_deg=45.0, az_deg=90.0),
-            MockForecastData(cloud_cover_percent=10, humidity=50, seeing=1.0),
+            MockForecastData(cloud_cover_pct=10, humidity_pct=50, seeing=1.0),
             bortle_scale=bortle_scale,
             moon_multiplier=1.0,
         )
@@ -542,7 +543,7 @@ class TestScoring(TestCase):
             max_altitude,
             min_target_altitude,
             MockAltAz(alt_deg=87.0, az_deg=180.0),
-            MockForecastData(cloud_cover_percent=60, humidity=90, seeing=3.0),
+            MockForecastData(cloud_cover_pct=60, humidity_pct=90, seeing=3.0),
             bortle_scale=bortle_scale,
             moon_multiplier=1.0,
         )

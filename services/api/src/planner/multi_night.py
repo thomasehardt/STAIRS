@@ -182,20 +182,20 @@ class MultiNightPlanner:
                     night_start, night_end, full_weather_range
                 )
 
-                day_data["date"] = (
-                    night_start.to_datetime(timezone=UTC).date().isoformat()
-                )
-                day_data["astronomical_night_start"] = night_start.to_datetime(
-                    timezone=UTC
-                )
-                day_data["astronomical_night_end"] = night_end.to_datetime(timezone=UTC)
+                local_start = observer.astropy_time_to_datetime(night_start)
+                local_end = observer.astropy_time_to_datetime(night_end)
+
+                day_data["date"] = local_start.date().isoformat()
+                day_data["astronomical_night_start"] = local_start
+                day_data["astronomical_night_end"] = local_end
                 forecast.append(ForecastDay(**day_data))
 
                 loop_time = night_end + TimeDelta(1 * u.hour)
             else:
+                local_loop = observer.astropy_time_to_datetime(loop_time)
                 forecast.append(
                     ForecastDay(
-                        date=loop_time.to_datetime(timezone=UTC).date().isoformat(),
+                        date=local_loop.date().isoformat(),
                         total_dark_hours=0.0,
                         effective_hours=0.0,
                         quality_score=0,

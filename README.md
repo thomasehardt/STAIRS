@@ -1,15 +1,15 @@
 # STAIRS Astro Imaging Run Scheduler
 
-STAIRS is a specialized planning tool designed for astrophotography enthusiasts with smart telescopes (like the [Seestar S50](https://www.seestar.com/products/seestar-s50) to assist with the planning of imaging sessions. It takes into account telescope specifications, target suitability, sky conditions, and user preferences to score objects.
+STAIRS is a specialized planning tool designed for astrophotography enthusiasts with smart telescopes (like the [Seestar S50](https://www.seestar.com/products/seestar-s50)) to assist with the planning of imaging sessions. It takes into account telescope specifications, target suitability, sky conditions, and user preferences to score objects.
 
 ## Overview
 
-A lot of apps will tell you _what_ is in the sky, but not how to build an efficient imaging plan. STAIRS does both as well as optimizing for specific equipment.
+A lot of apps will tell you _what_ is in the sky, but not how to build an efficient imaging plan. STAIRS does both and optimizes for specific equipment.
 
 ## Core Features
 
 - Optimal Window Calculation: Determines the best start/end times for targets based on altitude thresholds and environment.
-- Multi-Target Sequencing: Creates chronological plan to image multiple targets in one session.
+- Multi-Target Sequencing: Creates a chronological plan to image multiple targets in one session.
 - Session Logging: log sessions and document what you have captured
 
 ## Tech Stack
@@ -39,19 +39,22 @@ A lot of apps will tell you _what_ is in the sky, but not how to build an effici
 ### Running the application
 
 1. Start the API layer
-    docker compose up -d
+```docker compose up -d```
 2. Run the cli (note: this will spin up a container and exit it once done)
-    docker compose run --rm -it cli
+```docker compose run --rm -it cli```
 
 ## Usage
 
 Once started, the API layer will initialize a cache to store ephemeris and weather data. If you go to http://localhost:8000, you will be presented with the Swagger API page. This can be used to test and verify the application is working.
 
 Alternatively, you can check the status (among many other things) with the cli:
+
     docker compose run --rm -it cli status
 
 For help with the cli application, there's a very useful help function:
+
     docker compose run --rm -it cli --help
 
 It is recommended that you create an alias for running the cli ... on Mac/Linux:
+
     alias stairs-cli="docker compose run --rm -it cli"

@@ -68,8 +68,10 @@ class NightScheduler:
                 f"at {start_time}"
             )
             return {
-                "astronomical_night_start": night_start.to_datetime(),
-                "astronomical_night_end": night_end.to_datetime(),
+                "astronomical_night_start": observer.astropy_time_to_datetime(
+                    night_start
+                ),
+                "astronomical_night_end": observer.astropy_time_to_datetime(night_end),
                 "timeline": [],
                 "recommendations": [],
             }
@@ -125,6 +127,18 @@ class NightScheduler:
         )
         candidates_pool["static_oss"] = static_oss
         candidates_pool["static_aqs"] = static_aqs
+
+        # if we have no candidates, return early
+        if candidates_pool.empty:
+            return {
+                "location_name": self.location.name,
+                "astronomical_night_start": observer.astropy_time_to_datetime(
+                    night_start
+                ),
+                "astronomical_night_end": observer.astropy_time_to_datetime(night_end),
+                "timeline": [],
+                "recommendations": [],
+            }
 
         blocks = []
         current_time = night_start
@@ -216,8 +230,8 @@ class NightScheduler:
                         if pd.isna(selected_row.get("common_name"))
                         else selected_row.get("common_name")
                     ),
-                    "start_time": b_start.to_datetime(timezone=UTC),
-                    "end_time": b_end.to_datetime(timezone=UTC),
+                    "start_time": observer.astropy_time_to_datetime(b_start),
+                    "end_time": observer.astropy_time_to_datetime(b_end),
                     "oss_score": round(float(final_scores[selected_idx]), 1),
                     "aqs_score": round(float(final_aqs_scores[selected_idx]), 1),
                 }
@@ -269,18 +283,18 @@ class NightScheduler:
                     "aqs_score": round(float(data["aqs"]), 1),
                     "sqs_score": round(float(data["sqs"]), 1),
                     "final_score": round(float(data["final"]), 1),
-                    "visible_start": window[0].to_datetime(timezone=UTC)
+                    "visible_start": observer.astropy_time_to_datetime(window[0])
                     if window
                     else None,
-                    "visible_end": window[1].to_datetime(timezone=UTC)
+                    "visible_end": observer.astropy_time_to_datetime(window[1])
                     if window
                     else None,
                 }
             )
 
         return {
-            "astronomical_night_start": night_start.to_datetime(timezone=UTC),
-            "astronomical_night_end": night_end.to_datetime(timezone=UTC),
+            "astronomical_night_start": observer.astropy_time_to_datetime(night_start),
+            "astronomical_night_end": observer.astropy_time_to_datetime(night_end),
             "timeline": timeline,
             "recommendations": recommendations,
         }

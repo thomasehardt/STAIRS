@@ -51,7 +51,7 @@ class DuckCatalogService:
 
     def get_profile_by_name(self, name: str) -> TelescopeProfile | None:
         res = self.conn.execute("SELECT * FROM profiles WHERE name = ?", [name]).df()
-        return TelescopeProfile(**res.iloc[0].to_dict())
+        return TelescopeProfile(**res.iloc[0].to_dict()) if not res.empty else None
 
     def get_recommendations(
         self,

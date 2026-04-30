@@ -29,12 +29,12 @@ class TelescopeProfile(BaseModel):
     represents a hardware configuration for a smart telescope
     """
 
-    name: str = NonEmptyStr
-    aperture_mm: int = PositiveInt
-    focal_length_mm: int = PositiveInt
-    sensor_x: int = PositiveInt
-    sensor_y: int = PositiveInt
-    pixel_pitch_um: float = PositiveFloat
+    name: NonEmptyStr
+    aperture_mm: PositiveInt
+    focal_length_mm: PositiveInt
+    sensor_x: PositiveInt
+    sensor_y: PositiveInt
+    pixel_pitch_um: PositiveFloat
 
     def calculate_fov(self) -> tuple[float, float]:
         """

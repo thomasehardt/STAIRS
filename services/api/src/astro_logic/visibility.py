@@ -56,7 +56,7 @@ def find_horizon_crossings(
     observer: Observer, start_dt: datetime, direction: str = "setting"
 ) -> Time | None:
     astronomical_twilight_alt = -18
-    test_time = start_dt
+    test_time = Time(start_dt)
 
     found = False
     # search for the first crossing of the horizon in the next year

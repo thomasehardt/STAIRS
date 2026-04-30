@@ -61,7 +61,7 @@ async def get_target_detail(
     # get our observation history for this object
     history_df = db.execute(
         "SELECT COUNT(*) as count, MAX(session_date) as last_date "
-        "FROM observation_logs WHERE target_id = ?",
+        "FROM observation_log WHERE target_id = ?",
         [target_id],
     ).df()
 
@@ -160,7 +160,7 @@ async def get_target_position(
 
     positions = [
         PositionPoint(
-            time=t.to_datetime(timezone=UTC),
+            time=observer.astropy_time_to_datetime(t),
             alt_deg=round(aa.alt.deg, 2),
             az_deg=round(aa.az.deg, 2),
         )

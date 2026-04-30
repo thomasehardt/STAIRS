@@ -137,6 +137,7 @@ class Test(TestCase):
         self.assertEqual(visible_end, end_time)
 
         expected_start_rough = Time("2026-01-15T20:30:00Z")
+        assert visible_window is not None
         self.assertAlmostEqual(
             visible_window[0],
             expected_start_rough,
@@ -161,6 +162,7 @@ class Test(TestCase):
         self.assertIsNotNone(visible_window)
         self.assertGreaterEqual(visible_start, start_time)
         self.assertLessEqual(visible_end, end_time)
+        assert visible_window is not None
         self.assertAlmostEqual(
             visible_window[-1], expected_end_rough, delta=15 * u.minute
         )
