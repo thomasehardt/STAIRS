@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from src.api.schemas import ForecastData
@@ -75,6 +75,9 @@ class DummyWeatherApiClient:
         :param for_timestamp:
         :return:
         """
+        # Ensure for_timestamp is UTC aware for comparison
+        if for_timestamp.tzinfo is None:
+            for_timestamp = for_timestamp.replace(tzinfo=UTC)
 
         all_forecast_points: list[dict[str, Any]] = []
 

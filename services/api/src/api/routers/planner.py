@@ -32,22 +32,18 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@router.post("/generate", response_model=PlanResponse)
-async def generate_plan(
+def _build_plan_context(
     request: PlanRequest,
-    db: duckdb.DuckDBPyConnection = Depends(get_duck_db),
-    weather_service: WeatherService | None = Depends(get_weather_service),
-) -> PlanResponse:
-    """Generate a chronological observation plan for a single night."""
-    logger.info(f"Generating plan for {request.location_name} at {request.start_time}")
+    db: duckdb.DuckDBPyConnection,
+    weather_service: WeatherService | None,
+):
+    """Shared logic to build catalog service, location, and timeline plan."""
     catalog_service = DuckCatalogService(db)
 
-    # 1. Fetch hardware profile
     profile = catalog_service.get_profile_by_name(request.telescope_profile_name)
     if not profile:
         raise HTTPException(status_code=404, detail="Telescope profile not found")
 
-    # 2. Setup location
     loc = resolve_location(
         db=db,
         latitude=request.latitude,
@@ -57,9 +53,7 @@ async def generate_plan(
         bortle_scale=request.bortle_scale,
     )
 
-    # 3. Use Scheduler to build timeline
     scheduler = NightScheduler(location=loc, catalog_service=catalog_service)
-
     start_time = Time(request.start_time) if request.start_time else Time.now()
 
     plan = scheduler.build_timeline(
@@ -68,6 +62,19 @@ async def generate_plan(
         min_alt=request.min_alt,
         weather_service=weather_service,
     )
+
+    return loc, plan, start_time
+
+
+@router.post("/generate", response_model=PlanResponse)
+async def generate_plan(
+    request: PlanRequest,
+    db: duckdb.DuckDBPyConnection = Depends(get_duck_db),
+    weather_service: WeatherService | None = Depends(get_weather_service),
+) -> PlanResponse:
+    """Generate a chronological observation plan for a single night."""
+    logger.info(f"Generating plan for {request.location_name} at {request.start_time}")
+    loc, plan, start_time = _build_plan_context(request, db, weather_service)
 
     return PlanResponse(
         location_name=loc.name,
@@ -87,34 +94,7 @@ async def export_plan_skylist(
     weather_service: WeatherService | None = Depends(get_weather_service),
 ) -> Response:
     """Generates and returns a SkySafari .skylist file for the plan."""
-    catalog_service = DuckCatalogService(db)
-
-    # 1. Fetch hardware profile
-    profile = catalog_service.get_profile_by_name(request.telescope_profile_name)
-    if not profile:
-        raise HTTPException(status_code=404, detail="Telescope profile not found")
-
-    # 2. Setup location
-    loc = resolve_location(
-        db=db,
-        latitude=request.latitude,
-        longitude=request.longitude,
-        name=request.location_name,
-        elevation_m=request.elevation_m,
-        bortle_scale=request.bortle_scale,
-    )
-
-    # 3. Use Scheduler to build timeline
-    scheduler = NightScheduler(location=loc, catalog_service=catalog_service)
-
-    start_time = Time(request.start_time) if request.start_time else Time.now()
-
-    plan = scheduler.build_timeline(
-        profile=profile,
-        start_time=start_time,
-        min_alt=request.min_alt,
-        weather_service=weather_service,
-    )
+    loc, plan, start_time = _build_plan_context(request, db, weather_service)
 
     # 4. Extract targets from the plan
     targets = []
@@ -147,34 +127,7 @@ async def export_plan_csv(
     weather_service: WeatherService | None = Depends(get_weather_service),
 ) -> Response:
     """Generates and returns a CSV file for the observation plan."""
-    catalog_service = DuckCatalogService(db)
-
-    # 1. Fetch hardware profile
-    profile = catalog_service.get_profile_by_name(request.telescope_profile_name)
-    if not profile:
-        raise HTTPException(status_code=404, detail="Telescope profile not found")
-
-    # 2. Setup location
-    loc = resolve_location(
-        db=db,
-        latitude=request.latitude,
-        longitude=request.longitude,
-        name=request.location_name,
-        elevation_m=request.elevation_m,
-        bortle_scale=request.bortle_scale,
-    )
-
-    # 3. Use Scheduler to build timeline
-    scheduler = NightScheduler(location=loc, catalog_service=catalog_service)
-
-    start_time = Time(request.start_time) if request.start_time else Time.now()
-
-    plan = scheduler.build_timeline(
-        profile=profile,
-        start_time=start_time,
-        min_alt=request.min_alt,
-        weather_service=weather_service,
-    )
+    loc, plan, start_time = _build_plan_context(request, db, weather_service)
 
     # 4. Generate CSV content
     exporter = CsvExporter()
