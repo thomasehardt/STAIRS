@@ -1,4 +1,10 @@
-import { type ReactNode, useState, useEffect, useCallback, useRef } from "react";
+import {
+  type ReactNode,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+} from "react";
 import {
   Home,
   Telescope,
@@ -55,7 +61,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         }
       }
     },
-    [isResizing]
+    [isResizing],
   );
 
   useEffect(() => {
@@ -76,7 +82,9 @@ export function AppLayout({ children }: AppLayoutProps) {
         className={cn(
           "fixed inset-y-0 left-0 z-50 border-r border-border bg-card transition-all duration-300 ease-in-out md:relative md:flex flex-col group",
           !isSidebarOpen && "md:w-0 border-r-0 overflow-hidden",
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          isSidebarOpen
+            ? "translate-x-0"
+            : "-translate-x-full md:translate-x-0",
         )}
       >
         <div className="h-14 px-6 border-b border-border flex items-center justify-between shrink-0 overflow-hidden whitespace-nowrap">
@@ -112,7 +120,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           onMouseDown={startResizing}
           className={cn(
             "absolute top-0 right-0 bottom-0 w-1 cursor-col-resize hover:bg-primary/50 transition-colors",
-            isResizing && "bg-primary w-1"
+            isResizing && "bg-primary w-1",
           )}
         />
       </aside>
@@ -154,7 +162,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
         <main className="flex-1 overflow-y-auto px-8 pt-4 pb-12 relative">
           {isResizing && (
-             <div className="absolute inset-0 z-50 cursor-col-resize" />
+            <div className="absolute inset-0 z-50 cursor-col-resize" />
           )}
           {children}
         </main>
