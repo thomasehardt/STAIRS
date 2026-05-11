@@ -1,0 +1,345 @@
+/* STAIRS Unified Theme - Works with v1 and v2 mockups */
+/* Use this CSS file to have consistent class names across versions */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+/* ============================================
+   UNIFIED DESIGN TOKENS
+   ============================================ */
+
+:root {
+    /* Base Colors (v1 compatible) */
+    --color-bg-primary: #0a0e1a;
+    --color-bg-surface: #111827;
+    --color-bg-surface-hover: #1f2937;
+    --color-bg-elevated: #374151;
+
+    /* Brand Colors */
+    --color-primary: #3b82f6;
+    --color-primary-hover: #2563eb;
+    --color-primary-light: rgba(59, 130, 246, 0.1);
+
+    /* Semantic Colors */
+    --color-success: #22c55e;
+    --color-warning: #eab308;
+    --color-danger: #ef4444;
+    --color-star: #eab308;
+
+    /* Text Colors */
+    --color-text-primary: #f9fafb;
+    --color-text-secondary: #9ca3af;
+    --color-text-muted: #6b7280;
+
+    /* Neon Colors (v2) */
+    --neon-blue: #00d4ff;
+    --neon-purple: #bf00ff;
+    --neon-pink: #ff00ff;
+    --neon-green: #00ff88;
+    --deep-space: #050510;
+}
+
+/* ============================================
+   BASE STYLES (v1 + v2 Compatible)
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.6;
+}
+
+/* ============================================
+   UNIFIED SIDEBAR
+   ============================================ */
+
+.sidebar {
+    background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+    border-right: 1px solid #374151;
+    width: 260px;
+    min-height: 100vh;
+    position: relative;
+    z-index: 100;
+}
+
+.sidebar-item {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+    color: var(--color-text-secondary);
+}
+
+.sidebar-item:hover {
+    background: rgba(31, 41, 55, 0.5);
+    color: var(--color-text-primary);
+}
+
+.sidebar-item.active {
+    background: var(--color-primary-light);
+    border-left-color: var(--color-primary);
+    color: #60a5fa;
+}
+
+/* ============================================
+   UNIFIED CARD (works for v1 .card and v2 .glass-card)
+   ============================================ */
+
+.card {
+    background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(17, 24, 39, 0.8) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(55, 65, 81, 0.5);
+    border-radius: 16px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.15);
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   UNIFIED BADGE
+   ============================================ */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-green { background: #166534; color: #bbf7d0; }
+.badge-yellow { background: #854d0e; color: #fef08a; }
+.badge-red { background: #991b1b; color: #fecaca; }
+
+/* v2 Badge Variants */
+.badge-galaxy { background: rgba(139, 92, 246, 0.2); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); }
+.badge-nebula { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); }
+.badge-cluster { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+.badge-star { background: rgba(234, 179, 8, 0.2); color: #fbbf24; border: 1px solid rgba(234, 179, 8, 0.3); }
+
+/* ============================================
+   UNIFIED BUTTONS
+   ============================================ */
+
+.btn-primary {
+    background: var(--color-primary);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary:hover {
+    background: var(--color-primary-hover);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+/* ============================================
+   UNIFIED PAGE TITLE
+   ============================================ */
+
+.page-title {
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+/* ============================================
+   UNIFIED STATS GRID
+   ============================================ */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+/* ============================================
+   UNIFIED TARGET GRID
+   ============================================ */
+
+.target-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* ============================================
+   UNIFIED MAIN CONTENT
+   ============================================ */
+
+.main-content {
+    flex: 1;
+    padding: 32px;
+}
+
+/* ============================================
+   FILTER CHIP (v2 style, works in v1)
+   ============================================ */
+
+.filter-chip {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid #374151;
+    background: transparent;
+    color: #9ca3af;
+}
+
+.filter-chip:hover {
+    border-color: #3b82f6;
+    color: #60a5fa;
+}
+
+.filter-chip.active {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: #3b82f6;
+    color: #60a5fa;
+}
+
+/* ============================================
+   STAR RATING
+   ============================================ */
+
+.star-rating {
+    color: var(--color-star);
+    letter-spacing: 2px;
+}
+
+/* ============================================
+   INPUT FIELDS
+   ============================================ */
+
+.input-field {
+    background: rgba(17, 24, 39, 0.8);
+    border: 1px solid #374151;
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--color-text-primary);
+    font-size: 14px;
+    transition: all 0.3s;
+    width: 100%;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* ============================================
+   TOGGLE SWITCH
+   ============================================ */
+
+.toggle-switch {
+    width: 48px;
+    height: 26px;
+    border-radius: 13px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.toggle-switch.active {
+    background: var(--color-primary);
+}
+
+.toggle-switch:not(.active) {
+    background: #374151;
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.3s;
+}
+
+.toggle-switch.active::after {
+    transform: translateX(22px);
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-bg-elevated);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-muted);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        min-height: auto;
+        position: relative;
+    }
+
+    .main-content {
+        padding: 16px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .target-grid {
+        grid-template-columns: 1fr;
+    }
+}

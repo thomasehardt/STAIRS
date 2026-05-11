@@ -29,6 +29,7 @@ integrations:
     enabled: true
     provider: open-meteo
     api_key: null
+    units: C # F or C
 
 logging:
   level: INFO

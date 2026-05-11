@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STAIRS - Catalog Browser</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        space: { 900: '#0a0e1a', 800: '#111827', 700: '#1f2937', 600: '#374151' }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="shared/unified-theme.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { background: #0a0e1a; color: #f9fafb; font-family: 'Inter', sans-serif; }
+
+        .glass-card {
+            background: linear-gradient(135deg, rgba(17,24,39,0.95) 0%, rgba(17,24,39,0.8) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(55,65,81,0.5);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            border-color: rgba(59,130,246,0.5);
+            box-shadow: 0 0 30px rgba(59,130,246,0.15);
+            transform: translateY(-2px);
+        }
+
+        .nebula-glow {
+            position: relative;
+            overflow: hidden;
+        }
+        .nebula-glow::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        .star-rating { color: #eab308; letter-spacing: 2px; }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-galaxy { background: rgba(139,92,246,0.2); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); }
+        .badge-nebula { background: rgba(236,72,153,0.2); color: #f472b6; border: 1px solid rgba(236,72,153,0.3); }
+        .badge-cluster { background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+        .badge-star { background: rgba(234,179,8,0.2); color: #fbbf24; border: 1px solid rgba(234,179,8,0.3); }
+
+        .sidebar {
+            background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+            border-right: 1px solid #374151;
+            width: 260px;
+            min-height: 100vh;
+        }
+        .sidebar-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-item:hover { background: rgba(31,41,55,0.5); }
+        .sidebar-item.active {
+            background: rgba(59,130,246,0.1);
+            border-left-color: #3b82f6;
+            color: #60a5fa;
+        }
+
+        .search-input {
+            background: rgba(17,24,39,0.8);
+            border: 1px solid #374151;
+            border-radius: 12px;
+            padding: 12px 20px 12px 44px;
+            color: #f9fafb;
+            transition: all 0.3s;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+
+        .filter-chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #374151;
+            background: transparent;
+            color: #9ca3af;
+        }
+        .filter-chip:hover { border-color: #3b82f6; color: #60a5fa; }
+        .filter-chip.active {
+            background: rgba(59,130,246,0.2);
+            border-color: #3b82f6;
+            color: #60a5fa;
+        }
+
+        .target-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .constellation-line {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            opacity: 0.1;
+        }
+    </style>
+</head>
+<body class="flex">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="p-6 border-b border-gray-700/50">
+            <div class="flex items-center gap-3 mb-1">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">S</div>
+                <span class="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">STAIRS</span>
+            </div>
+        </div>
+        <nav class="py-4">
+            <div class="sidebar-item">
+                <i data-lucide="home" class="w-5 h-5"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="sidebar-item">
+                <i data-lucide="calendar" class="w-5 h-5"></i>
+                <span>Plan Generator</span>
+            </div>
+            <div class="sidebar-item">
+                <i data-lucide="cloud-moon" class="w-5 h-5"></i>
+                <span>Forecast</span>
+            </div>
+            <div class="sidebar-item active">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+                <span>Catalogs</span>
+            </div>
+            <div class="sidebar-item">
+                <i data-lucide="telescope" class="w-5 h-5"></i>
+                <span>Target Detail</span>
+            </div>
+            <div class="sidebar-item">
+                <i data-lucide="scroll-text" class="w-5 h-5"></i>
+                <span>Logs</span>
+            </div>
+            <div class="sidebar-item">
+                <i data-lucide="settings" class="w-5 h-5"></i>
+                <span>Settings</span>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold mb-1">Catalog Browser</h1>
+                <p class="text-gray-400">Explore deep sky objects ready for imaging</p>
+            </div>
+            <div class="flex gap-3 items-center">
+                <button class="p-2 hover:bg-gray-800 rounded-lg transition-colors">
+                    <i data-lucide="bell" class="w-5 h-5 text-gray-400"></i>
+                </button>
+                <button class="p-2 hover:bg-gray-800 rounded-lg transition-colors">
+                    <i data-lucide="settings" class="w-5 h-5 text-gray-400"></i>
+                </button>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center font-bold text-sm">T</div>
+            </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="mb-8 space-y-4">
+            <div class="relative">
+                <i data-lucide="search" class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" placeholder="Search catalogs, targets, constellations..." class="search-input w-full">
+            </div>
+
+            <div class="flex gap-3 flex-wrap items-center">
+                <span class="text-sm text-gray-400 mr-2">Catalogs:</span>
+                <button class="filter-chip active">All</button>
+                <button class="filter-chip">Messier</button>
+                <button class="filter-chip">NGC</button>
+                <button class="filter-chip">IC</button>
+                <button class="filter-chip">Caldwell</button>
+
+                <div class="h-6 w-px bg-gray-700 mx-2"></div>
+
+                <span class="text-sm text-gray-400 mr-2">Type:</span>
+                <button class="filter-chip">Galaxies</button>
+                <button class="filter-chip">Nebulae</button>
+                <button class="filter-chip">Clusters</button>
+                <button class="filter-chip">Stars</button>
+
+                <div class="ml-auto flex gap-2">
+                    <button class="p-2 hover:bg-gray-800 rounded-lg transition-colors border border-gray-700">
+                        <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                    </button>
+                    <button class="p-2 hover:bg-gray-800 rounded-lg transition-colors border border-gray-700">
+                        <i data-lucide="list" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="grid grid-cols-4 gap-4 mb-8">
+            <div class="glass-card p-4">
+                <div class="text-sm text-gray-400 mb-1">Total Objects</div>
+                <div class="text-2xl font-bold">2,847</div>
+            </div>
+            <div class="glass-card p-4">
+                <div class="text-sm text-gray-400 mb-1">Visible Tonight</div>
+                <div class="text-2xl font-bold text-green-400">342</div>
+            </div>
+            <div class="glass-card p-4">
+                <div class="text-sm text-gray-400 mb-1">Best Targets</div>
+                <div class="text-2xl font-bold text-blue-400">28</div>
+            </div>
+            <div class="glass-card p-4">
+                <div class="text-sm text-gray-400 mb-1">Captured</div>
+                <div class="text-2xl font-bold text-purple-400">15</div>
+            </div>
+        </div>
+
+        <!-- Catalog Sections -->
+        <div class="space-y-8">
+            <!-- Messier Catalog -->
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-xl font-semibold">Messier Catalog</h2>
+                        <span class="badge badge-galaxy">110 Objects</span>
+                    </div>
+                    <button class="text-sm text-blue-400 hover:text-blue-300">View All →</button>
+                </div>
+                <div class="target-grid">
+                    <!-- M31 -->
+                    <div class="glass-card p-5 nebula-glow relative">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="font-semibold text-lg mb-1">M31 - Andromeda Galaxy</h3>
+                                <p class="text-sm text-gray-400">Andromeda • 3.4 mag</p>
+                            </div>
+                            <span class="badge badge-galaxy">Galaxy</span>
+                        </div>
+                        <div class="flex items-center gap-4 mb-3 text-sm">
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="maximize-2" class="w-3 h-3 text-gray-400"></i>
+                                <span class="text-gray-300">190'</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="mountain" class="w-3 h-3 text-gray-400"></i>
+                                <span class="text-gray-300">30°</span>
+                            </div>
+                            <div class="star-rating text-sm">★★★★☆</div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                                <span class="text-xs text-green-400">SQS: 78</span>
+                            </div>
+                            <button class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-xs font-medium transition-colors">+ Add to Plan</button>
+                        </div>
+                    </div>
+
+                    <!-- M42 -->
+                    <div class="glass-card p-5 nebula-glow relative">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="font-semibold text-lg mb-1">M42 - Orion Nebula</h3>
+                                <p class="text-sm text-gray-400">Orion • 4.0 mag</p>
+                            </div>
+                            <span class="badge badge-nebula">Nebula</span>
+                        </div>
+                        <div class="flex items-center gap-4 mb-3 text-sm">
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="maximize-2" class="w-3 h-3 text-gray-400"></i>
+                                <span class="text-gray-300">65'</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="mountain" class="w-3 h-3 text-gray-400"></i>
+                                <span class="text-gray-300">42°</span>
+                            </div>
+                            <div class="star-rating text-sm">★★★★☆</div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                                <span class="text-xs text-green-400">SQS: 82</span>
+                            </div>
+                            <button class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-xs font-medium transition-colors">+ Add to Plan</button>
+                        </div>
+                    </div>
+
+                    <!-- M45 -->
+                    <div class="glass-card p-5 nebula-glow relative">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="font-semibold text-lg mb-1">M45 - Pleiades</h3>
+                                <p class="text-sm text-gray-400">Taurus • 1.6 mag</p>
+                            </div>
+                            <span class="badge badge-cluster">Cluster</span>
+                        </div>
+                        <div class="flex items-center gap-4 mb-3 text-sm">
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="maximize-2" class="w-3 h-3 text-gray-400"></i>
+                                <span class="text-gray-300">110'</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="mountain" class="w-3 h-3 text-gray-400"></i>
+                                <span class="text-gray-300">65°</span>
+                            </div>
+                            <div class="star-rating text-sm">★★★☆☆</div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
+                                <span class="text-xs text-yellow-400">SQS: 65</span>
+                            </div>
+                            <button class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-xs font-medium transition-colors">+ Add to Plan</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NGC Highlights -->
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-xl font-semibold">NGC Highlights</h2>
+                        <span class="badge badge-star">7,840 Objects</span>
+                    </div>
+                    <button class="text-sm text-blue-400 hover:text-blue-300">View All →</button>
+                </div>
+                <div class="target-grid">
+                    <!-- NGC 281 -->
+                    <div class="glass-card p-5 relative">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="font-semibold text-lg mb-1">NGC 281 - Pacman Nebula</h3>
+                                <p class="text-sm text-gray-400">Cassiopeia • 7.4 mag</p>
+                            </div>
+                            <span class="badge badge-nebula">Nebula</span>
+                        </div>
+                        <div class="flex items-center gap-4 mb-3 text-sm">
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="maximize-2" class="w-3 h-3 text-gray-400"></i>
+                                <span class="text-gray-300">35'</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="mountain" class="w-3 h-3 text-gray-400"></i>
+                                <span class="text-gray-300">55°</span>
+                            </div>
+                            <div class="star-rating text-sm">★★★☆☆</div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
+                                <span class="text-xs text-yellow-400">SQS: 72</span>
+                            </div>
+                            <button class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-xs font-medium transition-colors">+ Add to Plan</button>
+                        </div>
+                    </div>
+
+                    <!-- NGC 2244 -->
+                    <div class="glass-card p-5 relative">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="font-semibold text-lg mb-1">NGC 2244 - Rosette Nebula</h3>
+                                <p class="text-sm text-gray-400">Monoceros • 4.8 mag</p>
+                            </div>
+                            <span class="badge badge-nebula">Nebula</span>
+                        </div>
+                        <div class="flex items-center gap-4 mb-3 text-sm">
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="maximize-2" class="w-3 h-3 text-gray-400"></i>
+                                <span class="text-gray-300">80'</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="mountain" class="w-3 h-3 text-gray-400"></i>
+                                <span class="text-gray-300">25°</span>
+                            </div>
+                            <div class="star-rating text-sm">★★☆☆☆</div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-red-400"></div>
+                                <span class="text-xs text-red-400">SQS: 48</span>
+                            </div>
+                            <button class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-xs font-medium transition-colors">+ Add to Plan</button>
+                        </div>
+                    </div>
+
+                    <!-- NGC 4565 -->
+                    <div class="glass-card p-5 relative">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="font-semibold text-lg mb-1">NGC 4565 - Needle Galaxy</h3>
+                                <p class="text-sm text-gray-400">Coma Berenices • 9.6 mag</p>
+                            </div>
+                            <span class="badge badge-galaxy">Galaxy</span>
+                        </div>
+                        <div class="flex items-center gap-4 mb-3 text-sm">
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="maximize-2" class="w-3 h-3 text-gray-400"></i>
+                                <span class="text-gray-300">16'</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="mountain" class="w-3 h-3 text-gray-400"></i>
+                                <span class="text-gray-300">71°</span>
+                            </div>
+                            <div class="star-rating text-sm">★★★☆☆</div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                                <span class="text-xs text-green-400">SQS: 81</span>
+                            </div>
+                            <button class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-xs font-medium transition-colors">+ Add to Plan</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

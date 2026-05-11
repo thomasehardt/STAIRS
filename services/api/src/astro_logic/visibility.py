@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from typing import Any
 
 import astropy.units as u
 import numpy as np
@@ -15,6 +16,21 @@ contains logic related to the viewer at a point in time (i.e., a location + time
 
 logger = logging.getLogger(__name__)
 iers.conf.auto_download = False
+
+
+def safe_round(val: Any, decimals: int = 1) -> float:
+    """
+    Safely rounds a value to a given number of decimals, handling None and NaN.
+    """
+    if val is None:
+        return 0.0
+    try:
+        fval = float(val)
+        if np.isnan(fval):
+            return 0.0
+        return round(fval, decimals)
+    except (ValueError, TypeError):
+        return 0.0
 
 
 def get_astronomical_day_for_date(

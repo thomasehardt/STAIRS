@@ -80,7 +80,7 @@ class WeatherService:
         self,
         latitude: float,
         longitude: float,
-        dt: datetime,
+        dt: datetime | None,
     ) -> ForecastData | None:
         """
         gets the most relevant forecast data point for a given location and timestamp
@@ -89,6 +89,9 @@ class WeatherService:
         :param dt:
         :return:
         """
+        if dt is None:
+            return None
+
         if not (-90 <= latitude <= 90):
             raise ValueError(f"latitude must be between -90 and 90, got {latitude}")
         if not (-180 <= longitude <= 180):
@@ -119,8 +122,8 @@ class WeatherService:
         self,
         latitude: float,
         longitude: float,
-        start_dt: datetime,
-        end_dt: datetime,
+        start_dt: datetime | None,
+        end_dt: datetime | None,
     ) -> list[ForecastData]:
         """
         retrieves a range of forecast data points for a given location and time range
@@ -130,6 +133,9 @@ class WeatherService:
         :param end_dt:
         :return:
         """
+        if start_dt is None or end_dt is None:
+            return []
+
         if start_dt.tzinfo is None:
             logger.warning(f"timezone not set for {start_dt}, setting to UTC")
             start_dt = start_dt.replace(tzinfo=UTC)

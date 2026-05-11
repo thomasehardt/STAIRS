@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STAIRS v3 - WHAT IS HAPPENING?!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'puke-green': '#7fff00',
+                        'angry-red': '#ff0033',
+                        'baby-blue': '#00ffff',
+                        'hot-pink': '#ff69b4',
+                        'pee-yellow': '#ffd700',
+                        'vomit-orange': '#ff8c00',
+                        'barf-purple': '#9d00ff',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;400;700&family=Permanent+Marker&family=Courier+Prime&family=Cinzel:wght@400;700;900&family=UnifrakturMaguntia&family=Bungee+Inline&family=ZCOOL+KuaiLe&display=swap');
+
+        * { margin:0; padding:0; box-sizing: border-box; }
+
+        body {
+            background: repeating-linear-gradient(
+                45deg,
+                #ff00ff,
+                #ff00ff 10px,
+                #00ffff 10px,
+                #00ffff 20px,
+                #ffff00 20px,
+                #ffff00 30px
+            );
+            background-size: 42px 42px;
+            font-family: 'Comic Neue', cursive;
+            overflow-x: hidden;
+            animation: bg-scroll 3s linear infinite;
+        }
+
+        @keyframes bg-scroll {
+            0% { background-position: 0 0; }
+            100% { background-position: 42px 42px; }
+        }
+
+        /* DIAGONAL EVERYTHING */
+        .wtf-container {
+            transform: rotate(3deg);
+            margin: 50px -100px;
+            padding: 80px;
+            background: rgba(0,0,0,0.8);
+            border: 20px dotted #ff00ff;
+        }
+
+        /* SIDEBAR ON TOP AND UPSIDE DOWN */
+        .wtf-sidebar {
+            position: fixed;
+            top: -50px;
+            left: -50px;
+            right: -50px;
+            height: 200px;
+            background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+            z-index: 9999;
+            transform: rotate(-5deg) skewX(10deg);
+            border-bottom: 15px dashed black;
+            display: flex;
+            align-items: center;
+            padding: 0 100px;
+            animation: rainbow-slide 2s linear infinite;
+        }
+
+        @keyframes rainbow-slide {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        .sidebar-item {
+            font-family: 'Bungee Inline', cursive;
+            font-size: 18px;
+            color: white;
+            text-shadow: 3px 3px 0 black, -3px -3px 0 black;
+            margin: 0 30px;
+            cursor: pointer;
+            transform: rotate(15deg) scale(1.2);
+            transition: all 0.1s;
+            display: inline-block;
+        }
+
+        .sidebar-item:hover {
+            transform: rotate(-15deg) scale(2) translateY(-20px);
+            color: #ff00ff;
+        }
+
+        .sidebar-item.active {
+            font-family: 'UnifrakturMaguntia', cursive;
+            font-size: 28px;
+            color: lime;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* MAIN CONTENT DIAGONAL AND CHAOTIC */
+        .wtf-main {
+            margin-top: 250px;
+            padding: 100px 50px;
+            transform: skewY(-2deg);
+        }
+
+        /* CARDS THAT BOUNCE AND FLIP */
+        .wtf-card {
+            background: linear-gradient(135deg, rgba(255,0,0,0.8), rgba(0,255,0,0.8));
+            border: 10px double cyan;
+            border-radius: 50% 0 50% 0;
+            padding: 40px;
+            margin: 30px;
+            transform: rotate(5deg);
+            transition: all 0.3s;
+            animation: bounce-card 2s ease-in-out infinite;
+            font-family: 'ZCOOL KuaiLe', cursive;
+        }
+
+        @keyframes bounce-card {
+            0%, 100% { transform: rotate(5deg) translateY(0); }
+            25% { transform: rotate(-3deg) translateY(-20px); }
+            50% { transform: rotate(8deg) translateY(10px); }
+            75% { transform: rotate(-5deg) translateY(-10px); }
+        }
+
+        .wtf-card:hover {
+            transform: rotate(180deg) scale(1.5);
+            border-radius: 0 50% 0 50%;
+            z-index: 999;
+            position: relative;
+        }
+
+        .wtf-card h3 {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 36px;
+            color: #ff00ff;
+            text-decoration: underline wavy lime;
+            transform: rotate(-10deg);
+            margin-bottom: 20px;
+        }
+
+        .wtf-card p {
+            font-family: 'Courier Prime', monospace;
+            font-size: 14px;
+            color: yellow;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            float: right;
+        }
+
+        /* TEXT THAT CHANGES SIZE */
+        .wtf-title {
+            font-family: 'Cinzel', serif;
+            font-size: 72px;
+            font-weight: 900;
+            text-align: center;
+            background: linear-gradient(red, blue, green, yellow, pink, cyan);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: color-cycle 1s linear infinite;
+            transform: perspective(500px) rotateY(20deg);
+            text-shadow: 10px 10px 20px rgba(0,0,0,0.5);
+            margin-bottom: 50px;
+        }
+
+        @keyframes color-cycle {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        /* BUTTONS THAT EXPLODE */
+        .wtf-btn {
+            font-family: 'Bungee Inline', cursive;
+            font-size: 20px;
+            padding: 20px 40px;
+            background: repeating-conic-gradient(red, yellow, lime, cyan, magenta, red);
+            border: 8px solid white;
+            border-radius: 0;
+            color: black;
+            cursor: pointer;
+            transform: rotate(45deg);
+            transition: all 0.2s;
+            animation: pulse-btn 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse-btn {
+            0% { transform: rotate(45deg) scale(1); }
+            100% { transform: rotate(45deg) scale(1.1); }
+        }
+
+        .wtf-btn:hover {
+            transform: rotate(720deg) scale(3);
+            border-radius: 50%;
+        }
+
+        /* METRICS IN A CIRCLE */
+        .wtf-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 50px;
+            transform: rotate(-10deg);
+        }
+
+        .metric-bubble {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, lime, transparent);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: float-bubble 3s ease-in-out infinite;
+            border: 5px dotted magenta;
+            font-family: 'Permanent Marker', cursive;
+        }
+
+        @keyframes float-bubble {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(120deg); }
+            66% { transform: translateY(20px) rotate(240deg); }
+        }
+
+        .metric-bubble:nth-child(2) {
+            animation-delay: 0.5s;
+            background: radial-gradient(circle, cyan, transparent);
+        }
+
+        .metric-bubble:nth-child(3) {
+            animation-delay: 1s;
+            background: radial-gradient(circle, yellow, transparent);
+        }
+
+        .metric-bubble:nth-child(4) {
+            animation-delay: 1.5s;
+            background: radial-gradient(circle, magenta, transparent);
+        }
+
+        .metric-number {
+            font-size: 48px;
+            font-weight: 900;
+            color: red;
+            text-shadow: 2px 2px 0 white;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: blue;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+        }
+
+        /* RANDOM ROTATED TEXT */
+        .random-text {
+            position: absolute;
+            font-family: 'UnifrakturMaguntia', cursive;
+            font-size: 24px;
+            color: rgba(255,0,255,0.6);
+            animation: float-random 10s linear infinite;
+        }
+
+        @keyframes float-random {
+            0% { transform: translate(0, 100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translate(100vw, -100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* GRID THAT DOESN'T MAKE SENSE */
+        .wtf-grid {
+            display: grid;
+            grid-template-columns: 100px 300px 150px 250px;
+            grid-template-rows: auto auto auto;
+            gap: 40px;
+            transform: rotate(2deg) scale(0.9);
+        }
+
+        .wtf-grid .wtf-card:nth-child(1) { grid-column: 1/3; grid-row: 1/3; }
+        .wtf-grid .wtf-card:nth-child(2) { grid-column: 3/5; grid-row: 1/2; transform: rotate(-10deg); }
+        .wtf-grid .wtf-card:nth-child(3) { grid-column: 1/2; grid-row: 3/4; transform: rotate(45deg); }
+        .wtf-grid .wtf-card:nth-child(4) { grid-column: 2/5; grid-row: 3/4; transform: rotate(-5deg) scale(1.2); }
+
+        /* UPSIDE DOWN SECTION */
+        .upside-down {
+            transform: rotate(180deg);
+            background: rgba(255,255,0,0.2);
+            padding: 40px;
+            margin: 50px 0;
+        }
+
+        .upside-down * {
+            transform: scaleX(-1);
+        }
+
+        /* MARQUEE OF DEATH */
+        .marquee-death {
+            background: black;
+            color: lime;
+            font-family: 'Courier Prime', monospace;
+            font-size: 24px;
+            padding: 20px;
+            overflow: hidden;
+            white-space: nowrap;
+            border-top: 10px solid red;
+            border-bottom: 10px solid blue;
+        }
+
+        .marquee-death div {
+            display: inline-block;
+            animation: marquee-scroll 5s linear infinite;
+        }
+
+        @keyframes marquee-scroll {
+            0% { transform: translateX(100vw); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* BLINKING EVERYTHING */
+        .blink-fast {
+            animation: blink-fast 0.3s step-end infinite;
+        }
+
+        @keyframes blink-fast {
+            50% { opacity: 0; }
+        }
+
+        .blink-slow {
+            animation: blink-slow 2s ease-in-out infinite;
+        }
+
+        @keyframes blink-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Rainbow Marquee of Death -->
+    <div class="marquee-death">
+        <div>
+            🔭 STAIRS v3 - THE WTF EDITION 🚀 &nbsp;&nbsp;&nbsp;
+            NOTHING MAKES SENSE ANYMORE &nbsp;&nbsp;&nbsp;
+            ENJOY THE CHAOS &nbsp;&nbsp;&nbsp;
+            DESIGN IS DEAD &nbsp;&nbsp;&nbsp;
+            LONG LIVE THE WTF &nbsp;&nbsp;&nbsp;
+            🌟 S T A R S 🌟 &nbsp;&nbsp;&nbsp;
+        </div>
+    </div>
+
+    <!-- Upside Down Sidebar -->
+    <div class="wtf-sidebar">
+        <div class="sidebar-item blink-fast">
+            <i data-lucide="home" style="width: 30px; height: 30px;"></i>
+            HOMY
+        </div>
+        <div class="sidebar-item">
+            <i data-lucide="calendar" style="width: 30px; height: 30px;"></i>
+            PLANZ
+        </div>
+        <div class="sidebar-item active">
+            <i data-lucide="sparkles" style="width: 30px; height: 30px;"></i>
+            WTF?
+        </div>
+        <div class="sidebar-item blink-slow">
+            <i data-lucide="book-open" style="width: 30px; height: 30px;"></i>
+            BOOK
+        </div>
+        <div class="sidebar-item">
+            <i data-lucide="settings" style="width: 30px; height: 30px;"></i>
+            GEARZ
+        </div>
+    </div>
+
+    <!-- Random Floating Text -->
+    <div class="random-text" style="left: 10%; animation-delay: 0s;">WTF?!</div>
+    <div class="random-text" style="left: 30%; animation-delay: 2s;">LOOK AT THIS!</div>
+    <div class="random-text" style="left: 50%; animation-delay: 4s;">DESIGN IS DEAD</div>
+    <div class="random-text" style="left: 70%; animation-delay: 6s;">WOW MUCH CRAZY</div>
+    <div class="random-text" style="left: 90%; animation-delay: 8s;">SO WTF!</div>
+
+    <!-- Main Content (Diagonal Container) -->
+    <div class="wtf-container">
+        <div class="wtf-main">
+            <!-- Title That Hurts -->
+            <h1 class="wtf-title blink-fast">
+                SKY VISUALIZATION v3
+            </h1>
+
+            <!-- Metric Bubbles in a Circle -->
+            <div class="wtf-metrics" style="margin-bottom: 100px;">
+                <div class="metric-bubble">
+                    <div class="metric-number">342</div>
+                    <div class="metric-label">Targets</div>
+                </div>
+                <div class="metric-bubble">
+                    <div class="metric-number">6h</div>
+                    <div class="metric-label">Window</div>
+                </div>
+                <div class="metric-bubble">
+                    <div class="metric-number">8.4</div>
+                    <div class="metric-label">SQM</div>
+                </div>
+                <div class="metric-bubble">
+                    <div class="metric-number">94</div>
+                    <div class="metric-label">Score</div>
+                </div>
+            </div>
+
+            <!-- Upside Down Section -->
+            <div class="upside-down">
+                <h2 style="font-family: 'UnifrakturMaguntia', cursive; font-size: 48px; color: cyan; text-align: center;">
+                    ᗡO⅁ᗡOИ ΨONƎ
+                </h2>
+                <p style="font-family: 'Comic Neue', cursive; font-size: 18px; color: lime; text-align: center; margin-top: 20px;">
+                    This section is literally upside down because why not? ¯\_(ツ)_/¯
+                </p>
+                <button class="wtf-btn" style="margin: 30px auto; display: block;">
+                    CLICK ME!
+                </button>
+            </div>
+
+            <!-- Chaos Grid -->
+            <div style="margin-top: 100px;">
+                <h2 style="font-family: 'Bungee Inline', cursive; font-size: 36px; color: yellow; text-align: center; transform: rotate(-5deg); margin-bottom: 50px;">
+                    TARGETS THAT DON'T MAKE SENSE
+                </h2>
+
+                <div class="wtf-grid">
+                    <div class="wtf-card">
+                        <h3>M31</h3>
+                        <p>Andromeda Galaxy<br>Magnitude: 3.4<br>Size: 190'<br>Altitude: 42°</p>
+                        <div style="font-size: 48px; text-align: center; margin-top: 20px;">🌌</div>
+                    </div>
+
+                    <div class="wtf-card" style="background: linear-gradient(135deg, rgba(255,0,255,0.8), rgba(0,255,255,0.8));">
+                        <h3>M42</h3>
+                        <p>Orion Nebula<br>Magnitude: 4.0<br>Size: 65'<br>Altitude: 38°</p>
+                        <div style="font-size: 48px; text-align: center; margin-top: 20px;">🔭</div>
+                    </div>
+
+                    <div class="wtf-card" style="background: linear-gradient(135deg, rgba(255,255,0,0.8), rgba(255,0,0,0.8));">
+                        <h3>M45</h3>
+                        <p>Pleiades<br>Magnitude: 1.6<br>Size: 110'<br>Altitude: 71°</p>
+                        <div style="font-size: 48px; text-align: center; margin-top: 20px;">⭐</div>
+                    </div>
+
+                    <div class="wtf-card" style="background: linear-gradient(135deg, rgba(0,255,0,0.8), rgba(128,0,128,0.8));">
+                        <h3>NGC 281</h3>
+                        <p>Pacman Nebula<br>Magnitude: 7.4<br>Size: 35'<br>Altitude: 55°</p>
+                        <div style="font-size: 48px; text-align: center; margin-top: 20px;">🌠</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- More Chaos Buttons -->
+            <div style="display: flex; justify-content: center; gap: 50px; margin-top: 100px; transform: rotate(-3deg);">
+                <button class="wtf-btn" style="background: repeating-conic-gradient(lime, cyan, magenta);">
+                    EXPORT!
+                </button>
+                <button class="wtf-btn" style="background: repeating-conic-gradient(yellow, red, blue); transform: rotate(-45deg);">
+                    SAVE!
+                </button>
+                <button class="wtf-btn" style="background: repeating-conic-gradient(pink, orange, green); transform: rotate(90deg);">
+                    WTF?!
+                </button>
+            </div>
+
+            <!-- Vertical Text Section -->
+            <div style="margin-top: 100px; padding: 50px; background: rgba(0,0,0,0.5); border: 15px groove gold; transform: skewX(5deg);">
+                <div style="writing-mode: vertical-lr; text-orientation: upright; font-family: 'Cinzel', serif; font-size: 16px; color: cyan; float: left; margin-right: 30px; letter-spacing: 10px;">
+                    T H I S &nbsp; I S &nbsp; V E R T I C A L
+                </div>
+                <p style="font-family: 'Comic Neue', cursive; font-size: 20px; color: lime; line-height: 1.8;">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                    <span style="font-size: 40px; color: red; font-family: 'Bungee Inline';">WTF</span>
+                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+                    <span style="font-size: 10px; color: yellow;">tiny text</span>
+                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.
+                </p>
+            </div>
+
+            <!-- Final Chaos -->
+            <div style="text-align: center; margin-top: 150px; transform: rotate(5deg) scale(1.1);">
+                <div style="font-family: 'UnifrakturMaguntia', cursive; font-size: 72px; color: magenta; animation: spin 3s linear infinite;">
+                    DONE!
+                </div>
+                <div style="font-family: 'Permanent Marker', cursive; font-size: 24px; color: lime; margin-top: 20px;">
+                    You made it to the end! Here's a cookie 🍪
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- More random floating stuff -->
+    <div style="position: fixed; bottom: 50px; right: 50px; font-size: 100px; animation: bounce-card 1s infinite;">
+        🚀
+    </div>
+
+    <div style="position: fixed; top: 300px; left: 20px; font-size: 60px; animation: spin 2s linear infinite;">
+        🌙
+    </div>
+
+    <div style="position: fixed; bottom: 200px; left: 100px; font-size: 80px; animation: float-bubble 4s ease-in-out infinite;">
+        ⭐
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Make buttons even more chaotic on click
+        document.querySelectorAll('.wtf-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                this.style.transform = `rotate(${Math.random() * 720}deg) scale(${Math.random() * 3 + 1})`;
+                this.style.borderRadius = `${Math.random() * 50}%`;
+                this.textContent = ['WTF?!', 'OMG!', 'NO!', 'YES!', 'MAYBE?'][Math.floor(Math.random() * 5)];
+            });
+        });
+
+        // Randomly change sidebar item colors
+        setInterval(() => {
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            });
+        }, 500);
+    </script>
+</body>
+</html>
