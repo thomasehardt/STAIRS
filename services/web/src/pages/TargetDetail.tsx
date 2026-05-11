@@ -116,7 +116,7 @@ export function TargetDetailPage() {
   }
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-8 pb-12">
       <div className="flex flex-col md:flex-row justify-between items-start gap-6">
         <div className="space-y-2">
           <div className="flex items-center gap-3">

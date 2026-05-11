@@ -170,7 +170,7 @@ export function Dashboard() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
           <h1 className="text-4xl font-black tracking-tight uppercase">
@@ -305,8 +305,8 @@ export function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1 space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-8">
           <div className="space-y-4">
             <div className="flex items-center justify-between px-1">
               <div className="flex bg-secondary/50 p-1 rounded-xl border border-border/50">
@@ -512,14 +512,14 @@ export function Dashboard() {
           </div>
         </div>
 
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-black uppercase tracking-tight flex items-center gap-2">
               <Sparkles className="w-6 h-6 text-primary" />
               Tonight's Best
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {targetsLoading ? (
               Array.from({ length: 6 }).map((_, i) => (
                 <div

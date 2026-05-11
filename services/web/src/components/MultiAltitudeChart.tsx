@@ -156,7 +156,7 @@ export function MultiAltitudeChart({
     responsive: true,
     maintainAspectRatio: false,
     interaction: {
-      mode: "index",
+      mode: "x",
       intersect: false,
     },
     scales: {

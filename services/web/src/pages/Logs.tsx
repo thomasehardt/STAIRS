@@ -39,7 +39,7 @@ export function LogsPage() {
     const captured = logs.filter((l) => l.status === "Captured").length;
     const attempted = logs.filter((l) => l.status === "Attempted").length;
 
-    const ratedLogs = logs.filter((l) => l.rating !== null && l.rating > 0);
+    const ratedLogs = logs.filter((l) => (l.rating ?? 0) > 0);
     const avgRating =
       ratedLogs.length > 0
         ? (
@@ -82,7 +82,7 @@ export function LogsPage() {
   }
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-8 pb-12">
       <div className="flex flex-col md:flex-row justify-between items-start gap-4">
         <div>
           <h1 className="text-3xl font-black tracking-tight mb-2">
