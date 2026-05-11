@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme {
+  /* main background and text (deep space blue: #0a0e1a) */
+  --color-background: #0a0e1a;
+  --color-foreground: #f9fafb;
+
+  /* card surfaces (#111827) */
+  --color-card: #111827;
+  --color-card-foreground: #f9fafb;
+
+  /* popovers and modals */
+  --color-popover: #0a0e1a;
+  --color-popover-foreground: #f9fafb;
+
+  /* primary action color (neon blue #3b82f6) */
+  --color-primary: #3b82f6;
+  --color-primary-foreground: #ffffff;
+
+  /* secondary/muted surfaces */
+  --color-secondary: #1f2937;
+  --color-secondary-foreground: #f9fafb;
+  --color-muted: #1f2937;
+  --color-muted-foreground: #9ca3af;
+
+  /* accents and highlights */
+  --color-accent: #3b82f6;
+  --color-accent-foreground: #ffffff;
+
+  /* semantic colors (success/warning handled via tailwind.config.js or here) */
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+
+  /* borders and inputs */
+  --color-border: #374151;
+  --color-input: #374151;
+  --color-ring: #3b82f6;
+
+  /* standard border radii */
+  --radius-lg: 0.5rem;
+  --radius-md: calc(0.5rem - 2px);
+  --radius-sm: calc(0.5rem - 4px);
+}
+
+/* base styles:
+   use @layer base to apply styles to standard HTML tags while
+   still respecting Tailwind's theme variables.
+*/
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
