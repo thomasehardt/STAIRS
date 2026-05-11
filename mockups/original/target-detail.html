@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STAIRS - M42 Target Detail</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body { background: #0a0e1a; color: #f9fafb; font-family: system-ui, -apple-system, sans-serif; }
+        .card { background: #111827; border: 1px solid #374151; border-radius: 12px; padding: 24px; }
+        .btn { background: #3b82f6; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+        .btn:hover { background: #2563eb; }
+        .btn-secondary { background: #374151; }
+        .btn-secondary:hover { background: #4b5563; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-green { background: #166534; color: #bbf7d0; }
+        .badge-yellow { background: #854d0e; color: #fef08a; }
+        .star { color: #eab308; }
+        .fov-box { width: 200px; height: 120px; background: #1f2937; border: 2px solid #3b82f6; border-radius: 8px; position: relative; display: flex; align-items: center; justify-content: center; }
+        .target-box { width: 160px; height: 100px; background: #7c3aed; opacity: 0.5; border-radius: 4px; position: absolute; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <a href="#" class="text-blue-400 hover:text-blue-300">← Back to Catalog</a>
+                </div>
+                <h1 class="text-4xl font-bold">M42 - Orion Nebula</h1>
+                <div class="flex gap-4 mt-2 text-gray-400">
+                    <span>Emission Nebula</span>
+                    <span>|</span>
+                    <span>Mag: 4.0</span>
+                    <span>|</span>
+                    <span>Size: 65' × 60'</span>
+                    <span>|</span>
+                    <span>Orion</span>
+                </div>
+                <div class="mt-2 text-sm text-gray-400">RA: 83.8221° | Dec: -5.3911°</div>
+            </div>
+            <div class="flex gap-4">
+                <button class="btn">+ Add to Tonight's Plan</button>
+                <button class="btn btn-secondary">📌 Save to Favorites</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-8 mb-8">
+            <!-- FOV Fit -->
+            <div class="card">
+                <h3 class="text-lg font-bold mb-4">🔭 FOV Fit</h3>
+                <div class="flex justify-center mb-4">
+                    <div class="fov-box">
+                        <div class="target-box"></div>
+                        <div class="text-xs text-gray-400" style="z-index: 1;">Sensor: 1.7° × 1.0°</div>
+                    </div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-green-400 mb-1">✅ Fits!</div>
+                    <div class="text-sm text-gray-400">2.6× fill (target fills 38% of FOV)</div>
+                </div>
+                <button class="btn btn-secondary w-full mt-4" style="font-size: 14px; padding: 8px;">Change Telescope</button>
+            </div>
+
+            <!-- Altitude Chart -->
+            <div class="card col-span-2">
+                <h3 class="text-lg font-bold mb-4">📈 Altitude Tonight</h3>
+                <canvas id="altChart" style="max-height: 250px;"></canvas>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-8 mb-8">
+            <!-- Quality Score Chart -->
+            <div class="card">
+                <h3 class="text-lg font-bold mb-2">📊 Quality Score (SQS)</h3>
+                <p class="text-sm text-gray-400 mb-4">Weather: 100% | Moon: 85% | Final: 82</p>
+                <canvas id="sqsChart" style="max-height: 250px;"></canvas>
+            </div>
+
+            <!-- Observation History -->
+            <div class="card">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold">📝 Observation History</h3>
+                    <button class="btn" style="font-size: 14px; padding: 8px 16px;">+ Add Log</button>
+                </div>
+                <div class="space-y-4">
+                    <div class="p-4 rounded-lg" style="background: #1f2937;">
+                        <div class="flex justify-between mb-2">
+                            <span class="font-semibold">2026-01-15</span>
+                            <span class="text-yellow-400">★★★★☆ (4/5)</span>
+                        </div>
+                        <div><span class="badge badge-green">captured</span></div>
+                        <p class="text-sm text-gray-400 mt-2">"Great run, saw detail in the spiral arms!"</p>
+                    </div>
+                    <div class="p-4 rounded-lg" style="background: #1f2937;">
+                        <div class="flex justify-between mb-2">
+                            <span class="font-semibold">2026-01-10</span>
+                            <span class="text-yellow-400">★★★☆☆ (3/5)</span>
+                        </div>
+                        <div><span class="badge badge-green">captured</span></div>
+                        <p class="text-sm text-gray-400 mt-2">"Clouds rolled in after 20min."</p>
+                    </div>
+                    <div class="p-4 rounded-lg" style="background: #1f2937;">
+                        <div class="flex justify-between mb-2">
+                            <span class="font-semibold">2026-01-05</span>
+                            <span class="text-yellow-400">★★★★★ (5/5)</span>
+                        </div>
+                        <div><span class="badge badge-green">captured</span></div>
+                        <p class="text-sm text-gray-400 mt-2">"Perfect conditions! 30min integration."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Altitude Chart
+        const altCtx = document.getElementById('altChart').getContext('2d');
+        const times = ['18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00', '22:30', '23:00', '23:30', '00:00'];
+        const altitudes = [25, 30, 35, 40, 42, 41, 38, 35, 32, 28, 24, 20, 16];
+
+        new Chart(altCtx, {
+            type: 'line',
+            data: {
+                labels: times,
+                datasets: [{
+                    label: 'Altitude (°)',
+                    data: altitudes,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#f9fafb' } }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#9ca3af' },
+                        grid: { color: '#374151' }
+                    },
+                    y: {
+                        ticks: { color: '#9ca3af' },
+                        grid: { color: '#374151' },
+                        min: 0,
+                        max: 90
+                    }
+                }
+            }
+        });
+
+        // SQS Chart
+        const sqsCtx = document.getElementById('sqsChart').getContext('2d');
+        const sqsScores = [75, 78, 82, 85, 82, 80, 76, 72, 68, 65, 62, 58, 55];
+
+        new Chart(sqsCtx, {
+            type: 'line',
+            data: {
+                labels: times,
+                datasets: [{
+                    label: 'SQS Score',
+                    data: sqsScores,
+                    borderColor: '#22c55e',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#f9fafb' } }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#9ca3af' },
+                        grid: { color: '#374151' }
+                    },
+                    y: {
+                        ticks: { color: '#9ca3af' },
+                        grid: { color: '#374151' },
+                        min: 0,
+                        max: 100
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

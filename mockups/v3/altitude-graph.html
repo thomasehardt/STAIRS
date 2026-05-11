@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altitude Graph Mockup</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            width: 80%;
+            max-width: 900px;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sky Object Altitude</h1>
+        <canvas id="altitudeChart"></canvas>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('altitudeChart').getContext('2d');
+
+        // Generate data points from 6 AM (6) to 6 PM (18)
+        const labels = [];
+        const data = [];
+
+        for (let t = 6; t <= 18; t += 0.25) { // 15-minute intervals
+            const hour = Math.floor(t);
+            const minutes = Math.round((t - hour) * 60);
+
+            // Format time as 12-hour (e.g., 6 AM, 12 PM, 6 PM)
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+            const timeString = minutes === 0 ? `${displayHour} ${ampm}` : '';
+
+            labels.push(timeString);
+
+            // Altitude sine wave: 90 * sin(pi * (t - 6) / 12)
+            const altitude = 90 * Math.sin(Math.PI * (t - 6) / 12);
+            data.push(altitude);
+        }
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Altitude',
+                    data: data,
+                    fill: false,
+                    pointRadius: 0,
+                    tension: 0.4, // Smooth curve
+                    segment: {
+                        borderColor: ctx => {
+                            const y0 = ctx.p0.parsed.y;
+                            const y1 = ctx.p1.parsed.y;
+                            const avg = (y0 + y1) / 2;
+                            if (avg >= 30 && avg <= 80) return '#1f77b4';
+                            return '#808080';
+                        },
+                        borderWidth: ctx => {
+                            const y0 = ctx.p0.parsed.y;
+                            const y1 = ctx.p1.parsed.y;
+                            const avg = (y0 + y1) / 2;
+                            if (avg >= 30 && avg <= 80) return 3;
+                            return 1;
+                        }
+                    }
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time'
+                        },
+                        ticks: {
+                            maxRotation: 0,
+                            autoSkip: false
+                        }
+                    },
+                    y: {
+                        min: 0,
+                        max: 90,
+                        title: {
+                            display: true,
+                            text: 'Altitude (degrees)'
+                        },
+                        ticks: {
+                            stepSize: 10
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    annotation: {
+                        annotations: {
+                            // Shading between 30 and 80
+                            shading: {
+                                type: 'box',
+                                yMin: 30,
+                                yMax: 80,
+                                backgroundColor: 'rgba(31, 119, 180, 0.1)',
+                                borderWidth: 0,
+                                z: -1
+                            },
+                            // Reference Line 30 (min)
+                            line30: {
+                                type: 'line',
+                                yMin: 30,
+                                yMax: 30,
+                                borderColor: '#666',
+                                borderWidth: 2,
+                                borderDash: [8, 4],
+                                label: {
+                                    display: true,
+                                    content: '30° (min)',
+                                    position: 'start',
+                                    yAdjust: -10,
+                                    backgroundColor: 'transparent',
+                                    color: '#666',
+                                    font: { size: 12 }
+                                }
+                            },
+                            // Reference Line 80 (max)
+                            line80: {
+                                type: 'line',
+                                yMin: 80,
+                                yMax: 80,
+                                borderColor: '#666',
+                                borderWidth: 2,
+                                borderDash: [8, 4],
+                                label: {
+                                    display: true,
+                                    content: '80° (max)',
+                                    position: 'start',
+                                    yAdjust: -10,
+                                    backgroundColor: 'transparent',
+                                    color: '#666',
+                                    font: { size: 12 }
+                                }
+                            },
+                            // Reference Line 90 (peak)
+                            line90: {
+                                type: 'line',
+                                yMin: 90,
+                                yMax: 90,
+                                borderColor: '#999',
+                                borderWidth: 1,
+                                borderDash: [3, 3],
+                                label: {
+                                    display: true,
+                                    content: '90° (peak)',
+                                    position: 'start',
+                                    yAdjust: -10,
+                                    backgroundColor: 'transparent',
+                                    color: '#999',
+                                    font: { size: 12 }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altitude Graph - Recharts Cyber Edition</title>
+    <!-- Dependencies: React, ReactDOM, Recharts, Lucide, Babel for JSX -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/recharts/umd/Recharts.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* STAIRS v2 Cyber Theme Tokens */
+            --neon-blue: #00d4ff;
+            --neon-blue-rgb: 0, 212, 255;
+            --neon-purple: #bf00ff;
+            --neon-purple-rgb: 191, 0, 255;
+            --deep-space: #050510;
+            --space-surface: rgba(5, 5, 16, 0.9);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.5);
+            --font-display: 'Orbitron', sans-serif;
+            --font-body: 'Rajdhani', sans-serif;
+            --glass-border: rgba(0, 212, 255, 0.3);
+            --glass-bg: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(191, 0, 255, 0.05) 100%);
+        }
+
+        body {
+            background: var(--deep-space);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 90%;
+            max-width: 1000px;
+        }
+
+        .holo-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .holo-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                from 0deg,
+                transparent,
+                rgba(0, 212, 255, 0.05),
+                transparent,
+                rgba(191, 0, 255, 0.05),
+                transparent
+            );
+            animation: holo-rotate 15s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes holo-rotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        .header {
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .cyber-title {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin: 0;
+            color: var(--neon-blue);
+            text-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+        }
+
+        .cyber-subtitle {
+            font-family: var(--font-display);
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        /* Recharts Customization */
+        .recharts-cartesian-axis-tick-value {
+            font-family: var(--font-display);
+            font-size: 10px;
+            fill: var(--text-secondary);
+        }
+
+        .recharts-label {
+            font-family: var(--font-display);
+            font-size: 10px;
+            fill: var(--neon-blue);
+        }
+
+        .custom-tooltip {
+            background: var(--space-surface);
+            border: 1px solid var(--neon-blue);
+            padding: 10px;
+            font-family: var(--font-display);
+            font-size: 12px;
+            color: var(--text-primary);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="starfield"></canvas>
+
+    <div id="root" class="container"></div>
+
+    <script type="text/babel">
+        const {
+            LineChart, Line, XAxis, YAxis, CartesianGrid,
+            Tooltip, ReferenceLine, ReferenceArea, ResponsiveContainer,
+            Label, Cell
+        } = window.Recharts;
+
+        const AltitudeGraph = () => {
+            // Generate data points from 6 AM to 6 PM
+            const generateData = () => {
+                const points = [];
+                for (let t = 6; t <= 18; t += 0.1) { // High density for smooth curve
+                    const hour = Math.floor(t);
+                    const minutes = Math.round((t - hour) * 60);
+
+                    // Time formatting for X-axis
+                    const ampm = hour >= 12 ? 'PM' : 'AM';
+                    const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+                    const timeLabel = minutes === 0 ? `${displayHour} ${ampm}` : '';
+
+                    // Sine wave: 90 * sin(pi * (t - 6) / 12)
+                    const altitude = Math.max(0, 90 * Math.sin(Math.PI * (t - 6) / 12));
+
+                    points.push({
+                        time: t,
+                        displayTime: timeLabel,
+                        fullTime: `${displayHour}:${minutes.toString().padStart(2, '0')} ${ampm}`,
+                        altitude: parseFloat(altitude.toFixed(2))
+                    });
+                }
+                return points;
+            };
+
+            const data = generateData();
+
+            // Recharts doesn't support segmented lines in a single dataset easily with variable width.
+            // We use a custom dot or multiple lines, but for a mockup, we can use the "strokeDasharray"
+            // or better, a custom SVG filter or simply multiple Line components if we want hard boundaries.
+            // However, the spec asks for continuous with no gaps.
+            // The cleanest way in Recharts for different colors is multiple datasets or a Gradient.
+            // But for different WIDTHS and COLORS, we can split the data or use a custom SVG path.
+
+            // For this mockup, I'll use a Gradient for color and a single width,
+            // OR multiple Line components for the discrete requirements.
+
+            const lowRange = data.map(d => ({ ...d, altitude: d.altitude <= 30 || d.altitude >= 80 ? d.altitude : null }));
+            const midRange = data.map(d => ({ ...d, altitude: d.altitude >= 30 && d.altitude <= 80 ? d.altitude : null }));
+
+            return (
+                <div className="holo-card">
+                    <div className="header">
+                        <h1 className="cyber-title">Altitude Telemetry</h1>
+                        <div className="cyber-subtitle">Celestial Tracking // Object Path v2.0</div>
+                    </div>
+
+                    <div style={{ width: '100%', height: 400 }}>
+                        <ResponsiveContainer>
+                            <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                                <defs>
+                                    <linearGradient id="lineGradient" x1="0" y1="1" x2="0" y2="0">
+                                        <stop offset="0%" stopColor="#808080" />
+                                        <stop offset="33%" stopColor="#808080" />
+                                        <stop offset="34%" stopColor="var(--neon-blue)" />
+                                        <stop offset="88%" stopColor="var(--neon-blue)" />
+                                        <stop offset="89%" stopColor="#808080" />
+                                        <stop offset="100%" stopColor="#808080" />
+                                    </linearGradient>
+                                </defs>
+
+                                <XAxis
+                                    dataKey="time"
+                                    type="number"
+                                    domain={[6, 18]}
+                                    ticks={[6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]}
+                                    tickFormatter={(tick) => {
+                                        const h = Math.floor(tick);
+                                        const ampm = h >= 12 ? 'PM' : 'AM';
+                                        const dh = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+                                        return `${dh} ${ampm}`;
+                                    }}
+                                    stroke="rgba(255,255,255,0.2)"
+                                />
+                                <YAxis
+                                    domain={[0, 90]}
+                                    stroke="rgba(255,255,255,0.2)"
+                                >
+                                    <Label
+                                        value="Altitude (degrees)"
+                                        angle={-90}
+                                        position="insideLeft"
+                                        style={{ textAnchor: 'middle', fill: 'var(--text-secondary)', fontFamily: 'var(--font-display)', fontSize: '10px' }}
+                                    />
+                                </YAxis>
+
+                                <Tooltip
+                                    content={({ active, payload }) => {
+                                        if (active && payload && payload.length) {
+                                            return (
+                                                <div className="custom-tooltip">
+                                                    <div>TIME: {payload[0].payload.fullTime}</div>
+                                                    <div style={{ color: 'var(--neon-blue)' }}>ALT: {payload[0].value}°</div>
+                                                </div>
+                                            );
+                                        }
+                                        return null;
+                                    }}
+                                />
+
+                                {/* Shading */}
+                                <ReferenceArea y1={30} y2={80} fill="var(--neon-blue)" fillOpacity={0.05} />
+
+                                {/* Reference Lines */}
+                                <ReferenceLine y={30} stroke="#666" strokeDasharray="8 4" strokeWidth={2}>
+                                    <Label value="30° (min)" position="insideTopLeft" fill="#666" offset={10} />
+                                </ReferenceLine>
+                                <ReferenceLine y={80} stroke="#666" strokeDasharray="8 4" strokeWidth={2}>
+                                    <Label value="80° (max)" position="insideTopLeft" fill="#666" offset={10} />
+                                </ReferenceLine>
+                                <ReferenceLine y={90} stroke="#999" strokeDasharray="3 3" strokeWidth={1}>
+                                    <Label value="90° (peak)" position="insideTopLeft" fill="#999" offset={10} />
+                                </ReferenceLine>
+
+                                {/* We use two lines to simulate the width change.
+                                    The "mid" line is thicker. Overlap ensures no gaps. */}
+                                <Line
+                                    type="monotone"
+                                    dataKey="altitude"
+                                    stroke="#808080"
+                                    strokeWidth={1}
+                                    dot={false}
+                                    activeDot={{ r: 4, fill: 'var(--neon-blue)' }}
+                                />
+                                <Line
+                                    type="monotone"
+                                    data={data.map(d => ({...d, altitude: (d.altitude >= 30 && d.altitude <= 80) ? d.altitude : null}))}
+                                    dataKey="altitude"
+                                    stroke="var(--neon-blue)"
+                                    strokeWidth={3}
+                                    dot={false}
+                                    connectNulls={false}
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<AltitudeGraph />);
+
+        // Starfield background script
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function initStars() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars = [];
+            for (let i = 0; i < 200; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 1.5,
+                    opacity: Math.random(),
+                    speed: Math.random() * 0.05
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                star.opacity += (Math.random() - 0.5) * 0.05;
+                if (star.opacity < 0.1) star.opacity = 0.1;
+                if (star.opacity > 0.8) star.opacity = 0.8;
+            });
+            requestAnimationFrame(drawStars);
+        }
+
+        window.addEventListener('resize', initStars);
+        initStars();
+        drawStars();
+    </script>
+</body>
+</html>

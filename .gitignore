@@ -10,11 +10,11 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
+# dist/  <-- Commented out to allow JS dist folders if needed, or manage per-service
 downloads/
 eggs/
 .eggs/
-lib/
+# lib/   <-- Removed to prevent ignoring JS src/lib folders
 lib64/
 parts/
 sdist/

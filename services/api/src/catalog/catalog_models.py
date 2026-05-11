@@ -257,7 +257,7 @@ class TargetRecord(BaseModel):
             v = v.tolist()
         if isinstance(v, list) and len(v) == 0:
             return ()
-        if not isinstance(v | (list, tuple)):
+        if not isinstance(v, list | tuple):
             raise ValueError(f"size must be a tuple or list, got {type(v).__name__}")
         if len(v) > 2:
             raise ValueError(f"size must be a tuple or list of length 2, got {len(v)}")

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STAIRS - Plan Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0a0e1a; color: #f9fafb; }
+        .card { background: #111827; border: 1px solid #374151; border-radius: 12px; padding: 20px; }
+        .btn { background: #3b82f6; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+        .btn:hover { background: #2563eb; }
+        .btn-secondary { background: #374151; }
+        .btn-secondary:hover { background: #4b5563; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-green { background: #166534; color: #bbf7d0; }
+        .badge-yellow { background: #854d0e; color: #fef08a; }
+        .timeline-block { background: #1f2937; border-left: 4px solid #3b82f6; padding: 16px; border-radius: 8px; margin-bottom: 12px; }
+        .input { background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 10px; color: #f9fafb; width: 100%; }
+        .select { background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 10px; color: #f9fafb; }
+        .star { color: #eab308; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold mb-2">📋 Plan Generator</h1>
+                <p class="text-gray-400">Generate an optimized observation plan for tonight</p>
+            </div>
+            <div class="flex gap-4">
+                <button class="btn btn-secondary">← Back to Dashboard</button>
+            </div>
+        </div>
+
+        <!-- Location & Telescope Panel -->
+        <div class="card mb-8">
+            <h2 class="text-xl font-bold mb-6">📍 Location & Telescope</h2>
+            <div class="grid grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Location</label>
+                    <select class="select">
+                        <option>Tromsø, Norway</option>
+                        <option>Los Angeles, CA</option>
+                        <option>Greenwich, London</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Telescope Profile</label>
+                    <select class="select">
+                        <option>Seestar S50</option>
+                        <option>Dwarf II</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-4 gap-4 mb-6">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Latitude</label>
+                    <input type="text" class="input" value="69.65" />
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Longitude</label>
+                    <input type="text" class="input" value="18.95" />
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Elevation (m)</label>
+                    <input type="text" class="input" value="100" />
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Bortle Scale</label>
+                    <select class="select">
+                        <option>1 - Exellent</option>
+                        <option>2 - Typical dark</option>
+                        <option selected>3 - Rural sky</option>
+                        <option>4 - Suburban</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Start Time</label>
+                    <input type="datetime-local" class="input" value="2026-01-15T18:00" />
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-2">Min Altitude</label>
+                    <select class="select">
+                        <option>20°</option>
+                        <option selected>30°</option>
+                        <option>40°</option>
+                        <option>50°</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn w-full mt-6 text-lg py-3">🚀 Generate Plan</button>
+        </div>
+
+        <!-- Results Section -->
+        <div class="grid grid-cols-2 gap-8">
+            <!-- Timeline -->
+            <div class="card">
+                <h2 class="text-xl font-bold mb-2">📋 Timeline</h2>
+                <p class="text-sm text-gray-400 mb-6">4 observation blocks scheduled</p>
+
+                <div class="timeline-block">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <div class="font-bold text-lg">M42 - Orion Nebula</div>
+                            <div class="text-sm text-gray-400">18:42 - 20:15 (1h 33m)</div>
+                        </div>
+                        <span class="badge badge-green">★★★☆ 82</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-sm text-gray-400">
+                        <div>Alt: <span class="text-white">42°</span></div>
+                        <div>Mag: <span class="text-white">4.0</span></div>
+                        <div>Size: <span class="text-white">65' × 60'</span></div>
+                    </div>
+                    <div class="flex gap-2 mt-3">
+                        <button class="text-sm" style="color: #3b82f6;">△ Reorder</button>
+                        <button class="text-sm" style="color: #3b82f6;">□ View</button>
+                        <button class="text-sm" style="color: #eab308;">✎ Edit</button>
+                        <button class="text-sm" style="color: #ef4444;">✘ Remove</button>
+                    </div>
+                </div>
+
+                <div class="timeline-block" style="border-color: #22c55e;">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <div class="font-bold text-lg">M31 - Andromeda Galaxy</div>
+                            <div class="text-sm text-gray-400">20:15 - 21:30 (1h 15m)</div>
+                        </div>
+                        <span class="badge badge-green">★★★☆ 78</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-sm text-gray-400">
+                        <div>Alt: <span class="text-white">55°</span></div>
+                        <div>Mag: <span class="text-white">3.4</span></div>
+                        <div>Size: <span class="text-white">190' × 60'</span></div>
+                    </div>
+                    <div class="flex gap-2 mt-3">
+                        <button class="text-sm" style="color: #3b82f6;">△ Reorder</button>
+                        <button class="text-sm" style="color: #3b82f6;">□ View</button>
+                        <button class="text-sm" style="color: #eab308;">✎ Edit</button>
+                        <button class="text-sm" style="color: #ef4444;">✘ Remove</button>
+                    </div>
+                </div>
+
+                <div class="timeline-block" style="border-color: #22c55e;">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <div class="font-bold text-lg">M45 - Pleiades</div>
+                            <div class="text-sm text-gray-400">21:30 - 22:45 (1h 15m)</div>
+                        </div>
+                        <span class="badge badge-yellow">★★☆☆ 65</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-sm text-gray-400">
+                        <div>Alt: <span class="text-white">68°</span></div>
+                        <div>Mag: <span class="text-white">1.6</span></div>
+                        <div>Size: <span class="text-white">110' × 110'</span></div>
+                    </div>
+                    <div class="flex gap-2 mt-3">
+                        <button class="text-sm" style="color: #3b82f6;">△ Reorder</button>
+                        <button class="text-sm" style="color: #3b82f6;">□ View</button>
+                        <button class="text-sm" style="color: #eab308;">✎ Edit</button>
+                        <button class="text-sm" style="color: #ef4444;">✘ Remove</button>
+                    </div>
+                </div>
+
+                <div class="timeline-block" style="border-color: #eab308;">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <div class="font-bold text-lg">M42 - Orion Nebula (2nd pass)</div>
+                            <div class="text-sm text-gray-400">22:45 - 00:00 (1h 15m)</div>
+                        </div>
+                        <span class="badge badge-green">★★★☆ 79</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-sm text-gray-400">
+                        <div>Alt: <span class="text-white">61°</span></div>
+                        <div>Mag: <span class="text-white">4.0</span></div>
+                        <div>Size: <span class="text-white">65' × 60'</span></div>
+                    </div>
+                    <div class="flex gap-2 mt-3">
+                        <button class="text-sm" style="color: #3b82f6;">△ Reorder</button>
+                        <button class="text-sm" style="color: #3b82f6;">□ View</button>
+                        <button class="text-sm" style="color: #eab308;">✎ Edit</button>
+                        <button class="text-sm" style="color: #ef4444;">✘ Remove</button>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 mt-4">
+                    <button class="btn flex-1">📥 Export CSV</button>
+                    <button class="btn flex-1 btn-secondary">🔭 Export SkySafari</button>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="card">
+                <h2 class="text-xl font-bold mb-2">⭐ Recommendations</h2>
+                <p class="text-sm text-gray-400 mb-6">Targets not yet in timeline</p>
+
+                <div class="mb-4 p-4 rounded-lg" style="background: #1f2937;">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <div class="font-bold">M31 - Andromeda Galaxy</div>
+                            <div class="text-sm text-gray-400">Galaxy | Mag: 3.4 | Size: 190'</div>
+                        </div>
+                        <span class="badge badge-green">★★★☆ 78</span>
+                    </div>
+                    <button class="btn w-full mt-2" style="font-size: 14px; padding: 8px;">+ Add to Plan</button>
+                </div>
+
+                <div class="mb-4 p-4 rounded-lg" style="background: #1f2937;">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <div class="font-bold">M45 - Pleiades</div>
+                            <div class="text-sm text-gray-400">Open Cluster | Mag: 1.6 | Size: 110'</div>
+                        </div>
+                        <span class="badge badge-yellow">★★☆☆ 65</span>
+                    </div>
+                    <button class="btn w-full mt-2" style="font-size: 14px; padding: 8px;">+ Add to Plan</button>
+                </div>
+
+                <div class="mb-4 p-4 rounded-lg" style="background: #1f2937;">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <div class="font-bold">NGC 281 - Pacman Nebula</div>
+                            <div class="text-sm text-gray-400">Emission Nebula | Mag: 7.3 | Size: 35'</div>
+                        </div>
+                        <span class="badge badge-yellow">★★☆☆ 42</span>
+                    </div>
+                    <button class="btn w-full mt-2" style="font-size: 14px; padding: 8px;">+ Add to Plan</button>
+                </div>
+
+                <div class="p-4 rounded-lg" style="background: #1f2937;">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <div class="font-bold">M13 - Hercules Cluster</div>
+                            <div class="text-sm text-gray-400">Globular Cluster | Mag: 5.8 | Size: 20'</div>
+                        </div>
+                        <span class="badge badge-yellow">★★☆☆ 48</span>
+                    </div>
+                    <button class="btn w-full mt-2" style="font-size: 14px; padding: 8px;">+ Add to Plan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

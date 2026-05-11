@@ -81,6 +81,15 @@ def load_data_to_parquet() -> None:
 
         if all_targets:
             df = pd.DataFrame(all_targets)
+
+            # ensure angular_size is always float list to avoid schema mismatch
+            if "angular_size" in df.columns:
+                df["angular_size"] = df["angular_size"].apply(
+                    lambda x: (
+                        [float(v) for v in x] if isinstance(x, list | tuple) else []
+                    )
+                )
+
             df.to_parquet(TARGETS_OUT, partition_cols=["catalog_id"], engine="pyarrow")
         else:
             empty_df = pd.DataFrame(
