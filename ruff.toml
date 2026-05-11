@@ -1,4 +1,6 @@
 # Ruff configuration for Smart Telescope Planner
+line-length = 88
+target-version = "py313"
 
 # Selection of rules to enable/disable
 [lint]
@@ -15,7 +17,6 @@ select = [
 
 ignore = [
     "B008", # Do not perform function call `Depends` in argument defaults (FastAPI standard)
-    "E501", # Line too long
     "ANN001", # Missing type annotation for function argument
     "ANN002", # Missing type annotation for *args
     "ANN003", # Missing type annotation for **kwargs
@@ -36,4 +37,3 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
-
