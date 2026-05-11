@@ -1,13 +1,12 @@
-import { Routes, Route } from 'react-router-dom';
-import { AppLayout } from '@/components/AppLayout';
-import { SettingsPage } from '@/pages/Settings';
+import { Routes, Route } from "react-router-dom";
+import { AppLayout } from "@/components/AppLayout";
+import { SettingsPage } from "@/pages/Settings";
 import { Dashboard } from "@/pages/Dashboard";
 import { PlanGenerator } from "@/pages/PlanGenerator";
 import { CatalogsPage } from "@/pages/Catalogs";
 import { TargetDetailPage } from "@/pages/TargetDetail";
 import { ForecastPage } from "@/pages/Forecast";
 import { LogsPage } from "@/pages/Logs";
-
 
 function App() {
   return (

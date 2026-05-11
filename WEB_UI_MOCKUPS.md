@@ -61,6 +61,7 @@ Border:         #374151
 ```
 
 ### Key Elements:
+
 - **Header:** Logo, nav links, notification bell, settings gear, user avatar
 - **Location Card:** Current observing location with coordinates and Bortle scale
 - **Tonight Card:** Astronomical night window calculated from API
@@ -119,6 +120,7 @@ Border:         #374151
 ```
 
 ### Key Elements:
+
 - **Location & Telescope Panel:** Dropdowns with saved locations/profiles, manual override inputs
 - **Timeline View:** Chronological blocks with target name, altitude, score
 - **Block Actions:** Reorder (△), View (□), Edit (✎), Remove (✘)
@@ -163,6 +165,7 @@ Border:         #374151
 ```
 
 ### Key Elements:
+
 - **Filter Bar:** Location, days range, start date
 - **Day Cards:** Date, night hours, weather metrics, quality score badge
 - **Quality Bar:** Visual indicator of relative quality across the period
@@ -210,6 +213,7 @@ Border:         #374151
 ```
 
 ### Key Elements:
+
 - **Search Bar:** Instant search with debounce
 - **Catalog Tabs:** Quick switch between Messier, NGC, IC, Caldwell
 - **Filters:** Type, magnitude range, constellation dropdowns
@@ -272,6 +276,7 @@ Border:         #374151
 ```
 
 ### Key Elements:
+
 - **Header:** Target name, type, magnitude, size, constellation, coordinates
 - **FOV Fit Panel:** Visual indicator of how target fits in telescope view
 - **Altitude Chart:** Recharts line chart showing target altitude over time
@@ -323,6 +328,7 @@ Border:         #374151
 ```
 
 ### New Log Entry Modal:
+
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
 │  + New Observation Log                                    [✕]    │
@@ -408,6 +414,7 @@ Border:         #374151
 ## 8. Navigation & Layout
 
 ### Sidebar (Collapsed):
+
 ```
 ┌──┐
 │☰ │
@@ -422,6 +429,7 @@ Border:         #374151
 ```
 
 ### Sidebar (Expanded):
+
 ```
 ┌──────────────┐
 │  ☰ STAIRS   │
@@ -446,6 +454,7 @@ Border:         #374151
 ## Mobile Responsive Considerations
 
 ### Dashboard (Mobile):
+
 ```
 ┌─────────────────┐
 │ ☰ STAIRS    🔔 │
@@ -477,6 +486,7 @@ Border:         #374151
 ## Component States
 
 ### Loading State (Plan Generator):
+
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
 │  📋 Plan Generator                                                │
@@ -503,6 +513,7 @@ Border:         #374151
 ```
 
 ### Error State (API Failure):
+
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
 │  📋 Plan Generator                                                │

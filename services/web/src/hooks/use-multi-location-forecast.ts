@@ -1,8 +1,8 @@
-import { useQueries } from '@tanstack/react-query';
-import api from '@/lib/api';
-import type { components } from '@/types/api';
+import { useQueries } from "@tanstack/react-query";
+import api from "@/lib/api";
+import type { components } from "@/types/api";
 
-export type LocationConfig = components['schemas']['LocationConfig'];
+export type LocationConfig = components["schemas"]["LocationConfig"];
 
 export interface ForecastDay {
   date: string;
@@ -26,23 +26,28 @@ export interface MultiForecastResult {
   forecastData: ForecastResponse;
 }
 
-export function useMultiLocationForecast(locations: LocationConfig[] | undefined, days: number) {
+export function useMultiLocationForecast(
+  locations: LocationConfig[] | undefined,
+  days: number,
+) {
   const forecastQueries = (locations || []).map((location) => ({
-    queryKey: ['forecast', location.name, days],
+    queryKey: ["forecast", location.name, days],
     queryFn: async () => {
       const queryParams = new URLSearchParams();
 
       // Prioritize location_name to ensure the backend loads the full profile (Bortle, etc.) from DB
       if (location.name) {
-        queryParams.append('location_name', location.name);
+        queryParams.append("location_name", location.name);
       } else {
-        queryParams.append('latitude', location.latitude.toString());
-        queryParams.append('longitude', location.longitude.toString());
+        queryParams.append("latitude", location.latitude.toString());
+        queryParams.append("longitude", location.longitude.toString());
       }
 
-      queryParams.append('days', days.toString());
+      queryParams.append("days", days.toString());
 
-      const { data } = await api.get<ForecastResponse>(`/plan/forecast?${queryParams}`);
+      const { data } = await api.get<ForecastResponse>(
+        `/plan/forecast?${queryParams}`,
+      );
       return { locationName: location.name, forecastData: data };
     },
     enabled: !!locations && locations.length > 0 && days > 0,

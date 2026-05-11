@@ -1,7 +1,15 @@
-import { type ReactNode } from 'react';
-import { Home, Telescope, Calendar, ClipboardList, Settings, Menu, CalendarDays } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { type ReactNode } from "react";
+import {
+  Home,
+  Telescope,
+  Calendar,
+  ClipboardList,
+  Settings,
+  Menu,
+  CalendarDays,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -9,12 +17,12 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   const navItems = [
-    { icon: Home, label: 'Dashboard', href: '/' },
-    { icon: CalendarDays, label: 'Forecast', href: '/forecast' },
-    { icon: Calendar, label: 'Plan Generator', href: '/plan' },
-    { icon: Telescope, label: 'Catalogs', href: '/catalogs' },
-    { icon: ClipboardList, label: 'Observation Logs', href: '/logs' },
-    { icon: Settings, label: 'Settings', href: '/settings' },
+    { icon: Home, label: "Dashboard", href: "/" },
+    { icon: CalendarDays, label: "Forecast", href: "/forecast" },
+    { icon: Calendar, label: "Plan Generator", href: "/plan" },
+    { icon: Telescope, label: "Catalogs", href: "/catalogs" },
+    { icon: ClipboardList, label: "Observation Logs", href: "/logs" },
+    { icon: Settings, label: "Settings", href: "/settings" },
   ];
 
   return (
@@ -22,7 +30,9 @@ export function AppLayout({ children }: AppLayoutProps) {
       {/* sidebar - fixed on the left */}
       <aside className="w-64 border-r border-border bg-card hidden md:flex flex-col">
         <div className="p-6 border-b border-border">
-          <h2 className="text-xl font-black tracking-tighter text-primary">STAIRS</h2>
+          <h2 className="text-xl font-black tracking-tighter text-primary">
+            STAIRS
+          </h2>
         </div>
         <nav className="flex-1 p-4 space-y-2">
           {navItems.map((item) => (
@@ -38,7 +48,6 @@ export function AppLayout({ children }: AppLayoutProps) {
         </nav>
       </aside>
 
-
       {/* main content area */}
       <div className="flex-1 flex flex-col">
         <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm flex items-center justify-between px-6">
@@ -50,9 +59,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-8">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto p-8">{children}</main>
       </div>
     </div>
   );

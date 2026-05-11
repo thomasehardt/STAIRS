@@ -42,7 +42,6 @@
   --radius-sm: calc(0.5rem - 4px);
 }
 
-
 /* base styles:
    use @layer base to apply styles to standard HTML tags while
    still respecting Tailwind's theme variables.

@@ -29,19 +29,19 @@ A lot of apps will tell you _what_ is in the sky, but not how to build an effici
 ### Installation
 
 1. Clone the repository:
-    git clone https://github.com/thomasehardt/STAIRS.git
+   git clone https://github.com/thomasehardt/STAIRS.git
 1. navigate to the directory
-    cd STAIRS
+   cd STAIRS
 1. Create your own configuration file
-    cp .config.yaml.EXAMPLE config.yaml
+   cp .config.yaml.EXAMPLE config.yaml
 1. Edit config.yaml and update the information accordingly (the example config is well-documented)
 
 ### Running the application
 
 1. Start the API layer
-```docker compose up -d```
+   `docker compose up -d`
 2. Run the cli (note: this will spin up a container and exit it once done)
-```docker compose run --rm -it cli```
+   `docker compose run --rm -it cli`
 
 ## Usage
 

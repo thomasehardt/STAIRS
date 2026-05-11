@@ -5,6 +5,7 @@ This document defines the precise implementation details for the Phase 2b Dashbo
 ## 1. Schema Modifications (`services/api/src/api/schemas.py`)
 
 ### TargetRecommendation Update
+
 Add missing metadata fields required for the `TargetCard` UI to prevent redundant lookups.
 
 ```python
@@ -25,6 +26,7 @@ class TargetRecommendation(BaseModel):
 ```
 
 ### New Sky Quality Schemas
+
 ```python
 class QualityPoint(BaseModel):
     time: datetime
@@ -40,35 +42,38 @@ class QualitySeriesResponse(BaseModel):
 ## 2. API Endpoints (`services/api/src/api/routers/planner.py`)
 
 ### `POST /planner/recommend`
+
 A lightweight alternative to `/generate` that only ranks targets.
 
 - **Request**: `PlanRequest` (reuses existing model).
 - **Logic**:
-    1. Resolve location and astronomical night.
-    2. Calculate `static_oss` for all targets in the catalog.
-    3. Calculate `sqs_score` at the midpoint of the night (or current time if night has started).
-    4. Filter by `min_alt` and `theoretical_max_alt`.
-    5. Return top 20 recommendations.
+  1. Resolve location and astronomical night.
+  2. Calculate `static_oss` for all targets in the catalog.
+  3. Calculate `sqs_score` at the midpoint of the night (or current time if night has started).
+  4. Filter by `min_alt` and `theoretical_max_alt`.
+  5. Return top 20 recommendations.
 - **Goal**: Response time < 500ms.
 
 ### `GET /planner/quality-series`
+
 Provides the data for the Dashboard sky quality graph.
 
 - **Parameters**: `location_name`, `start_time` (optional).
 - **Logic**:
-    1. Resolve location and find the next astronomical night window.
-    2. Sample 10-minute intervals across the window.
-    3. For each interval:
-        - Get `w_mult` (Weather multiplier 0.0-1.0).
-        - Get `m_mult` (Moon quality multiplier 0.0-1.0).
-        - Combined Score = `(w_mult * m_mult) * 100`.
-    4. Return `QualitySeriesResponse`.
+  1. Resolve location and find the next astronomical night window.
+  2. Sample 10-minute intervals across the window.
+  3. For each interval:
+     - Get `w_mult` (Weather multiplier 0.0-1.0).
+     - Get `m_mult` (Moon quality multiplier 0.0-1.0).
+     - Combined Score = `(w_mult * m_mult) * 100`.
+  4. Return `QualitySeriesResponse`.
 
 ---
 
 ## 3. Frontend Implementation (`services/web/src`)
 
 ### Dashboard Timeframe Logic
+
 The Dashboard will calculate the header state based on `PlanResponse.astronomical_night_start/end`:
 
 ```typescript
@@ -78,12 +83,14 @@ const displayStart = isDarkNow ? now : nightStart;
 ```
 
 ### New Component: `SkyQualityChart.tsx`
+
 - **Library**: `react-chartjs-2`.
 - **Type**: Area chart (Line chart with fill).
 - **Y-Axis**: Fixed 0-100.
 - **Styling**: Semi-transparent primary color fill, matching the `AltitudeChart` aesthetic.
 
 ### Hook: `useSkyQuality()`
+
 New React Query hook fetching from `/planner/quality-series`.
 
 ---

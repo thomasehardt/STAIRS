@@ -19,7 +19,16 @@ services:
       - LOG_DIR=/app_data/logs
       - CACHE_DIR=/app_data/cache
       - HOME=/tmp
-    command: [ "uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    command:
+      [
+        "uvicorn",
+        "src.api.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+        "--reload",
+      ]
     restart: unless-stopped
 
   cli:
