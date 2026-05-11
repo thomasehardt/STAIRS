@@ -235,7 +235,6 @@ export function AltitudeChart({ data }: { data: AltitudePoint[] }) {
             },
             label: (item) =>
               ` Altitude: ${item.parsed.y?.toFixed(1) ?? "0.0"}\u00b0`,
-
           },
         },
         annotation: {

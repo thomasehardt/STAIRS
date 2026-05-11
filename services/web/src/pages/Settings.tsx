@@ -35,7 +35,7 @@ export function SettingsPage() {
     );
 
   return (
-    <div className="max-w-4xl space-y-10">
+    <div className="max-w-4xl space-y-8">
       <div>
         <h1 className="text-4xl font-black tracking-tight">Settings</h1>
         <p className="text-muted-foreground text-lg">
@@ -225,7 +225,7 @@ export function SettingsPage() {
                   Min Altitude
                 </label>
                 <span className="text-2xl font-black text-primary">
-                  {config?.planning.min_altitude}\u00b0
+                  {config?.planning.min_altitude}&deg;
                 </span>
               </div>
               <input
@@ -247,7 +247,7 @@ export function SettingsPage() {
                   Max Altitude
                 </label>
                 <span className="text-2xl font-black text-primary">
-                  {config?.planning.max_altitude}\u00b0
+                  {config?.planning.max_altitude}&deg;
                 </span>
               </div>
               <input
