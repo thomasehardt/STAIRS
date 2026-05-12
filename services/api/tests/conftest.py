@@ -3,7 +3,6 @@ import pytest
 
 # Disable IERS age checks to prevent tests from failing due to old Earth rotation data
 from astropy.utils.iers import conf
-from fastapi.testclient import TestClient
 from src.api.main import app
 from src.db.duck_session import get_duck_db
 
