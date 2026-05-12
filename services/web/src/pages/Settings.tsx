@@ -1,4 +1,4 @@
-import { useSettings } from "@/context/SettingsContext";
+import { useSettings } from "@/hooks/use-settings-context";
 import { useProfiles } from "@/hooks/use-config";
 import { MapPin, Activity, Telescope, Check, Trash2 } from "lucide-react";
 import { useState } from "react";

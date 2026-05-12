@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
-import { useSettings } from "@/context/SettingsContext";
+import { useSettings } from "@/hooks/use-settings-context";
 import type { components } from "@/types/api";
 
 type PositionSeries = components["schemas"]["TargetPositionSeries"];

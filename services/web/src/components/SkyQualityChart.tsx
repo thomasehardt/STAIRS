@@ -10,6 +10,7 @@ import {
   Filler,
   Legend,
 } from "chart.js";
+import type { TooltipItem } from "chart.js";
 import { Line } from "react-chartjs-2";
 import annotationPlugin from "chartjs-plugin-annotation";
 
@@ -97,7 +98,7 @@ export function SkyQualityChart({ points }: SkyQualityChartProps) {
         padding: 12,
         boxPadding: 6,
         callbacks: {
-          label: (context: any) =>
+          label: (context: TooltipItem<"line">) =>
             ` ${context.dataset.label}: ${context.parsed.y}%`,
         },
       },
@@ -134,7 +135,7 @@ export function SkyQualityChart({ points }: SkyQualityChartProps) {
           stepSize: 25,
           font: { size: 10 },
           color: "rgba(255, 255, 255, 0.5)",
-          callback: (value: any) => `${value}%`,
+          callback: (value: string | number) => `${value}%`,
         },
       },
     },

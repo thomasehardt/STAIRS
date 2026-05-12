@@ -138,7 +138,11 @@ export function LogsPage() {
                   </label>
                   <select
                     value={newLogStatus}
-                    onChange={(e) => setNewLogStatus(e.target.value as any)}
+                    onChange={(e) =>
+                      setNewLogStatus(
+                        e.target.value as "Captured" | "Attempted" | "Planned",
+                      )
+                    }
                     className="w-full bg-background border border-border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                   >
                     <option value="Captured">Captured</option>

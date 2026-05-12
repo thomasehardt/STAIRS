@@ -20,14 +20,22 @@ export function SkyVisualization({
   const [index, setIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // Reset index if timeline length changes unexpectedly
+  // Animation Loop - Increased frequency for smoothness
   useEffect(() => {
-    if (index >= timeline.length) {
-      setIndex(0);
+    let timer: number;
+    if (isPlaying && timeline.length > 0) {
+      timer = window.setInterval(() => {
+        setIndex((prev) => (prev + 1) % timeline.length);
+      }, 300); // Faster, smoother steps
     }
-  }, [timeline.length]);
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [isPlaying, timeline.length]);
 
-  const current = timeline[index];
+  // Ensure index is within bounds if timeline changes
+  const safeIndex = index < timeline.length ? index : 0;
+  const current = timeline[safeIndex];
 
   if (!current) {
     return (
@@ -40,17 +48,6 @@ export function SkyVisualization({
   const size = 400;
   const center = size / 2;
   const radius = size / 2 - 40;
-
-  // Animation Loop - Increased frequency for smoothness
-  useEffect(() => {
-    let timer: number;
-    if (isPlaying) {
-      timer = window.setInterval(() => {
-        setIndex((prev) => (prev + 1) % timeline.length);
-      }, 300); // Faster, smoother steps
-    }
-    return () => clearInterval(timer);
-  }, [isPlaying, timeline.length]);
 
   const project = (alt: number, az: number) => {
     // Project altitude and azimuth to polar coordinates

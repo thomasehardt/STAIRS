@@ -186,21 +186,29 @@ async def get_target_detail(
             )
 
             exposure = ExposureRecommendation(
-                sky_limited_sub_s=safe_round(sky_lim_sub, 1),
+                optimal_sub_s=safe_round(prac_sub, 1),
                 practical_sub_s=safe_round(prac_sub, 1),
-                total_integration_h=safe_round(
-                    calculate_total_integration_time(
-                        target.magnitude if target.magnitude is not None else 15.0,
-                        size_arcmin,
-                        bortle,
-                        profile.aperture_mm,
-                        profile.focal_length_mm,
-                        profile.pixel_pitch_um,
-                        profile.quantum_efficiency,
-                        profile.read_noise_e,
+                total_integration_h=float(
+                    np.clip(
+                        safe_round(
+                            calculate_total_integration_time(
+                                target.magnitude
+                                if target.magnitude is not None
+                                else 13.0,
+                                size_arcmin,
+                                bortle,
+                                profile.aperture_mm,
+                                profile.focal_length_mm,
+                                profile.pixel_pitch_um,
+                                profile.quantum_efficiency,
+                                profile.read_noise_e,
+                            )
+                            / 3600.0,
+                            1,
+                        ),
+                        0.1,
+                        12.0,
                     )
-                    / 3600.0,
-                    1,
                 ),
             )
 

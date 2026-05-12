@@ -1,11 +1,12 @@
 import logging
+import os
 from pathlib import Path
 from typing import Any
 
 import yaml
 
 logger = logging.getLogger(__name__)
-CONFIG_PATH = Path("config.yaml")
+CONFIG_PATH = Path(os.getenv("CONFIG_FILE", "config.yaml"))
 
 
 class ConfigManager:

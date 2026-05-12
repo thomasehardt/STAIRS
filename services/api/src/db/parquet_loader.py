@@ -13,10 +13,11 @@ from src.planner.planner_models import ObservationLocation
 
 logger = logging.getLogger(__name__)
 
-CONFIG_FILE = Path("config.yaml")
-CATALOG_DIR = Path("data/catalogs")
+CONFIG_FILE = Path(os.getenv("CONFIG_FILE", "config.yaml"))
+DATA_DIR = Path(os.getenv("DATA_DIR", "data"))
+CATALOG_DIR = DATA_DIR / "catalogs"
 OPENNGC_DIR = CATALOG_DIR / "openngc"
-TELESCOPE_PROFILES_DIR = Path("data/telescopes")
+TELESCOPE_PROFILES_DIR = DATA_DIR / "telescopes"
 
 CACHE_ROOT = Path(os.getenv("CACHE_DIR", "cache"))
 LOCATIONS_OUT = CACHE_ROOT / "user_locations.parquet"

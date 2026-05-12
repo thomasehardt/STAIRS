@@ -1,11 +1,13 @@
 import json
 import logging
+import os
 from pathlib import Path
 
 from src.catalog.catalog_models import TelescopeProfile
 
 logger = logging.getLogger(__name__)
-TELESCOPE_PROFILES_PATH = Path("data/telescope_profiles.json")
+DATA_DIR = Path(os.getenv("DATA_DIR", "data"))
+TELESCOPE_PROFILES_PATH = DATA_DIR / "telescope_profiles.json"
 
 
 class TelescopeService:

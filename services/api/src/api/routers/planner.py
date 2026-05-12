@@ -65,7 +65,10 @@ def _build_plan_context(
 
     profile = catalog_service.get_profile_by_name(request.telescope_profile_name)
     if not profile:
-        raise HTTPException(status_code=404, detail="Telescope profile not found")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Telescope profile '{request.telescope_profile_name}' not found",
+        )
 
     loc = resolve_location(
         db=db,
@@ -219,7 +222,10 @@ async def get_target_opportunity_series(
 
     profile = catalog_service.get_profile_by_name(telescope_profile_name)
     if not profile:
-        raise HTTPException(status_code=404, detail="Telescope profile not found")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Telescope profile '{telescope_profile_name}' not found",
+        )
 
     loc = resolve_location(db=db, name=location_name)
 
@@ -342,7 +348,10 @@ async def recommend_targets(
     catalog_service = DuckCatalogService(db)
     profile = catalog_service.get_profile_by_name(request.telescope_profile_name)
     if not profile:
-        raise HTTPException(status_code=404, detail="Telescope profile not found")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Telescope profile '{request.telescope_profile_name}' not found",
+        )
 
     loc = resolve_location(
         db=db,
@@ -469,21 +478,29 @@ async def recommend_targets(
                 if window
                 else None,
                 exposure=ExposureRecommendation(
-                    sky_limited_sub_s=safe_round(sky_lim_sub, 1),
+                    optimal_sub_s=safe_round(prac_sub, 1),
                     practical_sub_s=safe_round(prac_sub, 1),
-                    total_integration_h=safe_round(
-                        calculate_total_integration_time(
-                            row["magnitude"] if not pd.isna(row["magnitude"]) else 15.0,
-                            size_arcmin,
-                            loc.bortle_scale or 5,
-                            profile.aperture_mm,
-                            profile.focal_length_mm,
-                            profile.pixel_pitch_um,
-                            profile.quantum_efficiency,
-                            profile.read_noise_e,
+                    total_integration_h=float(
+                        np.clip(
+                            safe_round(
+                                calculate_total_integration_time(
+                                    row["magnitude"]
+                                    if not pd.isna(row["magnitude"])
+                                    else 13.0,
+                                    size_arcmin,
+                                    loc.bortle_scale or 5,
+                                    profile.aperture_mm,
+                                    profile.focal_length_mm,
+                                    profile.pixel_pitch_um,
+                                    profile.quantum_efficiency,
+                                    profile.read_noise_e,
+                                )
+                                / 3600.0,
+                                1,
+                            ),
+                            0.1,
+                            12.0,
                         )
-                        / 3600.0,
-                        1,
                     ),
                 ),
             )

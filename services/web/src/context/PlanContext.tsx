@@ -1,19 +1,6 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
-
-export interface PinnedTarget {
-  id: string;
-  common_name?: string | null;
-  target_type?: string | null;
-  score: number;
-}
-
-interface PlanContextType {
-  pinnedTargets: PinnedTarget[];
-  togglePin: (target: PinnedTarget) => void;
-  clearPins: () => void;
-}
-
-const PlanContext = createContext<PlanContextType | undefined>(undefined);
+import { useState, type ReactNode } from "react";
+import type { PinnedTarget } from "./PlanContext.types";
+import { PlanContext } from "./PlanContext.context";
 
 export function PlanProvider({ children }: { children: ReactNode }) {
   const [pinnedTargets, setPinnedTargets] = useState<PinnedTarget[]>([]);
@@ -35,10 +22,4 @@ export function PlanProvider({ children }: { children: ReactNode }) {
       {children}
     </PlanContext.Provider>
   );
-}
-
-export function usePlan() {
-  const context = useContext(PlanContext);
-  if (!context) throw new Error("usePlan must be used within a PlanProvider");
-  return context;
 }

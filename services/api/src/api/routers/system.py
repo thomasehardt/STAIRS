@@ -1,3 +1,4 @@
+import numpy as np
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel
 from src.astro_logic.exposure import (
@@ -24,7 +25,7 @@ class ExposureCalcRequest(BaseModel):
 class ExposureCalcResponse(BaseModel):
     aperture_mm: float
     sky_flux: float
-    sky_limited_sub_s: float
+    optimal_sub_s: float
     practical_sub_s: float
     total_integration_h: float
 
@@ -73,7 +74,7 @@ async def calculate_exposure(
     )
 
     total_s = calculate_total_integration_time(
-        request.magnitude,
+        request.magnitude if request.magnitude is not None else 13.0,
         request.angular_size,
         request.bortle,
         profile.aperture_mm,
@@ -86,7 +87,7 @@ async def calculate_exposure(
     return ExposureCalcResponse(
         aperture_mm=profile.aperture_mm,
         sky_flux=safe_round(sky_flux, 4),
-        sky_limited_sub_s=safe_round(sky_lim_sub, 1),
+        optimal_sub_s=safe_round(prac_sub, 1),
         practical_sub_s=safe_round(prac_sub, 1),
-        total_integration_h=safe_round(total_s / 3600.0, 2),
+        total_integration_h=float(np.clip(safe_round(total_s / 3600.0, 2), 0.1, 12.0)),
     )

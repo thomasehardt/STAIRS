@@ -1,34 +1,7 @@
-import { createContext, useContext, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useAppConfig, useUpdateAppConfig } from "@/hooks/use-config";
 import type { components } from "@/types/api";
-
-type AppConfig = components["schemas"]["AppConfig"];
-type LocationConfig = components["schemas"]["LocationConfig"];
-
-interface SettingsContextType {
-  config: AppConfig | undefined;
-  isLoading: boolean;
-
-  // the active (current) settings come from config
-  activeLocation: LocationConfig | undefined;
-  activeTelescope: string;
-  minAltitude: number;
-  maxAltitude: number;
-  tempUnit: "C" | "F";
-
-  // actions
-  updatePlanning: (
-    updates: Partial<components["schemas"]["PlanningSettings"]>,
-  ) => void;
-  updateWeatherUnits: (unit: "C" | "F") => void;
-  setDefaultLocation: (locationName: string) => void;
-  addLocation: (location: components["schemas"]["LocationConfig"]) => void;
-  deleteLocation: (locationName: string) => void;
-}
-
-const SettingsContext = createContext<SettingsContextType | undefined>(
-  undefined,
-);
+import { SettingsContext } from "./SettingsContext.context";
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const { data: config, isLoading } = useAppConfig();
@@ -126,11 +99,4 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       {children}
     </SettingsContext.Provider>
   );
-}
-
-export function useSettings() {
-  const context = useContext(SettingsContext);
-  if (!context)
-    throw new Error("useSettings must be used within a SettingsProvider");
-  return context;
 }

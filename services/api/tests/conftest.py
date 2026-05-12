@@ -1,8 +1,19 @@
+import os
+from pathlib import Path
+
 import duckdb
 import pytest
 
 # Disable IERS age checks to prevent tests from failing due to old Earth rotation data
 from astropy.utils.iers import conf
+
+# Set up environment variables for testing if not already set
+# This allows running tests from the services/api directory
+project_root = Path(__file__).parent.parent.parent.parent
+os.environ.setdefault("CONFIG_FILE", str(project_root / "config.yaml"))
+os.environ.setdefault("DATA_DIR", str(project_root / "data"))
+os.environ.setdefault("CACHE_DIR", str(project_root / "cache"))
+
 from src.api.main import app
 from src.db.duck_session import get_duck_db
 
