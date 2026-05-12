@@ -40,6 +40,17 @@
       "type": "number",
       "description": "Pixel pitch in micrometers",
       "minimum": 0
+    },
+    "read_noise_e": {
+      "type": "number",
+      "description": "Read noise in electrons (e-)",
+      "minimum": 0
+    },
+    "quantum_efficiency": {
+      "type": "number",
+      "description": "Quantum efficiency (0.0 to 1.0)",
+      "minimum": 0,
+      "maximum": 1
     }
   }
 }

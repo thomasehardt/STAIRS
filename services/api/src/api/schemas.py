@@ -55,6 +55,12 @@ class ObservationBlock(BaseModel):
     aqs_score: float | None = None
 
 
+class ExposureRecommendation(BaseModel):
+    optimal_sub_s: float
+    total_integration_h: float
+    target_snr: float = 20.0
+
+
 class TargetRecommendation(BaseModel):
     target_id: str
     common_name: str | None = None
@@ -67,6 +73,7 @@ class TargetRecommendation(BaseModel):
     final_score: float
     visible_start: datetime | None = None
     visible_end: datetime | None = None
+    exposure: ExposureRecommendation | None = None
 
 
 class PlanResponse(BaseModel):
@@ -168,6 +175,7 @@ class TargetDetail(BaseModel):
     fov_fit: FovFit | None = None
     last_observed: date | None = None
     observation_count: int | None = None
+    exposure: ExposureRecommendation | None = None
 
 
 class ForecastDay(BaseModel):

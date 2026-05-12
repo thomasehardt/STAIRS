@@ -956,6 +956,7 @@ export interface components {
       last_observed?: string | null;
       /** Observation Count */
       observation_count?: number | null;
+      exposure?: components["schemas"]["ExposureRecommendation"] | null;
     };
     /** TargetOpportunitySeries */
     TargetOpportunitySeries: {
@@ -965,6 +966,18 @@ export interface components {
       location_name: string;
       /** Points */
       points: components["schemas"]["OpportunityPoint"][];
+    };
+    /** ExposureRecommendation */
+    ExposureRecommendation: {
+      /** Optimal Sub S */
+      optimal_sub_s: number;
+      /** Total Integration H */
+      total_integration_h: number;
+      /**
+       * Target Snr
+       * @default 20
+       */
+      target_snr: number;
     };
     /** TargetPositionSeries */
     TargetPositionSeries: {
@@ -997,6 +1010,7 @@ export interface components {
       visible_start?: string | null;
       /** Visible End */
       visible_end?: string | null;
+      exposure?: components["schemas"]["ExposureRecommendation"] | null;
     };
     /** TargetSearchItem */
     TargetSearchItem: {

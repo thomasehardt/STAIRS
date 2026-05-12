@@ -4,5 +4,7 @@
   "focal_length_mm": 100,
   "sensor_x": 3840,
   "sensor_y": 2160,
-  "pixel_pitch_um": 1.45
+  "pixel_pitch_um": 1.45,
+  "read_noise_e": 1.5,
+  "quantum_efficiency": 0.75
 }

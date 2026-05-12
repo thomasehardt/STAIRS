@@ -35,6 +35,8 @@ class TelescopeProfile(BaseModel):
     sensor_x: PositiveInt
     sensor_y: PositiveInt
     pixel_pitch_um: PositiveFloat
+    read_noise_e: PositiveFloat = 1.5  # default for modern CMOS
+    quantum_efficiency: float = 0.8  # 80% QE common for modern sensors
 
     def calculate_fov(self) -> tuple[float, float]:
         """
