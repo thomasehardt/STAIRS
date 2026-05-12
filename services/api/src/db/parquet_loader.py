@@ -184,7 +184,12 @@ def load_data_to_parquet() -> None:
     convert OpenNGC CSV catalog and telescope profile data to parquet for use by duckdb
     :return:
     """
+    logger.info(
+        f"starting data ingestion. DATA_DIR={DATA_DIR}, CACHE_ROOT={CACHE_ROOT}"
+    )
+
     # 1. Ingest Catalogs
+    logger.info(f"checking catalogs in {OPENNGC_DIR}")
     if _needs_update(OPENNGC_DIR, METADATA_OUT) or not TARGETS_OUT.exists():
         if TARGETS_OUT.exists():
             shutil.rmtree(TARGETS_OUT)
@@ -196,124 +201,138 @@ def load_data_to_parquet() -> None:
         for f in csv_files:
             p = OPENNGC_DIR / f
             if p.exists():
+                logger.info(f"reading {p}")
                 dfs.append(pd.read_csv(p, sep=";", low_memory=False))
+            else:
+                logger.warning(f"catalog file not found: {p}")
 
         if not dfs:
-            logger.error("no OpenNGC data found")
-            return
+            logger.error(f"no OpenNGC data found in {OPENNGC_DIR}")
+            # we still want to ensure TARGETS_OUT is at least an empty dir
+        else:
+            df = pd.concat(dfs, ignore_index=True)
+            logger.info(f"loaded {len(df)} rows from CSV")
 
-        df = pd.concat(dfs, ignore_index=True)
+            # Basic Cleanup
+            df = df[df["Type"] != "NonEx"].copy()
+            df = df[df["RA"].notna() & df["Dec"].notna()].copy()
+            logger.info(f"after cleanup: {len(df)} rows")
 
-        # Basic Cleanup
-        df = df[df["Type"] != "NonEx"].copy()
-        df = df[df["RA"].notna() & df["Dec"].notna()].copy()
+            # Coordinate Conversion
+            try:
+                coords = SkyCoord(ra=df["RA"], dec=df["Dec"], unit=(u.hourangle, u.deg))
+                df["ra_deg"] = coords.ra.deg
+                df["dec_deg"] = coords.dec.deg
+                df["right_ascension"] = coords.ra.hour
+                df["declination"] = coords.dec.deg
+            except Exception as e:
+                logger.error(f"failed to parse coordinates: {e}")
+                return
 
-        # Coordinate Conversion
-        try:
-            coords = SkyCoord(ra=df["RA"], dec=df["Dec"], unit=(u.hourangle, u.deg))
-            df["ra_deg"] = coords.ra.deg
-            df["dec_deg"] = coords.dec.deg
-            df["right_ascension"] = coords.ra.hour
-            df["declination"] = coords.dec.deg
-        except Exception as e:
-            logger.error(f"failed to parse coordinates: {e}")
-            return
+            # Mapping and Normalization
+            df["constellation"] = df["Const"].map(CONST_MAP).fillna("Other")
+            df["target_type"] = df["Type"].map(TYPE_MAP).fillna("Other")
+            df["magnitude"] = df["V-Mag"].combine_first(df["B-Mag"])
+            df["common_name"] = df["Common names"].where(
+                df["Common names"].notna(), None
+            )
+            df["catalog_id"] = "openngc"
 
-        # Mapping and Normalization
-        df["constellation"] = df["Const"].map(CONST_MAP).fillna("Other")
-        df["target_type"] = df["Type"].map(TYPE_MAP).fillna("Other")
-        df["magnitude"] = df["V-Mag"].combine_first(df["B-Mag"])
-        df["common_name"] = df["Common names"].where(df["Common names"].notna(), None)
-        df["catalog_id"] = "openngc"
+            # Angular Size [MajAx, MinAx] in Degrees
+            def get_angular_size(r):
+                if pd.notna(r["MajAx"]):
+                    if pd.notna(r["MinAx"]):
+                        return [float(r["MajAx"]) / 60.0, float(r["MinAx"]) / 60.0]
+                    return [float(r["MajAx"]) / 60.0]
 
-        # Angular Size [MajAx, MinAx] in Degrees
-        def get_angular_size(r):
-            if pd.notna(r["MajAx"]):
-                if pd.notna(r["MinAx"]):
-                    return [float(r["MajAx"]) / 60.0, float(r["MinAx"]) / 60.0]
-                return [float(r["MajAx"]) / 60.0]
+                # Fallback based on type
+                t = TYPE_MAP.get(r["Type"], "Other")
+                fallback = TYPE_SIZE_FALLBACK.get(t, 0.01)
+                return [fallback]
 
-            # Fallback based on type
-            t = TYPE_MAP.get(r["Type"], "Other")
-            fallback = TYPE_SIZE_FALLBACK.get(t, 0.01)
-            return [fallback]
+            df["angular_size"] = df.apply(get_angular_size, axis=1)
 
-        df["angular_size"] = df.apply(get_angular_size, axis=1)
+            # Season
+            df["season"] = df["right_ascension"].apply(
+                lambda x: "winter"
+                if 0 <= x < 6
+                else "spring"
+                if 6 <= x < 12
+                else "summer"
+                if 12 <= x < 18
+                else "autumn"
+            )
 
-        # Season
-        df["season"] = df["right_ascension"].apply(
-            lambda x: "winter"
-            if 0 <= x < 6
-            else "spring"
-            if 6 <= x < 12
-            else "summer"
-            if 12 <= x < 18
-            else "autumn"
-        )
+            # Identifiers
+            def build_ids(row):
+                ids = [str(row["Name"])]
+                if pd.notna(row["M"]):
+                    ids.append(f"M{int(row['M'])}")
+                if pd.notna(row["Identifiers"]):
+                    other = str(row["Identifiers"]).split(",")
+                    ids.extend([o.strip() for o in other if o.strip()])
+                return list(set(ids))
 
-        # Identifiers
-        def build_ids(row):
-            ids = [str(row["Name"])]
-            if pd.notna(row["M"]):
-                ids.append(f"M{int(row['M'])}")
-            if pd.notna(row["Identifiers"]):
-                other = str(row["Identifiers"]).split(",")
-                ids.extend([o.strip() for o in other if o.strip()])
-            return list(set(ids))
+            df["identifiers"] = df.apply(build_ids, axis=1)
+            df["identifiers_str"] = df["identifiers"].apply(lambda x: ",".join(x))
+            df["identifier"] = df["Name"]
 
-        df["identifiers"] = df.apply(build_ids, axis=1)
-        df["identifiers_str"] = df["identifiers"].apply(lambda x: ",".join(x))
-        df["identifier"] = df["Name"]
+            # Select columns for Parquet
+            out_cols = [
+                "identifier",
+                "common_name",
+                "ra_deg",
+                "dec_deg",
+                "target_type",
+                "constellation",
+                "magnitude",
+                "catalog_id",
+                "angular_size",
+                "identifiers",
+                "identifiers_str",
+                "season",
+                "right_ascension",
+                "declination",
+            ]
+            final_df = df[out_cols].copy()
 
-        # Select columns for Parquet
-        out_cols = [
-            "identifier",
-            "common_name",
-            "ra_deg",
-            "dec_deg",
-            "target_type",
-            "constellation",
-            "magnitude",
-            "catalog_id",
-            "angular_size",
-            "identifiers",
-            "identifiers_str",
-            "season",
-            "right_ascension",
-            "declination",
-        ]
-        final_df = df[out_cols].copy()
+            # Write to Parquet
+            logger.info(f"writing targets to {TARGETS_OUT}")
+            final_df.to_parquet(
+                TARGETS_OUT, partition_cols=["catalog_id"], engine="pyarrow"
+            )
 
-        # Write to Parquet
-        final_df.to_parquet(
-            TARGETS_OUT, partition_cols=["catalog_id"], engine="pyarrow"
-        )
-
-        # Metadata
-        catalog_metadata = [
-            {
-                "catalog_id": "openngc",
-                "name": "OpenNGC",
-                "summary": "The Open New General Catalogue and Index Catalogue",
-                "author": "Mattia Verga",
-                "item_count": len(final_df),
-            }
-        ]
-        pd.DataFrame(catalog_metadata).to_parquet(METADATA_OUT, engine="pyarrow")
+            # Metadata
+            catalog_metadata = [
+                {
+                    "catalog_id": "openngc",
+                    "name": "OpenNGC",
+                    "summary": "The Open New General Catalogue and Index Catalogue",
+                    "author": "Mattia Verga",
+                    "item_count": len(final_df),
+                }
+            ]
+            logger.info(f"writing metadata to {METADATA_OUT}")
+            pd.DataFrame(catalog_metadata).to_parquet(METADATA_OUT, engine="pyarrow")
     else:
-        logger.debug("catalogs are already up to date")
+        logger.info("catalogs are already up to date")
 
     # 2. Ingest Telescope Profiles
+    logger.info(f"checking telescope profiles in {TELESCOPE_PROFILES_DIR}")
     if _needs_update(TELESCOPE_PROFILES_DIR, TELESCOPES_OUT):
         logger.info("ingesting telescope profiles")
         telescope_profiles = []
         for path in TELESCOPE_PROFILES_DIR.glob("*.json"):
+            logger.info(f"reading profile {path}")
             with open(path) as f:
                 profile_data = json.load(f)
                 profile = TelescopeProfile(**profile_data)
                 telescope_profiles.append(profile.model_dump())
 
         if telescope_profiles:
+            logger.info(
+                f"writing {len(telescope_profiles)} profiles to {TELESCOPES_OUT}"
+            )
             pd.DataFrame(telescope_profiles).to_parquet(
                 TELESCOPES_OUT, engine="pyarrow"
             )
@@ -330,9 +349,10 @@ def load_data_to_parquet() -> None:
             ).to_parquet(TELESCOPES_OUT, engine="pyarrow")
             logger.warning("no telescope profiles found")
     else:
-        logger.debug("telescope profiles are already up to date")
+        logger.info("telescope profiles are already up to date")
 
     # 3. Ingest User Locations from Config
+    logger.info(f"checking config file {CONFIG_FILE}")
     if _needs_update(CONFIG_FILE, LOCATIONS_OUT):
         validated_locations = []
         if CONFIG_FILE.exists():

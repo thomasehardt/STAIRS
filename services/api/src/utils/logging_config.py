@@ -41,6 +41,11 @@ def setup_logging():
         file_handler.setFormatter(formatter)
         root_logger.addHandler(file_handler)
 
+        # Stream handler (Console)
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(formatter)
+        root_logger.addHandler(stream_handler)
+
         # Ensure root logger level is set
         root_logger.setLevel(log_level)
     else:
