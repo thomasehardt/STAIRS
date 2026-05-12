@@ -1,10 +1,11 @@
+import { useMemo } from "react";
 import { Telescope, MapPin, Activity, Pin, PinOff, Clock } from "lucide-react";
 import { useTargetPosition } from "@/hooks/use-target-position";
 import { AltitudeChart } from "./AltitudeChart";
 import { Button } from "@/components/ui/button";
-import { useSettings } from "@/context/SettingsContext";
+import { useSettings } from "@/hooks/use-settings-context";
 import { useProfiles } from "@/hooks/use-config";
-import { useMemo } from "react";
+import type { components } from "@/types/api";
 
 // Helper to render the seasonal visibility bar
 function SeasonalBar({ season }: { season: string | null }) {
@@ -58,7 +59,7 @@ function FovPreview({
   targetSize,
   telescopeName,
 }: {
-  targetSize: number[] | null;
+  targetSize?: number[] | null;
   telescopeName: string;
 }) {
   const { data: profilesData } = useProfiles();
@@ -138,6 +139,21 @@ function FovPreview({
   );
 }
 
+interface TargetLike {
+  identifier?: string;
+  target_id?: string;
+  common_name?: string | null;
+  target_type: string;
+  constellation: string;
+  magnitude?: number | null;
+  angular_size?: number[] | null;
+  season?: string | null;
+  sqs_score?: number | null;
+  aqs_score?: number | null;
+  oss_score?: number | null;
+  exposure?: components["schemas"]["ExposureRecommendation"] | null;
+}
+
 export function TargetCard({
   target,
   nightStart,
@@ -146,7 +162,7 @@ export function TargetCard({
   isPinned,
   variant = "standard",
 }: {
-  target: any;
+  target: TargetLike;
   nightStart: Date | null;
   nightEnd: Date | null;
   onTogglePin?: (id: string) => void;
@@ -154,7 +170,7 @@ export function TargetCard({
   variant?: "standard" | "catalog";
 }) {
   const { activeTelescope } = useSettings();
-  const id = target.target_id || target.identifier;
+  const id = target.target_id || target.identifier || "unknown";
 
   const { data: posData, isLoading: posLoading } = useTargetPosition(
     id,
@@ -230,7 +246,7 @@ export function TargetCard({
             <div className="flex items-center gap-3">
               <div className="flex items-baseline gap-1">
                 <span className="text-2xl font-black text-primary leading-none">
-                  {Math.round(target.sqs_score)}
+                  {Math.round(target.sqs_score || 0)}
                 </span>
                 <span className="text-[10px] font-black text-primary/50 uppercase tracking-tighter">
                   REL
@@ -239,7 +255,7 @@ export function TargetCard({
               <div className="w-px h-4 bg-border" />
               <div className="flex items-baseline gap-1">
                 <span className="text-2xl font-black text-primary leading-none">
-                  {Math.round(target.aqs_score || target.oss_score)}
+                  {Math.round(target.aqs_score || target.oss_score || 0)}
                 </span>
                 <span className="text-[10px] font-black text-primary/50 uppercase tracking-tighter">
                   ABS
@@ -258,7 +274,7 @@ export function TargetCard({
             targetSize={target.angular_size}
             telescopeName={activeTelescope}
           />
-          <SeasonalBar season={target.season} />
+          <SeasonalBar season={target.season ?? null} />
         </div>
 
         {/* Technical Specs */}
@@ -334,7 +350,7 @@ function DetailItem({
 }: {
   label: string;
   value: string | number;
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
 }) {
   return (
     <div className="flex items-center gap-2 px-2 py-1.5 rounded-xl bg-background/50 border border-border/50">

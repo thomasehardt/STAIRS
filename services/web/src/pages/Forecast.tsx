@@ -1,10 +1,10 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { type UseQueryResult } from "@tanstack/react-query";
 import { Chart, registerables, type ChartOptions } from "chart.js";
 import { Line } from "react-chartjs-2";
 import "chartjs-adapter-date-fns";
 import { useNavigate } from "react-router-dom";
-import { useSettings } from "@/context/SettingsContext";
+import { useSettings } from "@/hooks/use-settings-context";
 import {
   useMultiLocationForecast,
   type MultiForecastResult,
@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { SkyQualityChart } from "@/components/SkyQualityChart";
 import { useSkyQuality } from "@/hooks/use-sky-quality";
+import type { components } from "@/types/api";
 
 // Register Chart.js components and plugins
 Chart.register(...registerables);
@@ -54,17 +55,23 @@ const QualityBadge: React.FC<{ score: number | null | undefined }> = ({
   );
 };
 
-const LocationNightCard: React.FC<{
-  loc: any;
+interface LocationNightCardProps {
+  loc: components["schemas"]["ForecastDay"] & { name: string };
   isBest: boolean;
-  navigate: any;
-}> = ({ loc, isBest, navigate }) => {
+  navigate: ReturnType<typeof useNavigate>;
+}
+
+const LocationNightCard: React.FC<LocationNightCardProps> = ({
+  loc,
+  isBest,
+  navigate,
+}) => {
   const { data: qualityData, isLoading } = useSkyQuality(
     loc.name,
     loc.astronomical_night_start || loc.date,
   );
 
-  const formatTime = (iso: string | null) => {
+  const formatTime = (iso: string | null | undefined) => {
     if (!iso) return "--:--";
     return new Date(iso).toLocaleTimeString([], {
       hour: "2-digit",
@@ -213,11 +220,24 @@ const LocationNightCard: React.FC<{
   );
 };
 
-const DayOverview: React.FC<{
-  day: any;
+interface DayOverviewProps {
+  day: {
+    date: string;
+    displayLocations: (components["schemas"]["ForecastDay"] & {
+      name: string;
+      displayScore: number;
+    })[];
+    bestLocationName: string | null;
+  };
   onClose: () => void;
-  navigate: any;
-}> = ({ day, onClose, navigate }) => {
+  navigate: ReturnType<typeof useNavigate>;
+}
+
+const DayOverview: React.FC<DayOverviewProps> = ({
+  day,
+  onClose,
+  navigate,
+}) => {
   const date = new Date(day.date);
 
   return (
@@ -254,7 +274,7 @@ const DayOverview: React.FC<{
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
-            {day.displayLocations.map((loc: any, idx: number) => (
+            {day.displayLocations.map((loc, idx) => (
               <LocationNightCard
                 key={idx}
                 loc={loc}
@@ -381,31 +401,33 @@ export const ForecastPage: React.FC = () => {
   const [qualityType, setQualityType] = useState<"absolute" | "relative">(
     "absolute",
   );
-  const [selectedDay, setSelectedDay] = useState<any>(null);
+  const [selectedDay, setSelectedDay] = useState<{
+    date: string;
+    displayLocations: (components["schemas"]["ForecastDay"] & {
+      name: string;
+      displayScore: number;
+    })[];
+    bestLocationName: string | null;
+  } | null>(null);
 
   // Manage which locations are selected for the forecast
-  const [selectedLocationNames, setSelectedLocationNames] = useState<string[]>(
-    [],
-  );
+  const [selectedLocationNames, setSelectedLocationNames] = useState<
+    string[] | null
+  >(null);
 
-  // Initialize selected locations from config if not set
-  useEffect(() => {
-    if (config?.locations && selectedLocationNames.length === 0) {
-      setSelectedLocationNames(config.locations.map((l) => l.name));
-    }
-  }, [config?.locations, selectedLocationNames.length]);
-
+  // Derived filtered locations to avoid useEffect initialization
   const filteredLocations = useMemo(() => {
     if (!config?.locations) return [];
-    // Always include the default/active location
+
     const activeName = activeLocation?.name;
+    const currentSelection =
+      selectedLocationNames ?? config.locations.map((l) => l.name);
+
     return config.locations.filter(
       (l) =>
-        selectedLocationNames.includes(l.name) ||
-        l.name === activeName ||
-        l.default,
+        currentSelection.includes(l.name) || l.name === activeName || l.default,
     );
-  }, [config?.locations, selectedLocationNames, activeLocation?.name]);
+  }, [config, selectedLocationNames, activeLocation?.name]);
 
   const results = useMultiLocationForecast(
     filteredLocations,
@@ -528,11 +550,19 @@ export const ForecastPage: React.FC = () => {
     };
   }, [qualityType]);
 
-  // Organize and sort data by day for the grid, ensuring reactivity to qualityType
   const daysGrid = useMemo(() => {
     if (results.length === 0) return [];
 
-    const allDays: Record<string, { date: string; locations: any[] }> = {};
+    const allDays: Record<
+      string,
+      {
+        date: string;
+        locations: (components["schemas"]["ForecastDay"] & {
+          name: string;
+          displayScore: number;
+        })[];
+      }
+    > = {};
 
     results.forEach((res) => {
       if (res.status === "success" && res.data) {
@@ -643,9 +673,12 @@ export const ForecastPage: React.FC = () => {
   }, [results, qualityType, activeLocation?.name, config?.locations]);
 
   const toggleLocation = (name: string) => {
-    setSelectedLocationNames((prev) =>
-      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name],
-    );
+    setSelectedLocationNames((prev) => {
+      const current = prev ?? config?.locations.map((l) => l.name) ?? [];
+      return current.includes(name)
+        ? current.filter((n) => n !== name)
+        : [...current, name];
+    });
   };
 
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -690,7 +723,9 @@ export const ForecastPage: React.FC = () => {
               const isDefault =
                 loc.default || loc.name === activeLocation?.name;
               const isSelected =
-                selectedLocationNames.includes(loc.name) || isDefault;
+                (
+                  selectedLocationNames ?? config.locations.map((l) => l.name)
+                ).includes(loc.name) || isDefault;
               return (
                 <button
                   key={loc.name}
@@ -716,7 +751,7 @@ export const ForecastPage: React.FC = () => {
           <h3 className="text-xl font-black text-rose-500 uppercase tracking-tighter mb-2">
             Sync Error
           </h3>
-          <p className="text-muted-foreground">{(error as any).message}</p>
+          <p className="text-muted-foreground">{(error as Error).message}</p>
         </div>
       )}
 
@@ -794,7 +829,10 @@ export const ForecastPage: React.FC = () => {
             }
 
             const forecastDay = day as {
-              displayLocations: any[];
+              displayLocations: (components["schemas"]["ForecastDay"] & {
+                name: string;
+                displayScore: number;
+              })[];
               bestLocationName: string | null;
               date: string;
             };
@@ -802,7 +840,11 @@ export const ForecastPage: React.FC = () => {
             return (
               <div
                 key={i}
-                onClick={() => setSelectedDay(day)}
+                onClick={() => {
+                  if (!("isPast" in day)) {
+                    setSelectedDay(day);
+                  }
+                }}
                 className={`p-4 border rounded-3xl bg-card shadow-sm flex flex-col transition-all hover:border-primary/40 cursor-pointer hover:shadow-md hover:scale-[1.02] active:scale-[0.98] ${
                   isToday
                     ? "ring-2 ring-primary ring-offset-4 ring-offset-background"

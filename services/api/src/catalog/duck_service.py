@@ -63,7 +63,9 @@ class DuckCatalogService:
         ]
 
     def get_profile_by_name(self, name: str) -> TelescopeProfile | None:
-        res = self.conn.execute("SELECT * FROM profiles WHERE name = ?", [name]).df()
+        res = self.conn.execute(
+            "SELECT * FROM profiles WHERE trim(name) ILIKE trim(?)", [name]
+        ).df()
         if res.empty:
             return None
         # Ensure keys are lowercase for Pydantic mapping

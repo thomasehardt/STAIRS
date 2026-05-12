@@ -10,10 +10,14 @@ import {
   Legend,
   Filler,
 } from "chart.js";
-import type { ChartOptions } from "chart.js";
+import type {
+  ChartOptions,
+  ChartDataset,
+  ScriptableLineSegmentContext,
+} from "chart.js";
 import { Line } from "react-chartjs-2";
 import annotationPlugin from "chartjs-plugin-annotation";
-import { useSettings } from "@/context/SettingsContext";
+import { useSettings } from "@/hooks/use-settings-context";
 
 // Register Chart.js components and plugins
 ChartJS.register(
@@ -41,20 +45,20 @@ interface MultiAltitudeChartProps {
   qualityPoints?: QualityPoint[];
 }
 
+const CHART_COLORS = [
+  "#3b82f6", // blue
+  "#10b981", // emerald
+  "#f59e0b", // amber
+  "#ef4444", // rose
+  "#8b5cf6", // violet
+  "#06b6d4", // cyan
+];
+
 export function MultiAltitudeChart({
   targetDatasets,
   qualityPoints,
 }: MultiAltitudeChartProps) {
   const { minAltitude, maxAltitude } = useSettings();
-
-  const colors = [
-    "#3b82f6", // blue
-    "#10b981", // emerald
-    "#f59e0b", // amber
-    "#ef4444", // rose
-    "#8b5cf6", // violet
-    "#06b6d4", // cyan
-  ];
 
   const chartData = useMemo(() => {
     // Find the overall start time to align all series on the X-axis
@@ -69,7 +73,7 @@ export function MultiAltitudeChart({
     const refTime = new Date(allSeries[0][0].time);
     const startHour = refTime.getHours() + refTime.getMinutes() / 60;
 
-    const datasets: any[] = [];
+    const datasets: ChartDataset<"line">[] = [];
 
     // 1. Add Imaging Quality (as a filled area on y1 axis)
     if (qualityPoints && qualityPoints.length > 0) {
@@ -97,7 +101,7 @@ export function MultiAltitudeChart({
 
     // 2. Add Target Altitudes (on y axis)
     targetDatasets.forEach((ds, idx) => {
-      const color = colors[idx % colors.length];
+      const color = CHART_COLORS[idx % CHART_COLORS.length];
       datasets.push({
         label: ds.label,
         data: ds.positions.map((p) => {
@@ -116,24 +120,24 @@ export function MultiAltitudeChart({
         fill: false,
         yAxisID: "y", // Use the left axis
         segment: {
-          borderColor: (ctx: any) => {
-            const y0 = ctx.p0.parsed.y;
-            const y1 = ctx.p1.parsed.y;
+          borderColor: (ctx: ScriptableLineSegmentContext) => {
+            const y0 = ctx.p0.parsed.y ?? 0;
+            const y1 = ctx.p1.parsed.y ?? 0;
             const avg = (y0 + y1) / 2;
             if (avg >= minAltitude - 0.1 && avg <= maxAltitude + 0.1)
               return color;
             return color + "44"; // Dimmer (lower opacity)
           },
-          borderDash: (ctx: any) => {
-            const y0 = ctx.p0.parsed.y;
-            const y1 = ctx.p1.parsed.y;
+          borderDash: (ctx: ScriptableLineSegmentContext) => {
+            const y0 = ctx.p0.parsed.y ?? 0;
+            const y1 = ctx.p1.parsed.y ?? 0;
             const avg = (y0 + y1) / 2;
             if (avg >= minAltitude - 0.1 && avg <= maxAltitude + 0.1) return [];
             return [4, 4]; // Dashed
           },
-          borderWidth: (ctx: any) => {
-            const y0 = ctx.p0.parsed.y;
-            const y1 = ctx.p1.parsed.y;
+          borderWidth: (ctx: ScriptableLineSegmentContext) => {
+            const y0 = ctx.p0.parsed.y ?? 0;
+            const y1 = ctx.p1.parsed.y ?? 0;
             const avg = (y0 + y1) / 2;
             if (avg >= minAltitude - 0.1 && avg <= maxAltitude + 0.1) return 3;
             return 1.5; // Thinner
@@ -143,11 +147,11 @@ export function MultiAltitudeChart({
     });
 
     return { datasets };
-  }, [targetDatasets, qualityPoints]);
+  }, [targetDatasets, qualityPoints, minAltitude, maxAltitude]);
 
   // Find min/max X for scaling
   const xValues = chartData.datasets.flatMap((ds) =>
-    ds.data.map((d: any) => d.x),
+    (ds.data as { x: number; y: number }[]).map((d) => d.x),
   );
   const xMin = xValues.length > 0 ? Math.floor(Math.min(...xValues)) : 0;
   const xMax = xValues.length > 0 ? Math.ceil(Math.max(...xValues)) : 12;

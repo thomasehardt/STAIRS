@@ -56,7 +56,7 @@ class ObservationBlock(BaseModel):
 
 
 class ExposureRecommendation(BaseModel):
-    sky_limited_sub_s: float
+    optimal_sub_s: float
     practical_sub_s: float
     total_integration_h: float
     target_snr: float = 20.0

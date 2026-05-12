@@ -793,9 +793,9 @@ def target(
             etc_panel = Panel(
                 f"[bold green]Practical Sub:[/bold green]"
                 f" {etc['practical_sub_s']:.0f}s\n"
-                f"[dim]Sky-Limited Min: {etc['sky_limited_sub_s']:.0f}s[/dim]\n"
+                f"[dim]Optimal Sub Min: {etc['optimal_sub_s']:.0f}s[/dim]\n"
                 f"[bold green]Target Integration:[/bold green]"
-                f" {etc['total_integration_h']:.1f}h [dim](SNR 20)[/dim]",
+                f" {etc['total_integration_h']:.1f}h [dim](SNR 10)[/dim]",
                 title="[bold]Exposure Recommendations[/bold]",
                 border_style="green",
                 padding=(1, 2),
@@ -973,10 +973,10 @@ def etc(
             f"[bold green]{res['practical_sub_s']:.0f}s[/bold green]",
         )
         table.add_row(
-            "[dim]Sky-Limited Min:[/dim]", f"[dim]{res['sky_limited_sub_s']:.0f}s[/dim]"
+            "[dim]Optimal Sub Min:[/dim]", f"[dim]{res['optimal_sub_s']:.0f}s[/dim]"
         )
         table.add_row(
-            "[green]Integration (SNR 20):[/green]",
+            "[green]Integration (SNR 10):[/green]",
             f"[bold green]{res['total_integration_h']:.1f} hours[/bold green]",
         )
 

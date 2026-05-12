@@ -1,0 +1,34 @@
+services:
+  api:
+    image: ghcr.io/thomasehardt/stairs-api:latest
+    container_name: stairs-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./config.yaml:/app/config.yaml
+      - ./data:/app/data:ro
+      - ./cache:/app_data/cache
+      - ./logs:/app_data/logs
+    environment:
+      - CACHE_DIR=/app_data/cache
+      - LOG_DIR=/app_data/logs
+
+  web:
+    image: ghcr.io/thomasehardt/stairs-web:latest
+    container_name: stairs-web
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - api
+
+  cli:
+    image: ghcr.io/thomasehardt/stairs-cli:latest
+    container_name: stairs-cli
+    environment:
+      - API_URL=http://api:8000
+    depends_on:
+      - api

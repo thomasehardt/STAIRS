@@ -1,7 +1,7 @@
 import { useQueries } from "@tanstack/react-query";
 import api from "@/lib/api";
 import type { components } from "@/types/api";
-import { useSettings } from "@/context/SettingsContext";
+import { useSettings } from "@/hooks/use-settings-context";
 
 type TargetPositionSeries = components["schemas"]["TargetPositionSeries"];
 

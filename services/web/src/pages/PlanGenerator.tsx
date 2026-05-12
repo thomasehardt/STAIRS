@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { AxiosError } from "axios";
 import {
   useGeneratePlan,
   useExportCsv,
   useExportSkylist,
 } from "@/hooks/use-plan";
 import api from "@/lib/api";
-import { useSettings } from "@/context/SettingsContext";
-import { usePlan } from "@/context/PlanContext";
+import { useSettings } from "@/hooks/use-settings-context";
+import { usePlan } from "@/hooks/use-plan-context";
 import { useSkyQuality } from "@/hooks/use-sky-quality";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +25,7 @@ import {
   Telescope,
 } from "lucide-react";
 import { TargetCard } from "@/components/TargetCard";
+import type { components } from "@/types/api";
 
 export function PlanGenerator() {
   const location = useLocation();
@@ -57,7 +59,9 @@ export function PlanGenerator() {
     const offset = baseTime.getTimezoneOffset() * 60000;
     return new Date(baseTime.getTime() - offset).toISOString().slice(0, 16);
   });
-  const [discoveryData, setDiscoveryData] = useState<any>(null);
+  const [discoveryData, setDiscoveryData] = useState<
+    components["schemas"]["PlanResponse"] | null
+  >(null);
   const [isDiscovering, setIsDiscovering] = useState(false);
 
   // Effect to update default location if initialLocationName is passed
@@ -128,16 +132,18 @@ export function PlanGenerator() {
   const handleOptimize = () => {
     // Use currentLocation for checks
     if (!currentLocation || pinnedTargets.length === 0) return;
-    generatePlan.mutate(getRequestParams() as any);
+    generatePlan.mutate(
+      getRequestParams() as components["schemas"]["PlanRequest"],
+    );
   };
 
   const handleTogglePin = (id: string) => {
     const isAlreadyPinned = pinnedTargets.some((pt) => pt.id === id);
     if (isAlreadyPinned) {
-      togglePin({ id } as any);
+      togglePin({ id, score: 0 });
     } else {
       const targetInfo = discoveryData?.recommendations.find(
-        (t: any) => t.target_id === id,
+        (t) => t.target_id === id,
       );
       if (targetInfo) {
         togglePin({
@@ -151,11 +157,15 @@ export function PlanGenerator() {
   };
 
   const handleExportCsv = () => {
-    exportCsv.mutate(getRequestParams() as any);
+    exportCsv.mutate(
+      getRequestParams() as components["schemas"]["PlanRequest"],
+    );
   };
 
   const handleExportSkylist = () => {
-    exportSkylist.mutate(getRequestParams() as any);
+    exportSkylist.mutate(
+      getRequestParams() as components["schemas"]["PlanRequest"],
+    );
   };
 
   // Modified to use currentLocation for rendering the loading state message
@@ -515,13 +525,12 @@ export function PlanGenerator() {
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {discoveryData.recommendations
                   .filter(
-                    (t: any) =>
-                      !pinnedTargets.some((pt) => pt.id === t.target_id),
+                    (t) => !pinnedTargets.some((pt) => pt.id === t.target_id),
                   )
-                  .map((target: any) => (
+                  .map((target) => (
                     <TargetCard
                       key={target.target_id}
-                      target={target as any}
+                      target={target}
                       onTogglePin={handleTogglePin}
                       isPinned={false}
                       nightStart={nightStart}
@@ -553,8 +562,8 @@ export function PlanGenerator() {
                 Algorithm Halted
               </p>
               <p className="text-sm font-medium opacity-80 max-w-md">
-                {(generatePlan.error as any)?.response?.data?.detail ||
-                  generatePlan.error.message}
+                {(generatePlan.error as AxiosError<{ detail: string }>)
+                  ?.response?.data?.detail || generatePlan.error.message}
               </p>
             </div>
           )}
@@ -564,7 +573,15 @@ export function PlanGenerator() {
   );
 }
 
-function SummaryCard({ label, value, icon: Icon }: any) {
+function SummaryCard({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
   return (
     <div className="p-4 bg-card border border-border rounded-2xl flex items-center gap-4">
       <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-primary">

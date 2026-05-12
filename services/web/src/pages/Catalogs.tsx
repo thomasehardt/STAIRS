@@ -8,7 +8,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { usePlan } from "@/context/PlanContext";
+import { usePlan } from "@/hooks/use-plan-context";
 import { useSkyQuality } from "@/hooks/use-sky-quality";
 import { useTargets } from "@/hooks/use-targets";
 import { useDebounce } from "@/hooks/use-debounce";

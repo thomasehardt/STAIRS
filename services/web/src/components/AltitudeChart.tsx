@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { X } from "lucide-react";
 import {
   Chart as ChartJS,
@@ -11,10 +11,10 @@ import {
   Legend,
   Filler,
 } from "chart.js";
-import type { ChartOptions } from "chart.js";
+import type { ChartOptions, ScriptableLineSegmentContext } from "chart.js";
 import { Line } from "react-chartjs-2";
 import annotationPlugin from "chartjs-plugin-annotation";
-import { useSettings } from "@/context/SettingsContext";
+import { useSettings } from "@/hooks/use-settings-context";
 
 // Register Chart.js components and plugins
 ChartJS.register(
@@ -40,30 +40,29 @@ export function AltitudeChart({ data }: { data: AltitudePoint[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Theme state to hold resolved colors for Canvas
-  const [colors, setColors] = useState({
-    primary: "#3b82f6",
-    muted: "#9ca3af",
-    border: "#374151",
-    card: "#111827",
-    background: "#0a0e1a",
-  });
-
-  // Resolve CSS variables for Canvas
-  useEffect(() => {
+  const colors = useMemo(() => {
+    if (typeof document === "undefined") {
+      return {
+        primary: "#3b82f6",
+        muted: "#9ca3af",
+        border: "#374151",
+        card: "#111827",
+        background: "#0a0e1a",
+      };
+    }
     const style = getComputedStyle(document.documentElement);
     const resolveColor = (prop: string, fallback: string) => {
       const val = style.getPropertyValue(prop).trim();
-      // Tailwind v4 uses okLCH or specific formats, but browser computedStyle usually gives rgb/hex
       return val || fallback;
     };
 
-    setColors({
+    return {
       primary: resolveColor("--color-primary", "#3b82f6"),
       muted: resolveColor("--color-muted-foreground", "#9ca3af"),
       border: resolveColor("--color-border", "#374151"),
       card: resolveColor("--color-card", "#111827"),
       background: resolveColor("--color-background", "#0a0e1a"),
-    });
+    };
   }, []);
 
   // Color constants for the Dashboard style (Resolved)
@@ -77,19 +76,22 @@ export function AltitudeChart({ data }: { data: AltitudePoint[] }) {
   const COLOR_MOCKUP_REFERENCE = "#666666";
 
   // Process data for Chart.js
-  const processedData = data.map((p) => {
-    const date = new Date(p.time);
-    const firstDate = new Date(data[0].time);
-    const startHour = firstDate.getHours() + firstDate.getMinutes() / 60;
-    const offsetHours =
-      (date.getTime() - firstDate.getTime()) / (1000 * 60 * 60);
+  const processedData = useMemo(() => {
+    if (!data.length) return [];
+    return data.map((p) => {
+      const date = new Date(p.time);
+      const firstDate = new Date(data[0].time);
+      const startHour = firstDate.getHours() + firstDate.getMinutes() / 60;
+      const offsetHours =
+        (date.getTime() - firstDate.getTime()) / (1000 * 60 * 60);
 
-    return {
-      x: startHour + offsetHours,
-      y: Math.max(0, p.alt_deg), // Clip negative altitudes to 0 per spec
-      timeStr: p.time,
-    };
-  });
+      return {
+        x: startHour + offsetHours,
+        y: Math.max(0, p.alt_deg), // Clip negative altitudes to 0 per spec
+        timeStr: p.time,
+      };
+    });
+  }, [data]);
 
   const getChartData = (isMockupView: boolean) => {
     const optimalColor = isMockupView
@@ -110,25 +112,25 @@ export function AltitudeChart({ data }: { data: AltitudePoint[] }) {
           tension: 0.1,
           fill: false,
           segment: {
-            borderColor: (ctx: any) => {
-              const y0 = ctx.p0.parsed.y;
-              const y1 = ctx.p1.parsed.y;
+            borderColor: (ctx: ScriptableLineSegmentContext) => {
+              const y0 = ctx.p0.parsed.y ?? 0;
+              const y1 = ctx.p1.parsed.y ?? 0;
               const avg = (y0 + y1) / 2;
               if (avg >= minAltitude - 0.1 && avg <= maxAltitude + 0.1)
                 return optimalColor;
               return restrictedColor;
             },
-            borderWidth: (ctx: any) => {
-              const y0 = ctx.p0.parsed.y;
-              const y1 = ctx.p1.parsed.y;
+            borderWidth: (ctx: ScriptableLineSegmentContext) => {
+              const y0 = ctx.p0.parsed.y ?? 0;
+              const y1 = ctx.p1.parsed.y ?? 0;
               const avg = (y0 + y1) / 2;
               if (avg >= minAltitude - 0.1 && avg <= maxAltitude + 0.1)
                 return 3;
               return 1;
             },
-            borderDash: (ctx: any) => {
-              const y0 = ctx.p0.parsed.y;
-              const y1 = ctx.p1.parsed.y;
+            borderDash: (ctx: ScriptableLineSegmentContext) => {
+              const y0 = ctx.p0.parsed.y ?? 0;
+              const y1 = ctx.p1.parsed.y ?? 0;
               const avg = (y0 + y1) / 2;
               // Solid for optimal range, dashed for restricted
               if (avg >= minAltitude - 0.1 && avg <= maxAltitude + 0.1)

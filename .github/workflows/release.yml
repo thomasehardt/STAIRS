@@ -32,6 +32,7 @@ jobs:
         service:
           - api
           - cli
+          - web
         include:
           - service: api
             context: ./services/api
@@ -39,6 +40,9 @@ jobs:
           - service: cli
             context: ./services/cli
             image_name: stairs-cli
+          - service: web
+            context: ./services/web
+            image_name: stairs-web
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6

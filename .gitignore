@@ -213,6 +213,7 @@ mockups/
 # Project Documentation (Local Only)
 /*.md
 !/README.md
+!/RELEASE_GUIDE.md
 
 # Database Files
 stairs.db

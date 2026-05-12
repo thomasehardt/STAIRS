@@ -91,14 +91,14 @@ def calculate_total_integration_time(
     pixel_pitch_um: float,
     quantum_efficiency: float,
     read_noise_e: float,
-    target_snr: float = 20.0,
+    target_snr: float = 10.0,
 ) -> float:
     """
     Estimates total integration time required to reach a specific SNR.
 
     :param target_mag: Total visual magnitude of the object
     :param target_size_arcmin: [width, height] in arcminutes
-    :param target_snr: Desired Signal-to-Noise Ratio (default 20 is 'clean')
+    :param target_snr: Desired Signal-to-Noise Ratio (default 10 is 'good')
     :return: total time in seconds
     """
     # 1. Target Flux (electrons/sec)

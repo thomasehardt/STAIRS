@@ -1,8 +1,8 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useRecommendedTargets } from "@/hooks/use-recommended-targets";
 import { useSkyQuality } from "@/hooks/use-sky-quality";
 import { useWeather } from "@/hooks/use-weather";
-import { useSettings } from "@/context/SettingsContext";
+import { useSettings } from "@/hooks/use-settings-context";
 import { TargetCard } from "@/components/TargetCard";
 import { MultiAltitudeChart } from "@/components/MultiAltitudeChart";
 import { SkyVisualization } from "@/components/SkyVisualization";
@@ -36,20 +36,30 @@ export function Dashboard() {
   );
 
   // --- TIMEFRAME LOGIC ---
-  const now = new Date();
-  const points = qualityData?.points || [];
+  const now = useMemo(() => new Date(), []);
+  const points = useMemo(() => qualityData?.points || [], [qualityData]);
   const firstPoint = points[0];
   const lastPoint = points[points.length - 1];
 
-  const nightStart = firstPoint ? new Date(firstPoint.time) : null;
-  const nightEnd = lastPoint ? new Date(lastPoint.time) : null;
+  const nightStart = useMemo(
+    () => (firstPoint ? new Date(firstPoint.time) : null),
+    [firstPoint],
+  );
+  const nightEnd = useMemo(
+    () => (lastPoint ? new Date(lastPoint.time) : null),
+    [lastPoint],
+  );
 
-  const isDarkNow =
-    nightStart && nightEnd && now >= nightStart && now <= nightEnd;
+  const isDarkNow = useMemo(
+    () => nightStart && nightEnd && now >= nightStart && now <= nightEnd,
+    [nightStart, nightEnd, now],
+  );
   const timeLabel = isDarkNow ? "Current Astro Night" : "Next Astro Night";
 
   // Target Visibility & Filtering
-  const [visibleTargetIds, setVisibleTargetIds] = useState<string[]>([]);
+  const [manualVisibleTargetIds, setManualVisibleTargetIds] = useState<
+    string[] | null
+  >(null);
   const [scoreFilter, setScoreFilter] = useState<number | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
   const [dashboardView, setDashboardView] = useState<"paths" | "sky">("paths");
@@ -60,45 +70,30 @@ export function Dashboard() {
     return Array.from(cats).sort();
   }, [recommendations]);
 
-  // Initialize with top 5 recommendations once they load
-  useEffect(() => {
-    if (
-      recommendations &&
-      recommendations.length > 0 &&
-      visibleTargetIds.length === 0 &&
-      scoreFilter === null &&
-      categoryFilter.length === 0
-    ) {
-      setVisibleTargetIds(recommendations.slice(0, 5).map((r) => r.target_id));
+  // Derived visible targets based on filters OR manual selection OR defaults
+  const visibleTargetIds = useMemo(() => {
+    if (!recommendations) return [];
+
+    // If manual selection exists, use it
+    if (manualVisibleTargetIds !== null) return manualVisibleTargetIds;
+
+    // If filters are active, use filtered recommendations
+    if (scoreFilter !== null || categoryFilter.length > 0) {
+      return recommendations
+        .filter((r) => {
+          const matchesScore =
+            scoreFilter === null || r.final_score >= scoreFilter;
+          const matchesCategory =
+            categoryFilter.length === 0 ||
+            categoryFilter.includes(r.target_type.trim());
+          return matchesScore && matchesCategory;
+        })
+        .map((r) => r.target_id);
     }
-  }, [
-    recommendations,
-    visibleTargetIds.length,
-    scoreFilter,
-    categoryFilter.length,
-  ]);
 
-  // Live filtering effect
-  useEffect(() => {
-    if (!recommendations) return;
-
-    // If no filters are active, we don't want to override manual toggles
-    const isFilterActive = scoreFilter !== null || categoryFilter.length > 0;
-    if (!isFilterActive) return;
-
-    const filteredIds = recommendations
-      .filter((r) => {
-        const matchesScore =
-          scoreFilter === null || r.final_score >= scoreFilter;
-        const matchesCategory =
-          categoryFilter.length === 0 ||
-          categoryFilter.includes(r.target_type.trim());
-        return matchesScore && matchesCategory;
-      })
-      .map((r) => r.target_id);
-
-    setVisibleTargetIds(filteredIds);
-  }, [scoreFilter, categoryFilter, recommendations]);
+    // Default: Top 5 recommendations
+    return recommendations.slice(0, 5).map((r) => r.target_id);
+  }, [recommendations, manualVisibleTargetIds, scoreFilter, categoryFilter]);
 
   // Pre-fetch all positions for instant switching
   const allTargetIds = useMemo(
@@ -150,23 +145,27 @@ export function Dashboard() {
   }, [points, now, activeLocation]);
 
   const toggleTarget = (id: string) => {
-    setVisibleTargetIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
-    );
+    setManualVisibleTargetIds((prev) => {
+      const current =
+        prev ?? (recommendations || []).slice(0, 5).map((r) => r.target_id);
+      return current.includes(id)
+        ? current.filter((i) => i !== id)
+        : [...current, id];
+    });
   };
 
   const toggleCategory = (cat: string) => {
     setCategoryFilter((prev) =>
       prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat],
     );
+    // Reset manual selection when filters change
+    setManualVisibleTargetIds(null);
   };
 
   const handleClearFilters = () => {
     setScoreFilter(null);
     setCategoryFilter([]);
-    if (recommendations) {
-      setVisibleTargetIds(recommendations.slice(0, 5).map((r) => r.target_id));
-    }
+    setManualVisibleTargetIds(null);
   };
 
   return (
@@ -531,7 +530,7 @@ export function Dashboard() {
               recommendations.map((target) => (
                 <TargetCard
                   key={target.target_id}
-                  target={target as any}
+                  target={target}
                   nightStart={nightStart}
                   nightEnd={nightEnd}
                   variant="catalog"
@@ -551,7 +550,17 @@ export function Dashboard() {
   );
 }
 
-function WeatherWidget({ label, value, icon: Icon, loading }: any) {
+function WeatherWidget({
+  label,
+  value,
+  icon: Icon,
+  loading,
+}: {
+  label: string;
+  value: string;
+  icon: React.ComponentType<{ className?: string }>;
+  loading: boolean;
+}) {
   return (
     <div className="p-4 bg-card border border-border rounded-2xl flex items-center gap-4 hover:border-primary/30 transition-colors group">
       <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-primary group-hover:scale-110 transition-transform">

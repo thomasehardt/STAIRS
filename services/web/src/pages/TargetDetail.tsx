@@ -5,8 +5,8 @@ import api from "@/lib/api";
 import type { components } from "@/types/api";
 import { AltitudeChart } from "@/components/AltitudeChart";
 import { useTargetPosition } from "@/hooks/use-target-position";
-import { useSettings } from "@/context/SettingsContext";
-import { usePlan } from "@/context/PlanContext";
+import { useSettings } from "@/hooks/use-settings-context";
+import { usePlan } from "@/hooks/use-plan-context";
 import { useSkyQuality } from "@/hooks/use-sky-quality";
 import { useTargetLogs, useCreateLog, useDeleteLog } from "@/hooks/use-logs";
 import {
@@ -394,7 +394,7 @@ function DetailItem({
 }: {
   label: string;
   value: string;
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
 }) {
   return (
     <div className="space-y-2">
