@@ -184,7 +184,7 @@ This will start the Web and API layers. You can then use the CLI via the same co
 ```yaml
 services:
   api:
-    image: ghcr.io/thomasehardt/stairs-api:latest
+    image: ghcr.io/thomasehardt/stairs/stairs-api:latest
     container_name: stairs-api
     ports:
       - "8000:8000"
@@ -196,7 +196,7 @@ services:
     restart: unless-stopped
 
   web:
-    image: ghcr.io/thomasehardt/stairs-web:latest
+    image: ghcr.io/thomasehardt/stairs/stairs-web:latest
     container_name: stairs-web
     ports:
       - "3000:80"
@@ -207,7 +207,7 @@ services:
     restart: unless-stopped
 
   cli:
-    image: ghcr.io/thomasehardt/stairs-cli:latest
+    image: ghcr.io/thomasehardt/stairs/stairs-cli:latest
     container_name: stairs-cli
     environment:
       - API_URL=http://api:8000
