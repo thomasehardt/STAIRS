@@ -428,6 +428,27 @@ async def recommend_targets(
             observer, cand_coords[pos], night_window, request.min_alt
         )
 
+        # Convert degrees to arcminutes for ETC
+        size_arcmin = (
+            [s * 60.0 for s in row["angular_size"]]
+            if isinstance(row["angular_size"], list) and len(row["angular_size"]) > 0
+            else [10.0]
+        )
+
+        from src.astro_logic.exposure import calculate_practical_sub_exposure
+
+        sky_flux = calculate_sky_flux(
+            loc.bortle_scale or 5,
+            profile.aperture_mm,
+            profile.focal_length_mm,
+            profile.pixel_pitch_um,
+            profile.quantum_efficiency,
+        )
+        sky_lim_sub = calculate_optimal_sub_exposure(sky_flux, profile.read_noise_e)
+        prac_sub = calculate_practical_sub_exposure(
+            sky_lim_sub, profile.focal_length_mm, is_alt_az=True
+        )
+
         recommendations.append(
             TargetRecommendation(
                 target_id=row["identifier"],
@@ -448,26 +469,12 @@ async def recommend_targets(
                 if window
                 else None,
                 exposure=ExposureRecommendation(
-                    optimal_sub_s=safe_round(
-                        calculate_optimal_sub_exposure(
-                            calculate_sky_flux(
-                                loc.bortle_scale or 5,
-                                profile.aperture_mm,
-                                profile.focal_length_mm,
-                                profile.pixel_pitch_um,
-                                profile.quantum_efficiency,
-                            ),
-                            profile.read_noise_e,
-                        ),
-                        1,
-                    ),
+                    sky_limited_sub_s=safe_round(sky_lim_sub, 1),
+                    practical_sub_s=safe_round(prac_sub, 1),
                     total_integration_h=safe_round(
                         calculate_total_integration_time(
                             row["magnitude"] if not pd.isna(row["magnitude"]) else 15.0,
-                            row["angular_size"]
-                            if isinstance(row["angular_size"], list)
-                            and len(row["angular_size"]) > 0
-                            else [10.0],
+                            size_arcmin,
                             loc.bortle_scale or 5,
                             profile.aperture_mm,
                             profile.focal_length_mm,
