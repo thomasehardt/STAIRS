@@ -14,6 +14,21 @@ A lot of apps will tell you _what_ is in the sky, but not how to build an effici
 - Multi-Night Forecasting: sky conditions forecasting for multiple nights
 - Multi-Location Forecasting: sky conditions forecasting for multiple locations
 
+## Screenshots
+
+<details>
+<summary>Click to view application screenshots</summary>
+
+### Web Application
+
+![STAIRS Dashboard](docs/screenshots/dashboard.png)
+_The Sky Dashboard showing current conditions and recommended targets for Nashville, TN._
+
+![Plan Generator](docs/screenshots/planner.png) ![Forecast View](docs/screenshots/forecast.png)
+_Left: AI-Optimized Plan Generator. Right: Multi-site Observation Forecast._
+
+</details>
+
 ## Tech Stack
 
 - Backend/API: Python with [astroplan](https://github.com/astropy/astroplan), [Astropy](https://www.astropy.org/), [DuckDB](https://duckdb.org/), [Swagger](https://swagger.io/), and others (see the [pyproject.toml](services/api/pyproject.toml) file for more dependencies)
