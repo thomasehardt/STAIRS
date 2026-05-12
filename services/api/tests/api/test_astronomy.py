@@ -262,7 +262,10 @@ def test_brightest_targets_integration():
 
         assert response.status_code == 200
         data = response.json()
-        assert len(data["timeline"]) == 6
+        # Timeline should have at least one target (they get consolidated now)
+        assert len(data["timeline"]) >= 1
+        assert data["timeline"][0]["common_name"] == "Orion Nebula"
+
         assert all(item["target_id"] == "M42" for item in data["timeline"])
         assert len(data["recommendations"]) == 2
         assert all(item["target_id"] in {"M31", "M42"} for item in data["timeline"])

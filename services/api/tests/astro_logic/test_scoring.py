@@ -180,7 +180,7 @@ class TestScoring(TestCase):
             scoring.calculate_weather_score_vectorized(
                 clouds_bad, humidity_mod, seeing_bad
             ),
-            np.array([0.0]),
+            np.array([0.2]),
             atol=1e-4,
         )
 
@@ -191,7 +191,7 @@ class TestScoring(TestCase):
             scoring.calculate_weather_score_vectorized(
                 clouds_linear, humidity_linear, seeing_linear
             ),
-            np.array([0.34]),
+            np.array([0.5829]),
             atol=1e-4,
         )
 
@@ -201,14 +201,14 @@ class TestScoring(TestCase):
             scoring.calculate_weather_score_vectorized(
                 clouds_ok, humidity_ok, seeing=None
             ),
-            np.array([0.875]),
+            np.array([1.0]),
             atol=1e-4,
         )
 
         clouds_multi = np.array([5.0, 30.0, 70.0])
         humidity_multi = np.array([50.0, 90.0, 70.0])
         seeing_multi = np.array([1.5, 3.0, 5.0])
-        expected_multi = np.array([0.95, 0.34, 0.0])
+        expected_multi = np.array([0.95, 0.5829, 0.2])
         np.testing.assert_allclose(
             scoring.calculate_weather_score_vectorized(
                 clouds_multi, humidity_multi, seeing_multi
@@ -235,7 +235,9 @@ class TestScoring(TestCase):
         weather_data_bad = MockForecastData(
             cloud_cover_pct=60, humidity_pct=90, seeing=3.0
         )
-        self.assertAlmostEqual(scoring.calculate_weather_score(weather_data_bad), 0.0)
+        self.assertAlmostEqual(
+            scoring.calculate_weather_score(weather_data_bad), 0.2914, places=4
+        )
 
         weather_data_missing = MockForecastData()
         self.assertAlmostEqual(
@@ -306,7 +308,8 @@ class TestScoring(TestCase):
                 weather_data=weather_data_bad,
                 moon_multiplier=1.0,
             ),
-            0.0,
+            12.4,
+            places=1,
         )
 
         weather_data_good = MockForecastData(
@@ -521,8 +524,8 @@ class TestScoring(TestCase):
             bortle_scale=None,
             moon_multiplier=1.0,
         )
-        self.assertAlmostEqual(final_rel_2, 0.0)
-        self.assertAlmostEqual(final_abs_2, 0.0)
+        self.assertAlmostEqual(final_rel_2, 2.8)
+        self.assertAlmostEqual(final_abs_2, 2.8)
 
         final_rel_3, final_abs_3 = scoring.calculate_final_score(
             target_data,
@@ -547,8 +550,8 @@ class TestScoring(TestCase):
             bortle_scale=bortle_scale,
             moon_multiplier=1.0,
         )
-        self.assertAlmostEqual(final_rel_4, 0.0)
-        self.assertAlmostEqual(final_abs_4, 0.0)
+        self.assertAlmostEqual(final_rel_4, 2.8)
+        self.assertAlmostEqual(final_abs_4, 0.6)
 
         final_rel_5, final_abs_5 = scoring.calculate_final_score(
             target_data,

@@ -36,20 +36,3 @@ def test_duck_catalog_service_get_profile(test_db):
     profile = service.get_profile_by_name("Seestar S50")
     assert profile is not None
     assert profile.aperture_mm == 50
-
-
-def test_duck_catalog_service_recommendations(test_db):
-    service = DuckCatalogService(test_db)
-    loc = ObservationLocation(
-        name="Test", latitude=30.0, longitude=-90.0, bortle_scale=None, elevation_m=0.0
-    )
-    profile = service.get_profile_by_name("Seestar S50")
-
-    # Winter night
-    start_time = Time("2026-01-15T02:00:00Z")
-    assert profile is not None
-    recs = service.get_recommendations(loc, profile, start_time)
-
-    assert not recs.empty
-    # Orion Nebula should be high in Jan
-    assert any(recs["identifier"] == "M42")

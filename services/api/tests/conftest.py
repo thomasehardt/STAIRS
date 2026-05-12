@@ -1,7 +1,13 @@
 import duckdb
 import pytest
+
+# Disable IERS age checks to prevent tests from failing due to old Earth rotation data
+from astropy.utils.iers import conf
+from fastapi.testclient import TestClient
 from src.api.main import app
 from src.db.duck_session import get_duck_db
+
+conf.auto_max_age = None
 
 
 @pytest.fixture(scope="session")
@@ -23,20 +29,23 @@ def test_db():
             angular_size DOUBLE[],
             constellation VARCHAR,
             catalog_id VARCHAR,
-            identifiers VARCHAR[]
+            identifiers VARCHAR[],
+            identifiers_str VARCHAR,
+            season VARCHAR
         )
     """)
     db.execute(
         """
         CREATE TABLE profiles
           (
-             NAME            VARCHAR,
+             name            VARCHAR,
              aperture_mm     DOUBLE,
              focal_length_mm DOUBLE,
              sensor_x        INTEGER,
              sensor_y        INTEGER,
              pixel_pitch_um  DOUBLE,
-             fov_min         DOUBLE
+             read_noise_e    DOUBLE DEFAULT 1.5,
+             quantum_efficiency DOUBLE DEFAULT 0.8
           )
         """
     )
@@ -77,18 +86,20 @@ def test_db():
         """
         INSERT INTO targets VALUES ('M31', 'Andromeda Galaxy', 10.6847, 41.2692,
             0.7123, 41.2692, 'Galaxy', 3.4, [190.0, 60.0], 'Andromeda', 'M',
-            ['ngc224'])
+            ['ngc224'], 'ngc224', 'autumn')
         """
     )
     db.execute(
         """
         INSERT INTO targets VALUES ('M42', 'Orion Nebula', 83.8221, -5.3911, 5.5881,
-            -5.3911, 'Emission Nebula', 4.0, [65.0, 60.0], 'Orion', 'M', ['ngc1976']
-        )
+            -5.3911, 'Emission Nebula', 4.0, [65.0, 60.0], 'Orion', 'M', ['ngc1976'],
+            'ngc1976', 'winter')
         """
     )
     db.execute(
-        "INSERT INTO profiles VALUES ('Seestar S50', 50, 250, 1920, 1080, 2.9, 0.5)"
+        """
+        INSERT INTO profiles VALUES ('Seestar S50', 50, 250, 1920, 1080, 2.9, 1.5, 0.8)
+        """
     )
     db.execute(
         """
@@ -108,15 +119,6 @@ def test_db():
     )
     db.execute(
         """
-        INSERT INTO
-            catalog_metadata
-        VALUES (
-            'M',
-            'Messier',
-            'Messier Catalog',
-            'Charles Messier',
-            110
-        )
         INSERT INTO
             catalog_metadata
         VALUES (
