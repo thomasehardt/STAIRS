@@ -13,14 +13,21 @@ RUN apt-get update \
 
 WORKDIR /app
 
+# Create a non-root user
+RUN groupadd -r stairs && useradd -r -g stairs stairs
+
 COPY pyproject.toml .
 RUN pip install --no-cache-dir -e .
 
 COPY src/ /app/src/
 
+RUN chown -R stairs:stairs /app
+USER stairs
+
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app/src
 ENV MPLBACKEND=Agg
+ENV HOME=/tmp
 
 ENTRYPOINT ["stairs"]
 CMD ["--help"]

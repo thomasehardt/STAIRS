@@ -14,7 +14,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM nginx:stable-alpine
+FROM nginxinc/nginx-unprivileged:stable-alpine
 
 # Copy custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
@@ -22,9 +22,12 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Copy build files
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Ensure proper permissions
-RUN chmod -R 755 /usr/share/nginx/html
+# Ensure proper permissions for the unprivileged user
+USER root
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html
+USER nginx
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]
