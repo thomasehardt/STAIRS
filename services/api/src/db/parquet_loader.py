@@ -4,7 +4,6 @@ import os
 import shutil
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import yaml
 from astropy import units as u
