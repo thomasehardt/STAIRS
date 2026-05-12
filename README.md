@@ -24,30 +24,166 @@ A lot of apps will tell you _what_ is in the sky, but not how to build an effici
 
 ### Prerequisites
 
-- Docker and Docker Compose
+- **Docker and Docker Compose** (Recommended for most users)
+- **Python 3.14+** (For local backend development)
+- **Node.js 22+** (For local web development)
 
-### Installation
+### Configuration
+
+Before running STAIRS, you must create a configuration file:
 
 1. Clone the repository:
+   ```bash
    git clone https://github.com/thomasehardt/STAIRS.git
-1. navigate to the directory
    cd STAIRS
-1. Create your own configuration file
-   cp .config.yaml.EXAMPLE config.yaml
-1. Edit config.yaml and update the information accordingly (the example config is well-documented)
+   ```
+2. Create your own configuration file from the example:
+   ```bash
+   cp .config.yaml.example config.yaml
+   ```
+3. Edit `config.yaml` and update the information accordingly (the example config is well-documented).
 
-### Running the application
+---
 
-1. Start the API and Web UI (Production)
-   `docker compose up -d web`
-   _The API will be available at http://localhost:8000 and the Web UI at http://localhost:3000_
+## 1. Local Development (As-Is)
 
-2. Run for development (with Hot Module Replacement)
-   `docker compose up -d web-dev`
-   _The dev UI will be available at http://localhost:5173_
+Running STAIRS directly on your machine without Docker is useful for development and debugging.
 
-3. Run the cli (note: this will spin up a container and exit it once done)
-   `docker compose run --rm -it cli`
+### Backend (API)
+
+1. Navigate to the API directory:
+   ```bash
+   cd services/api
+   ```
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   ```
+3. Install dependencies in editable mode:
+   ```bash
+   pip install -e .
+   ```
+4. Run the API (from the project root):
+   ```bash
+   # Return to root
+   cd ../..
+   export PYTHONPATH=$(pwd)/services/api
+   uvicorn src.api.main:app --reload
+   ```
+   _The API will be available at http://localhost:8000_
+
+### Web UI
+
+1. Navigate to the web directory:
+   ```bash
+   cd services/web
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+   _The UI will be available at http://localhost:5173_
+
+### CLI
+
+1. Navigate to the CLI directory:
+   ```bash
+   cd services/cli
+   ```
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate
+   ```
+3. Install the CLI tool:
+   ```bash
+   pip install -e .
+   ```
+4. Use the `stairs` command:
+   ```bash
+   stairs --help
+   ```
+
+---
+
+## 2. Local Docker Development
+
+Running with Docker Compose allows you to spin up the entire stack with a single command, building from your local source code.
+
+### Build and Start
+
+```bash
+docker compose up --build
+```
+
+- **Production-like UI:** Available at http://localhost:3000
+- **Development UI (with HMR):** Available at http://localhost:5173 (via `docker compose up web-dev`)
+- **API Docs:** Available at http://localhost:8000/docs
+
+### Running the CLI via Docker
+
+```bash
+docker compose run --rm -it cli status
+```
+
+_Tip: Create an alias for easier access: `alias stairs-cli="docker compose run --rm -it cli"`_
+
+---
+
+## 3. Production Docker (from GHCR.io)
+
+For production or simple deployment, you can run STAIRS using pre-built images from the GitHub Container Registry.
+
+### Using Docker Compose
+
+Create a `docker-compose.prod.yaml` (or update your existing one) to use images instead of building:
+
+```yaml
+services:
+  api:
+    image: ghcr.io/thomasehardt/stairs-api:latest
+    container_name: stairs-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./config.yaml:/app/config.yaml
+      - ./data:/app/data:ro
+      - ./cache:/app_data/cache
+      - ./logs:/app_data/logs
+    restart: unless-stopped
+
+  web:
+    image: ghcr.io/thomasehardt/stairs-web:latest
+    container_name: stairs-web
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  cli:
+    image: ghcr.io/thomasehardt/stairs-cli:latest
+    container_name: stairs-cli
+    environment:
+      - API_URL=http://api:8000
+    depends_on:
+      - api
+```
+
+Run with:
+
+```bash
+docker compose -f docker-compose.prod.yaml up -d
+```
+
+To start the Web and API layers (see below for an alias to use the CLI from Docker).
 
 ## Usage
 

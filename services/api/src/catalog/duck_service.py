@@ -56,10 +56,17 @@ class DuckCatalogService:
 
     def list_profiles(self) -> list[TelescopeProfile]:
         df = self.conn.execute("SELECT * FROM profiles").df()
-        return [TelescopeProfile(**row.to_dict()) for _, row in df.iterrows()]
+        # Ensure keys are lowercase for Pydantic mapping
+        return [
+            TelescopeProfile(**{k.lower(): v for k, v in row.to_dict().items()})
+            for _, row in df.iterrows()
+        ]
 
     def get_profile_by_name(self, name: str) -> TelescopeProfile | None:
         res = self.conn.execute("SELECT * FROM profiles WHERE name = ?", [name]).df()
         if res.empty:
             return None
-        return TelescopeProfile(**res.iloc[0].to_dict())
+        # Ensure keys are lowercase for Pydantic mapping
+        return TelescopeProfile(
+            **{k.lower(): v for k, v in res.iloc[0].to_dict().items()}
+        )
