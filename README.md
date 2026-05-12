@@ -38,9 +38,15 @@ A lot of apps will tell you _what_ is in the sky, but not how to build an effici
 
 ### Running the application
 
-1. Start the API layer
-   `docker compose up -d`
-2. Run the cli (note: this will spin up a container and exit it once done)
+1. Start the API and Web UI (Production)
+   `docker compose up -d web`
+   _The API will be available at http://localhost:8000 and the Web UI at http://localhost:3000_
+
+2. Run for development (with Hot Module Replacement)
+   `docker compose up -d web-dev`
+   _The dev UI will be available at http://localhost:5173_
+
+3. Run the cli (note: this will spin up a container and exit it once done)
    `docker compose run --rm -it cli`
 
 ## Usage
