@@ -1,6 +1,6 @@
 services:
   api:
-    image: ghcr.io/thomasehardt/stairs-api:latest
+    image: ghcr.io/thomasehardt/stairs/stairs-api:latest
     container_name: stairs-api
     restart: unless-stopped
     ports:
@@ -15,18 +15,20 @@ services:
       - LOG_DIR=/app_data/logs
 
   web:
-    image: ghcr.io/thomasehardt/stairs-web:latest
+    image: ghcr.io/thomasehardt/stairs/stairs-web:latest
     container_name: stairs-web
     restart: unless-stopped
     ports:
       - "3000:80"
+    # Note: VITE_API_URL must be set at build time in the Dockerfile.
+    # This environment variable is ignored by the static web files but kept for documentation.
     environment:
       - VITE_API_URL=http://localhost:8000
     depends_on:
       - api
 
   cli:
-    image: ghcr.io/thomasehardt/stairs-cli:latest
+    image: ghcr.io/thomasehardt/stairs/stairs-cli:latest
     container_name: stairs-cli
     environment:
       - API_URL=http://api:8000
