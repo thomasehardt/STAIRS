@@ -6,18 +6,23 @@ interface FovSimulatorProps {
   targetSize: number[]; // [width, height] in arcminutes
   targetName: string;
   defaultTelescopeName: string;
+  imageUrl?: string | null;
+  imageFov?: number | null; // in degrees
 }
 
 export function FovSimulator({
   targetSize,
   targetName,
   defaultTelescopeName,
+  imageUrl,
+  imageFov,
 }: FovSimulatorProps) {
   const { data: profilesData } = useProfiles();
   const [selectedTelescopeName, setSelectedTelescopeName] =
     useState(defaultTelescopeName);
   const [rotation, setRotation] = useState(0);
   const [zoom, setZoom] = useState(1);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const selectedTelescope = useMemo(() => {
     return (
@@ -32,7 +37,6 @@ export function FovSimulator({
       return null;
 
     // Calculate sensor FOV in arcminutes
-    // FOV = 2 * arctan(sensor_size_mm / (2 * focal_length_mm))
     const calcFov = (
       sensorPx: number,
       pixelPitchUm: number,
@@ -55,12 +59,16 @@ export function FovSimulator({
       selectedTelescope.focal_length_mm,
     );
 
-    const tX = targetSize[0];
-    const tY = targetSize[1] || targetSize[0];
+    const tX = targetSize[0] * 60; // convert degrees to arcminutes
+    const tY = (targetSize[1] || targetSize[0]) * 60;
 
     // Scaling for the view area
-    // We want the larger of FOV or Target to fit nicely with some padding
-    const baseScale = Math.max(fovX, fovY, tX, tY) * 1.3;
+    // If we have a catalog image, we want the viewScale to be based on the image FOV
+    // imageFov is in degrees, convert to arcmins
+    const imageFovMins = (imageFov || 0) * 60;
+
+    // If no image, use the larger of FOV or Target + padding
+    const baseScale = imageFovMins || Math.max(fovX, fovY, tX, tY) * 1.3;
     const viewScale = baseScale / zoom;
 
     return {
@@ -68,39 +76,66 @@ export function FovSimulator({
       sensorH: (fovY / viewScale) * 100,
       targetW: (tX / viewScale) * 100,
       targetH: (tY / viewScale) * 100,
+      imageW: imageFovMins ? (imageFovMins / viewScale) * 100 : 0,
       fovX,
       fovY,
       tX,
       tY,
-      fits: tX <= fovX && tY <= fovY, // Simplified check
+      fits: tX <= fovX && tY <= fovY,
     };
-  }, [selectedTelescope, targetSize, zoom]);
+  }, [selectedTelescope, targetSize, zoom, imageFov]);
 
   if (!fov || !selectedTelescope) return null;
 
   return (
     <div className="flex flex-col gap-6">
       <div className="relative aspect-square w-full max-w-[500px] mx-auto bg-slate-950 rounded-[2.5rem] border border-slate-800 shadow-2xl overflow-hidden group">
-        {/* Background Star Pattern (Simulated) */}
-        <div
-          className="absolute inset-0 opacity-20 pointer-events-none"
-          style={{
-            backgroundImage: "radial-gradient(white 1px, transparent 0)",
-            backgroundSize: "40px 40px",
-          }}
-        />
+        {/* Catalog Image */}
+        {imageUrl && (
+          <div
+            className="absolute inset-0 flex items-center justify-center transition-opacity duration-700"
+            style={{ opacity: imageLoaded ? 1 : 0 }}
+          >
+            <img
+              src={imageUrl}
+              alt={targetName}
+              onLoad={() => setImageLoaded(true)}
+              className="object-cover transition-transform duration-300"
+              style={{
+                width: `${fov.imageW}%`,
+                height: `${fov.imageW}%`,
+                filter: "brightness(1.1) contrast(1.1) saturate(1.1)",
+              }}
+            />
+            {/* Subtle Vignette for depth */}
+            <div className="absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.9)] pointer-events-none" />
+          </div>
+        )}
+
+        {/* Background Star Pattern (Fallback) */}
+        {!imageLoaded && (
+          <div
+            className="absolute inset-0 opacity-20 pointer-events-none"
+            style={{
+              backgroundImage: "radial-gradient(white 1px, transparent 0)",
+              backgroundSize: "40px 40px",
+            }}
+          />
+        )}
 
         {/* The Viewport */}
         <div className="absolute inset-0 flex items-center justify-center p-8">
-          {/* Target Representation */}
-          <div
-            className="absolute border-2 border-primary/30 bg-primary/5 rounded-full transition-all duration-500 flex items-center justify-center"
-            style={{ width: `${fov.targetW}%`, height: `${fov.targetH}%` }}
-          >
-            <span className="text-[10px] font-black uppercase text-primary/40 tracking-tighter text-center px-2">
-              {targetName}
-            </span>
-          </div>
+          {/* Target Representation (only show if no image or image not loaded) */}
+          {(!imageUrl || !imageLoaded) && (
+            <div
+              className="absolute border-2 border-primary/30 bg-primary/5 rounded-full transition-all duration-500 flex items-center justify-center"
+              style={{ width: `${fov.targetW}%`, height: `${fov.targetH}%` }}
+            >
+              <span className="text-[10px] font-black uppercase text-primary/40 tracking-tighter text-center px-2">
+                {targetName}
+              </span>
+            </div>
+          )}
 
           {/* Sensor Frame (Rotatable) */}
           <div
@@ -147,10 +182,18 @@ export function FovSimulator({
               </span>
             </div>
             <p className="text-[9px] font-medium text-white/60 leading-none">
-              Target: {fov.tX.toFixed(1)}' \u00d7 {fov.tY.toFixed(1)}'
+              Target:{" "}
+              {fov.tX.toLocaleString(undefined, {
+                maximumSignificantDigits: 2,
+              })}
+              ' \u00d7{" "}
+              {fov.tY.toLocaleString(undefined, {
+                maximumSignificantDigits: 2,
+              })}
+              '
             </p>
             <p className="text-[9px] font-medium text-white/60 leading-none">
-              Sensor: {fov.fovX.toFixed(1)}' \u00d7 {fov.fovY.toFixed(1)}'
+              Sensor: {Math.round(fov.fovX)}' \u00d7 {Math.round(fov.fovY)}'
             </p>
           </div>
 

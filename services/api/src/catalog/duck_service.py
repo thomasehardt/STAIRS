@@ -27,9 +27,9 @@ class DuckCatalogService:
                 identifier, common_name, target_type, constellation,
                 magnitude, angular_size, season
             FROM targets
-            WHERE (identifier ILIKE ? OR common_name ILIKE ?)
+            WHERE (identifier ILIKE ? OR common_name ILIKE ? OR identifiers_str ILIKE ?)
         """
-        params = [f"%{query}%", f"%{query}%"]
+        params = [f"%{query}%", f"%{query}%", f"%{query}%"]
 
         if target_type:
             sql += " AND target_type = ?"
