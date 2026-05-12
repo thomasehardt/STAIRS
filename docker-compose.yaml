@@ -9,7 +9,7 @@ services:
       - "8000:8000"
     volumes:
       - ./services/api/src:/app/src
-      - ./data:/app/data:ro
+      - ./services/api/data:/app/data:ro
       - ./cache:/app_data/cache
       - ./logs:/app_data/logs
       - ./config.yaml:/app/config.yaml

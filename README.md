@@ -97,7 +97,7 @@ Running STAIRS directly on your machine without Docker is useful for development
    **Tip:** You can override default paths using environment variables:
 
    - `CONFIG_FILE`: Path to `config.yaml` (default: `config.yaml`)
-   - `DATA_DIR`: Path to the `data` directory (default: `data`)
+   - `DATA_DIR`: Path to the `data` directory (default: `services/api/data`)
    - `CACHE_DIR`: Path to the `cache` directory (default: `cache`)
    - `LOG_DIR`: Path to the `logs` directory (default: `logs`)
 
@@ -190,36 +190,33 @@ services:
       - "8000:8000"
     volumes:
       - ./config.yaml:/app/config.yaml
-      - ./data:/app/data:ro
+      - ./services/api/data:/app/data:ro
       - ./cache:/app_data/cache
       - ./logs:/app_data/logs
     restart: unless-stopped
-
-  web:
-    image: ghcr.io/thomasehardt/stairs/stairs-web:latest
-    container_name: stairs-web
-    ports:
-      - "3000:80"
-    environment:
-      - VITE_API_URL=http://localhost:8000
-    depends_on:
-      - api
-    restart: unless-stopped
-
-  cli:
-    image: ghcr.io/thomasehardt/stairs/stairs-cli:latest
-    container_name: stairs-cli
-    environment:
-      - API_URL=http://api:8000
-    depends_on:
-      - api
 ```
+
+web:
+image: ghcr.io/thomasehardt/stairs/stairs-web:latest
+container_name: stairs-web
+ports: - "3000:80"
+environment: - VITE_API_URL=http://localhost:8000
+depends_on: - api
+restart: unless-stopped
+
+cli:
+image: ghcr.io/thomasehardt/stairs/stairs-cli:latest
+container_name: stairs-cli
+environment: - API_URL=http://api:8000
+depends_on: - api
+
+````
 
 Run with:
 
 ```bash
 docker compose -f docker-compose.prod.yaml up -d
-```
+````
 
 To start the Web and API layers (see below for an alias to use the CLI from Docker).
 

@@ -7,12 +7,14 @@ services:
       - "8000:8000"
     volumes:
       - ./config.yaml:/app/config.yaml
-      - ./data:/app/data:ro
+      - ./services/api/data:/app/data:ro
       - ./cache:/app_data/cache
       - ./logs:/app_data/logs
     environment:
       - CACHE_DIR=/app_data/cache
       - LOG_DIR=/app_data/logs
+      - DATA_DIR=/app/data
+      - CONFIG_FILE=/app/config.yaml
 
   web:
     image: ghcr.io/thomasehardt/stairs/stairs-web:latest

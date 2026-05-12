@@ -10,8 +10,9 @@ from astropy.utils.iers import conf
 # Set up environment variables for testing if not already set
 # This allows running tests from the services/api directory
 project_root = Path(__file__).parent.parent.parent.parent
+api_root = project_root / "services/api"
 os.environ.setdefault("CONFIG_FILE", str(project_root / "config.yaml"))
-os.environ.setdefault("DATA_DIR", str(project_root / "data"))
+os.environ.setdefault("DATA_DIR", str(api_root / "data"))
 os.environ.setdefault("CACHE_DIR", str(project_root / "cache"))
 
 from src.api.main import app
