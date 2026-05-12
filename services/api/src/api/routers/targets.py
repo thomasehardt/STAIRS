@@ -106,20 +106,23 @@ async def get_target_detail(
     # Base FOV for image request
     img_fov_deg = 1.0
 
+    oss_score = None
+    aqs_score = None
+
     if profile_name:
         profile = service.get_profile_by_name(profile_name)
         if profile:
-            # FOV in arcmins
+            # 1. Hardware Metrics
             fov_x, fov_y = profile.calculate_fov()
             img_fov_deg = (max(fov_x, fov_y) / 60.0) * 1.5  # 50% padding
 
-            # We use target size to compute fit
-            # size is stored as list in DuckDB/Parquet
-            from src.astro_logic.scoring import get_target_size_fov
+            from src.astro_logic.scoring import (
+                calculate_oss,
+                get_target_size_fov,
+            )
 
             target_size = get_target_size_fov(target)
             fov_min = profile.fov_min
-
             fit_ratio = target_size / fov_min
 
             suggested = "Landscape"
@@ -133,12 +136,31 @@ async def get_target_detail(
                 orientation_suggested=suggested,
             )
 
-            # Exposure calculation
+            # 2. Location & Scoring
             from src.planner.location_service import resolve_location
 
-            loc = resolve_location(db=db)  # get default location
+            loc = resolve_location(db=db)
             bortle = loc.bortle_scale or 5
 
+            # Calculate peak altitude for tonight (approximate)
+            observer = loc.get_observer()
+            from astropy.coordinates import SkyCoord
+
+            target_coord = SkyCoord(
+                ra=target_data["ra_deg"] * u.deg, dec=target_data["dec_deg"] * u.deg
+            )
+
+            # Use next 12 hours to find peak
+            now = Time.now()
+            times = now + u.hour * np.linspace(0, 12, 24)
+            altaz = observer.altaz(times, target_coord)
+            peak_alt = float(np.max(altaz.alt.deg))
+
+            oss_score, aqs_score = calculate_oss(
+                target, profile, peak_alt, bortle_scale=bortle
+            )
+
+            # 3. Exposure calculation
             sky_flux = calculate_sky_flux(
                 bortle,
                 profile.aperture_mm,
@@ -147,14 +169,29 @@ async def get_target_detail(
                 profile.quantum_efficiency,
             )
 
+            # Convert degrees to arcminutes for the ETC
+            size_arcmin = (
+                [s * 60.0 for s in target.angular_size]
+                if target.angular_size
+                else [10.0]
+            )
+
+            from src.astro_logic.exposure import calculate_practical_sub_exposure
+
+            sky_lim_sub = calculate_optimal_sub_exposure(sky_flux, profile.read_noise_e)
+            prac_sub = calculate_practical_sub_exposure(
+                sky_lim_sub,
+                profile.focal_length_mm,
+                is_alt_az=True,  # Assume Alt-Az for smart telescopes
+            )
+
             exposure = ExposureRecommendation(
-                optimal_sub_s=safe_round(
-                    calculate_optimal_sub_exposure(sky_flux, profile.read_noise_e), 1
-                ),
+                sky_limited_sub_s=safe_round(sky_lim_sub, 1),
+                practical_sub_s=safe_round(prac_sub, 1),
                 total_integration_h=safe_round(
                     calculate_total_integration_time(
                         target.magnitude if target.magnitude is not None else 15.0,
-                        list(target.angular_size) if target.angular_size else [10.0],
+                        size_arcmin,
                         bortle,
                         profile.aperture_mm,
                         profile.focal_length_mm,
@@ -195,6 +232,8 @@ async def get_target_detail(
         exposure=exposure,
         image_url=image_url,
         image_fov_deg=img_fov_deg,
+        oss_score=oss_score,
+        aqs_score=aqs_score,
     )
 
 
@@ -229,7 +268,9 @@ async def get_target_position(
     )
     observer = loc.get_observer()
 
-    t_start = Time(start_time)
+    from datetime import datetime
+
+    t_start = Time(datetime.fromisoformat(start_time))
     # Generate 5-minute intervals
     num_points = int(hours * 12)
     times = t_start + u.minute * (5 * np.arange(num_points))

@@ -56,7 +56,8 @@ class ObservationBlock(BaseModel):
 
 
 class ExposureRecommendation(BaseModel):
-    optimal_sub_s: float
+    sky_limited_sub_s: float
+    practical_sub_s: float
     total_integration_h: float
     target_snr: float = 20.0
 
@@ -178,6 +179,8 @@ class TargetDetail(BaseModel):
     exposure: ExposureRecommendation | None = None
     image_url: str | None = None
     image_fov_deg: float | None = None
+    oss_score: float | None = None
+    aqs_score: float | None = None
 
 
 class ForecastDay(BaseModel):

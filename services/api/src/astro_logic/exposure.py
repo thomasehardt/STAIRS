@@ -59,17 +59,27 @@ def calculate_sky_flux(
 
 def calculate_optimal_sub_exposure(sky_flux_eps: float, read_noise_e: float) -> float:
     """
-    Calculates the optimal sub-exposure time to swamp read noise by 10x.
-
-    :param sky_flux_eps: sky flux in electrons/pixel/second
-    :param read_noise_e: read noise in electrons
-    :return: exposure time in seconds
+    Calculates the sky-limited sub-exposure time to swamp read noise by 10x.
     """
     if sky_flux_eps <= 0:
-        return 300.0  # fallback for pitch black
-
-    # Formula: t = 10 * R^2 / S
+        return 300.0
     return (10.0 * (read_noise_e**2)) / sky_flux_eps
+
+
+def calculate_practical_sub_exposure(
+    sky_limited_s: float, focal_length_mm: float, is_alt_az: bool = True
+) -> float:
+    """
+    Applies practical constraints to the sky-limited exposure.
+    For Alt-Az mounts (like Seestar), we clamp between 10s and 20s.
+    """
+    # 1. Hardware Floor: Stacking thousands of 1s-5s subs is impractical
+    # 2. Tracking Ceiling: Alt-Az mounts trail after ~20-30s
+    if is_alt_az:
+        return float(np.clip(sky_limited_s, 10.0, 20.0))
+
+    # EQ Mounts can go much longer
+    return float(np.clip(sky_limited_s, 30.0, 300.0))
 
 
 def calculate_total_integration_time(
@@ -112,20 +122,23 @@ def calculate_total_integration_time(
     ) * 60.0
     area_as2 = w_as * h_as
 
-    area_px = area_as2 / (pixel_scale**2)
+    # Minimum area to avoid infinity (e.g. for a star, assume 3x3 arcsec PSF)
+    area_as2 = max(area_as2, 9.0)
 
-    # 4. Optimal sub time
+    area_px = area_as2 / (pixel_scale**2)
+    area_px = max(area_px, 1.0)
+
+    # 4. Signal per pixel
+    target_eps_px = total_target_eps / area_px
+
+    # 5. Optimal sub time
     t_sub = calculate_optimal_sub_exposure(sky_eps, read_noise_e)
 
-    # 5. Solve for T (Total Time) in the SNR equation:
-    # SNR = (F_t * T) / sqrt(F_t * T + Area_px * S_eps * T + Area_px * (T/t_sub) * R^2)
-    # SNR^2 = (F_t^2 * T^2)/(F_t * T + Area_px * S_eps * T + Area_px * (T/t_sub) * R^2)
-    # SNR^2 = (F_t^2 * T) / (F_t + Area_px * S_eps + Area_px * (R^2 / t_sub))
-    # T = SNR^2 * (F_t + Area_px * S_eps + Area_px * (R^2 / t_sub)) / F_t^2
+    # 6. Solve for T (Total Time) in the per-pixel SNR equation:
+    # SNR = (F_px * T) / sqrt(F_px * T + S_eps * T + (T/t_sub) * R^2)
+    # T = SNR^2 * (F_px + S_eps + R^2/t_sub) / F_px^2
 
-    numerator_term = (
-        total_target_eps + (area_px * sky_eps) + (area_px * (read_noise_e**2 / t_sub))
-    )
-    total_time_s = (target_snr**2 * numerator_term) / (total_target_eps**2)
+    numerator_term = target_eps_px + sky_eps + (read_noise_e**2 / t_sub)
+    total_time_s = (target_snr**2 * numerator_term) / (target_eps_px**2)
 
     return total_time_s
