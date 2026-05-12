@@ -176,6 +176,8 @@ class TargetDetail(BaseModel):
     last_observed: date | None = None
     observation_count: int | None = None
     exposure: ExposureRecommendation | None = None
+    image_url: str | None = None
+    image_fov_deg: float | None = None
 
 
 class ForecastDay(BaseModel):

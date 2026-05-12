@@ -101,9 +101,18 @@ async def get_target_detail(
 
     fov_fit = None
     exposure = None
+    image_url = None
+
+    # Base FOV for image request
+    img_fov_deg = 1.0
+
     if profile_name:
         profile = service.get_profile_by_name(profile_name)
         if profile:
+            # FOV in arcmins
+            fov_x, fov_y = profile.calculate_fov()
+            img_fov_deg = (max(fov_x, fov_y) / 60.0) * 1.5  # 50% padding
+
             # We use target size to compute fit
             # size is stored as list in DuckDB/Parquet
             from src.astro_logic.scoring import get_target_size_fov
@@ -158,6 +167,14 @@ async def get_target_detail(
                 ),
             )
 
+    # NASA SkyView DSS2 Red survey
+    ra = target_data["ra_deg"]
+    dec = target_data["dec_deg"]
+    image_url = (
+        f"https://skyview.gsfc.nasa.gov/cgi-bin/images?"
+        f"survey=dss2r&position={ra},{dec}&size={img_fov_deg}&pixels=600&return=jpg"
+    )
+
     return TargetDetail(
         identifier=target.identifier,
         ra_deg=target_data["ra_deg"],
@@ -176,6 +193,8 @@ async def get_target_detail(
         observation_count=observation_count,
         last_observed=last_observed,
         exposure=exposure,
+        image_url=image_url,
+        image_fov_deg=img_fov_deg,
     )
 
 

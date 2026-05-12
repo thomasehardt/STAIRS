@@ -4,15 +4,19 @@ import os
 import shutil
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import yaml
-from src.catalog.catalog_models import ObjectCatalog, TelescopeProfile
+from astropy import units as u
+from astropy.coordinates import SkyCoord
+from src.catalog.catalog_models import TelescopeProfile
 from src.planner.planner_models import ObservationLocation
 
 logger = logging.getLogger(__name__)
 
 CONFIG_FILE = Path("config.yaml")
 CATALOG_DIR = Path("data/catalogs")
+OPENNGC_DIR = CATALOG_DIR / "openngc"
 TELESCOPE_PROFILES_DIR = Path("data/telescopes")
 
 CACHE_ROOT = Path(os.getenv("CACHE_DIR", "cache"))
@@ -20,6 +24,140 @@ LOCATIONS_OUT = CACHE_ROOT / "user_locations.parquet"
 TARGETS_OUT = CACHE_ROOT / "targets"
 METADATA_OUT = CACHE_ROOT / "catalog_metadata.parquet"
 TELESCOPES_OUT = CACHE_ROOT / "telescope_profiles.parquet"
+
+# --- OpenNGC Mappings ---
+CONST_MAP = {
+    "And": "Andromeda",
+    "Ant": "Antlia",
+    "Aps": "Apus",
+    "Aqr": "Aquarius",
+    "Aql": "Aquila",
+    "Ara": "Ara",
+    "Ari": "Aries",
+    "Aur": "Auriga",
+    "Boo": "Bootes",
+    "Cae": "Caelum",
+    "Cam": "Camelopardalis",
+    "Cnc": "Cancer",
+    "CVn": "Canes Venatici",
+    "CMa": "Canis Major",
+    "CMi": "Canis Minor",
+    "Cap": "Capricornus",
+    "Car": "Carina",
+    "Cas": "Cassiopeia",
+    "Cen": "Centaurus",
+    "Cep": "Cepheus",
+    "Cet": "Cetus",
+    "Cha": "Chamaeleon",
+    "Cir": "Circinus",
+    "Col": "Columba",
+    "Com": "Coma Berenices",
+    "CrA": "Corona Australis",
+    "CrB": "Corona Borealis",
+    "Crv": "Corvus",
+    "Crt": "Crater",
+    "Cru": "Crux",
+    "Cyg": "Cygnus",
+    "Del": "Delphinus",
+    "Dor": "Dorado",
+    "Dra": "Draco",
+    "Equ": "Equuleus",
+    "Eri": "Eridanus",
+    "For": "Fornax",
+    "Gem": "Gemini",
+    "Gru": "Grus",
+    "Her": "Hercules",
+    "Hor": "Horologium",
+    "Hya": "Hydra",
+    "Hyi": "Hydrus",
+    "Ind": "Indus",
+    "Lac": "Lacerta",
+    "Leo": "Leo",
+    "LMi": "Leo Minor",
+    "Lep": "Lepus",
+    "Lib": "Libra",
+    "Lup": "Lupus",
+    "Lyn": "Lynx",
+    "Lyr": "Lyra",
+    "Men": "Mensa",
+    "Mic": "Microscopium",
+    "Mon": "Monoceros",
+    "Mus": "Musca",
+    "Nor": "Norma",
+    "Oct": "Octans",
+    "Oph": "Ophiuchus",
+    "Ori": "Orion",
+    "Pav": "Pavo",
+    "Peg": "Pegasus",
+    "Per": "Perseus",
+    "Phe": "Phoenix",
+    "Pic": "Pictor",
+    "Psc": "Pisces",
+    "PsA": "Piscis Austrinus",
+    "Pup": "Puppis",
+    "Pyx": "Pyxis",
+    "Ret": "Reticulum",
+    "Sge": "Sagitta",
+    "Sgr": "Sagittarius",
+    "Sco": "Scorpius",
+    "Scl": "Sculptor",
+    "Sct": "Scutum",
+    "Ser": "Serpens",
+    "Se1": "Serpens",
+    "Se2": "Serpens",
+    "Sex": "Sextans",
+    "Tau": "Taurus",
+    "Tel": "Telescopium",
+    "Tri": "Triangulum",
+    "TrA": "Triangulum Australe",
+    "Tuc": "Tucana",
+    "UMa": "Ursa Major",
+    "UMi": "Ursa Minor",
+    "Vel": "Vela",
+    "Vir": "Virgo",
+    "Vol": "Volans",
+    "Vul": "Vulpecula",
+}
+
+TYPE_MAP = {
+    "*": "Star",
+    "**": "Double star",
+    "*Ass": "Stellar Association",
+    "OCl": "Open Cluster",
+    "GCl": "Globular Cluster",
+    "Cl+N": "Open Cluster",
+    "G": "Galaxy",
+    "GPair": "Galaxy Group",
+    "GTrpl": "Galaxy Group",
+    "GGroup": "Galaxy Group",
+    "PN": "Planetary Nebula",
+    "HII": "Emission Nebula",
+    "DrkN": "Dark Nebula",
+    "EmN": "Emission Nebula",
+    "Neb": "Nebula",
+    "RfN": "Reflection Nebula",
+    "SNR": "Supernova remnant",
+    "Nova": "Nova",
+    "Ast": "Asterism",
+    "QSO": "Quasar",
+}
+
+
+# --- Fallback Sizes (Degrees) for simulation if missing ---
+TYPE_SIZE_FALLBACK = {
+    "Star": 0.005,
+    "Double star": 0.005,
+    "Galaxy": 0.015,
+    "Galaxy Group": 0.05,
+    "Open Cluster": 0.1,
+    "Globular Cluster": 0.08,
+    "Planetary Nebula": 0.02,
+    "Emission Nebula": 0.1,
+    "Dark Nebula": 0.1,
+    "Reflection Nebula": 0.1,
+    "Supernova remnant": 0.1,
+    "Asterism": 0.1,
+}
 
 
 def _needs_update(source_path: Path, target_path: Path) -> bool:
@@ -43,80 +181,125 @@ def _needs_update(source_path: Path, target_path: Path) -> bool:
 
 def load_data_to_parquet() -> None:
     """
-    convert JSON catalog and telescope profile data to parquet for use by duckdb
-    catalog data to be partitioned by catalog_id
+    convert OpenNGC CSV catalog and telescope profile data to parquet for use by duckdb
     :return:
     """
     # 1. Ingest Catalogs
-    if _needs_update(CATALOG_DIR, METADATA_OUT) or not TARGETS_OUT.exists():
+    if _needs_update(OPENNGC_DIR, METADATA_OUT) or not TARGETS_OUT.exists():
         if TARGETS_OUT.exists():
             shutil.rmtree(TARGETS_OUT)
         TARGETS_OUT.mkdir(parents=True, exist_ok=True)
 
-        catalog_paths = list(CATALOG_DIR.glob("*.json"))
-        all_targets = []
-        catalog_metadata = []
-        for path in catalog_paths:
-            logger.info(f"ingesting catalog: {path.name}")
-            catalog = ObjectCatalog.from_json(path)
+        logger.info("ingesting OpenNGC catalogs")
+        csv_files = ["NGC.csv", "addendum.csv"]
+        dfs = []
+        for f in csv_files:
+            p = OPENNGC_DIR / f
+            if p.exists():
+                dfs.append(pd.read_csv(p, sep=";", low_memory=False))
 
-            desc = (catalog.metadata or {}).get("description", {})
-            catalog_metadata.append(
-                {
-                    "catalog_id": catalog.catalog_id,
-                    "name": catalog.name,
-                    "summary": desc.get("summary"),
-                    "author": desc.get("author"),
-                    "item_count": len(catalog),
-                }
-            )
+        if not dfs:
+            logger.error("no OpenNGC data found")
+            return
 
-            for record in catalog.records:
-                data = record.model_dump()
-                data["ra_deg"] = data["right_ascension"] * 15.0
-                data["dec_deg"] = data["declination"]
-                data["catalog_id"] = catalog.catalog_id
-                data["identifiers_str"] = ",".join(data["identifiers"])
-                all_targets.append(data)
+        df = pd.concat(dfs, ignore_index=True)
 
-        if all_targets:
-            df = pd.DataFrame(all_targets)
+        # Basic Cleanup
+        df = df[df["Type"] != "NonEx"].copy()
+        df = df[df["RA"].notna() & df["Dec"].notna()].copy()
 
-            # ensure angular_size is always float list to avoid schema mismatch
-            if "angular_size" in df.columns:
-                df["angular_size"] = df["angular_size"].apply(
-                    lambda x: (
-                        [float(v) for v in x] if isinstance(x, list | tuple) else []
-                    )
-                )
+        # Coordinate Conversion
+        try:
+            coords = SkyCoord(ra=df["RA"], dec=df["Dec"], unit=(u.hourangle, u.deg))
+            df["ra_deg"] = coords.ra.deg
+            df["dec_deg"] = coords.dec.deg
+            df["right_ascension"] = coords.ra.hour
+            df["declination"] = coords.dec.deg
+        except Exception as e:
+            logger.error(f"failed to parse coordinates: {e}")
+            return
 
-            df.to_parquet(TARGETS_OUT, partition_cols=["catalog_id"], engine="pyarrow")
-        else:
-            empty_df = pd.DataFrame(
-                columns=[
-                    "identifier",
-                    "common_name",
-                    "ra_deg",
-                    "dec_deg",
-                    "target_type",
-                    "constellation",
-                    "magnitude",
-                    "catalog_id",
-                    "angular_size",
-                    "identifiers",
-                    "identifiers_str",
-                ]
-            )
-            empty_df.to_parquet(TARGETS_OUT / "empty_schema.parquet", engine="pyarrow")
-            logger.warning("no targets found in any catalogs")
+        # Mapping and Normalization
+        df["constellation"] = df["Const"].map(CONST_MAP).fillna("Other")
+        df["target_type"] = df["Type"].map(TYPE_MAP).fillna("Other")
+        df["magnitude"] = df["V-Mag"].combine_first(df["B-Mag"])
+        df["common_name"] = df["Common names"].where(df["Common names"].notna(), None)
+        df["catalog_id"] = "openngc"
 
-        if catalog_metadata:
-            pd.DataFrame(catalog_metadata).to_parquet(METADATA_OUT, engine="pyarrow")
-        else:
-            pd.DataFrame(
-                columns=["catalog_id", "name", "summary", "author", "item_count"]
-            ).to_parquet(METADATA_OUT, engine="pyarrow")
-            logger.warning("no catalog metadata found")
+        # Angular Size [MajAx, MinAx] in Degrees
+        def get_angular_size(r):
+            if pd.notna(r["MajAx"]):
+                if pd.notna(r["MinAx"]):
+                    return [float(r["MajAx"]) / 60.0, float(r["MinAx"]) / 60.0]
+                return [float(r["MajAx"]) / 60.0]
+
+            # Fallback based on type
+            t = TYPE_MAP.get(r["Type"], "Other")
+            fallback = TYPE_SIZE_FALLBACK.get(t, 0.01)
+            return [fallback]
+
+        df["angular_size"] = df.apply(get_angular_size, axis=1)
+
+        # Season
+        df["season"] = df["right_ascension"].apply(
+            lambda x: "winter"
+            if 0 <= x < 6
+            else "spring"
+            if 6 <= x < 12
+            else "summer"
+            if 12 <= x < 18
+            else "autumn"
+        )
+
+        # Identifiers
+        def build_ids(row):
+            ids = [str(row["Name"])]
+            if pd.notna(row["M"]):
+                ids.append(f"M{int(row['M'])}")
+            if pd.notna(row["Identifiers"]):
+                other = str(row["Identifiers"]).split(",")
+                ids.extend([o.strip() for o in other if o.strip()])
+            return list(set(ids))
+
+        df["identifiers"] = df.apply(build_ids, axis=1)
+        df["identifiers_str"] = df["identifiers"].apply(lambda x: ",".join(x))
+        df["identifier"] = df["Name"]
+
+        # Select columns for Parquet
+        out_cols = [
+            "identifier",
+            "common_name",
+            "ra_deg",
+            "dec_deg",
+            "target_type",
+            "constellation",
+            "magnitude",
+            "catalog_id",
+            "angular_size",
+            "identifiers",
+            "identifiers_str",
+            "season",
+            "right_ascension",
+            "declination",
+        ]
+        final_df = df[out_cols].copy()
+
+        # Write to Parquet
+        final_df.to_parquet(
+            TARGETS_OUT, partition_cols=["catalog_id"], engine="pyarrow"
+        )
+
+        # Metadata
+        catalog_metadata = [
+            {
+                "catalog_id": "openngc",
+                "name": "OpenNGC",
+                "summary": "The Open New General Catalogue and Index Catalogue",
+                "author": "Mattia Verga",
+                "item_count": len(final_df),
+            }
+        ]
+        pd.DataFrame(catalog_metadata).to_parquet(METADATA_OUT, engine="pyarrow")
     else:
         logger.debug("catalogs are already up to date")
 

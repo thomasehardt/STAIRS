@@ -229,9 +229,11 @@ export function TargetDetailPage() {
               FOV Simulator
             </h3>
             <FovSimulator
-              targetSize={target.angular_size || [10, 10]}
+              targetSize={target.angular_size || [10]}
               targetName={target.identifier}
               defaultTelescopeName={activeTelescope}
+              imageUrl={target.image_url}
+              imageFov={target.image_fov_deg}
             />
           </div>
 

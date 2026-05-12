@@ -93,18 +93,19 @@ function FovPreview({
       profile.focal_length_mm,
     );
 
-    // Target size (usually in arcminutes)
-    const tX = targetSize[0];
-    const tY = targetSize[1] || targetSize[0];
+    // Target size (convert degrees from backend to arcminutes)
+    const tX = targetSize[0] * 60;
+    const tY = (targetSize[1] || targetSize[0]) * 60;
 
     // Scale for display (container is square, let's assume 100% is the larger of fovX/fovY)
-    const maxFov = Math.max(fovX, fovY, tX, tY) * 1.2;
+    const maxFov = Math.max(fovX, fovY, tX, tY) * 1.3;
 
     return {
       sensorW: (fovX / maxFov) * 100,
       sensorH: (fovY / maxFov) * 100,
       targetW: (tX / maxFov) * 100,
       targetH: (tY / maxFov) * 100,
+      tX,
     };
   }, [profilesData, targetSize, telescopeName]);
 
@@ -117,7 +118,8 @@ function FovPreview({
           FOV Scale
         </span>
         <span className="text-[10px] font-black uppercase text-primary tracking-widest">
-          {targetSize?.[0]} arcmin
+          {fov.tX.toLocaleString(undefined, { maximumSignificantDigits: 2 })}{" "}
+          arcmin
         </span>
       </div>
       <div className="aspect-square w-full bg-background/50 rounded-xl border border-border/50 relative flex items-center justify-center overflow-hidden">

@@ -198,7 +198,7 @@ export function Dashboard() {
                   hour: "2-digit",
                   minute: "2-digit",
                 })}{" "}
-                -
+                -{" "}
                 {nightEnd.toLocaleTimeString([], {
                   hour: "2-digit",
                   minute: "2-digit",

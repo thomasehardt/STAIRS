@@ -510,6 +510,18 @@ export interface components {
       /** Catalogs */
       catalogs: components["schemas"]["CatalogItem"][];
     };
+    /** ExposureRecommendation */
+    ExposureRecommendation: {
+      /** Optimal Sub S */
+      optimal_sub_s: number;
+      /** Total Integration H */
+      total_integration_h: number;
+      /**
+       * Target Snr
+       * @default 20
+       */
+      target_snr: number;
+    };
     /**
      * ForecastData
      * @description defines the structure of a single weather forecast data point for a specific
@@ -751,8 +763,8 @@ export interface components {
      *       "location_name": "Spring Hill TN",
      *       "longitude": -86.92,
      *       "min_alt": 30,
-     *       "start_time": "2026-05-11T04:53:37.431440",
-     *       "telescope_profile_name": "Seestar S30"
+     *       "start_time": "2026-05-12T15:20:02.724110",
+     *       "telescope_profile_name": "Seestar S50"
      *     }
      */
     PlanRequest: {
@@ -957,6 +969,10 @@ export interface components {
       /** Observation Count */
       observation_count?: number | null;
       exposure?: components["schemas"]["ExposureRecommendation"] | null;
+      /** Image Url */
+      image_url?: string | null;
+      /** Image Fov Deg */
+      image_fov_deg?: number | null;
     };
     /** TargetOpportunitySeries */
     TargetOpportunitySeries: {
@@ -966,18 +982,6 @@ export interface components {
       location_name: string;
       /** Points */
       points: components["schemas"]["OpportunityPoint"][];
-    };
-    /** ExposureRecommendation */
-    ExposureRecommendation: {
-      /** Optimal Sub S */
-      optimal_sub_s: number;
-      /** Total Integration H */
-      total_integration_h: number;
-      /**
-       * Target Snr
-       * @default 20
-       */
-      target_snr: number;
     };
     /** TargetPositionSeries */
     TargetPositionSeries: {
