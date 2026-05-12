@@ -22,6 +22,7 @@ import {
   Plus,
   Star,
   Trash2,
+  Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FovSimulator } from "@/components/FovSimulator";
@@ -203,6 +204,20 @@ export function TargetDetailPage() {
                 value={target.distance ? `${target.distance} kly` : "N/A"}
                 icon={Telescope}
               />
+              {target.exposure && (
+                <>
+                  <DetailItem
+                    label="Optimal Sub"
+                    value={`${target.exposure.optimal_sub_s}s`}
+                    icon={Clock}
+                  />
+                  <DetailItem
+                    label="Target Session"
+                    value={`${target.exposure.total_integration_h}h`}
+                    icon={Activity}
+                  />
+                </>
+              )}
             </div>
           </div>
         </div>

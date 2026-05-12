@@ -1,4 +1,4 @@
-import { Telescope, MapPin, Activity, Pin, PinOff } from "lucide-react";
+import { Telescope, MapPin, Activity, Pin, PinOff, Clock } from "lucide-react";
 import { useTargetPosition } from "@/hooks/use-target-position";
 import { AltitudeChart } from "./AltitudeChart";
 import { Button } from "@/components/ui/button";
@@ -272,6 +272,22 @@ export function TargetCard({
             icon={Activity}
           />
         </div>
+
+        {/* Exposure Recommendations */}
+        {target.exposure && (
+          <div className="grid grid-cols-2 gap-2">
+            <DetailItem
+              label="Optimal Sub"
+              value={`${target.exposure.optimal_sub_s}s`}
+              icon={Clock}
+            />
+            <DetailItem
+              label="Target Session"
+              value={`${target.exposure.total_integration_h}h`}
+              icon={Activity}
+            />
+          </div>
+        )}
 
         {/* Dynamic Context (Transit or Chart) */}
         <div className="mt-auto pt-4 border-t border-border/50">

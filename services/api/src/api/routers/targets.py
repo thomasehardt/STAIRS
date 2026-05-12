@@ -7,12 +7,18 @@ from astropy.time import Time
 from duckdb import DuckDBPyConnection
 from fastapi import APIRouter, Depends, HTTPException
 from src.api.schemas import (
+    ExposureRecommendation,
     FovFit,
     PositionPoint,
     TargetDetail,
     TargetPositionSeries,
     TargetSearchItem,
     TargetSearchResponse,
+)
+from src.astro_logic.exposure import (
+    calculate_optimal_sub_exposure,
+    calculate_sky_flux,
+    calculate_total_integration_time,
 )
 from src.astro_logic.visibility import safe_round
 from src.catalog.catalog_models import TargetRecord
@@ -94,6 +100,7 @@ async def get_target_detail(
         last_observed = None
 
     fov_fit = None
+    exposure = None
     if profile_name:
         profile = service.get_profile_by_name(profile_name)
         if profile:
@@ -117,6 +124,40 @@ async def get_target_detail(
                 orientation_suggested=suggested,
             )
 
+            # Exposure calculation
+            from src.planner.location_service import resolve_location
+
+            loc = resolve_location(db=db)  # get default location
+            bortle = loc.bortle_scale or 5
+
+            sky_flux = calculate_sky_flux(
+                bortle,
+                profile.aperture_mm,
+                profile.focal_length_mm,
+                profile.pixel_pitch_um,
+                profile.quantum_efficiency,
+            )
+
+            exposure = ExposureRecommendation(
+                optimal_sub_s=safe_round(
+                    calculate_optimal_sub_exposure(sky_flux, profile.read_noise_e), 1
+                ),
+                total_integration_h=safe_round(
+                    calculate_total_integration_time(
+                        target.magnitude if target.magnitude is not None else 15.0,
+                        list(target.angular_size) if target.angular_size else [10.0],
+                        bortle,
+                        profile.aperture_mm,
+                        profile.focal_length_mm,
+                        profile.pixel_pitch_um,
+                        profile.quantum_efficiency,
+                        profile.read_noise_e,
+                    )
+                    / 3600.0,
+                    1,
+                ),
+            )
+
     return TargetDetail(
         identifier=target.identifier,
         ra_deg=target_data["ra_deg"],
@@ -134,6 +175,7 @@ async def get_target_detail(
         fov_fit=fov_fit,
         observation_count=observation_count,
         last_observed=last_observed,
+        exposure=exposure,
     )
 
 

@@ -9,6 +9,7 @@ from astropy.time import Time
 from fastapi import APIRouter, Depends, HTTPException, Response
 from src.api.deps import get_weather_service
 from src.api.schemas import (
+    ExposureRecommendation,
     ForecastResponse,
     ObservationBlock,
     PlanRequest,
@@ -20,6 +21,11 @@ from src.api.schemas import (
     SkyViewResponse,
     TargetOpportunitySeries,
     TargetRecommendation,
+)
+from src.astro_logic.exposure import (
+    calculate_optimal_sub_exposure,
+    calculate_sky_flux,
+    calculate_total_integration_time,
 )
 from src.astro_logic.scoring import (
     calculate_oss_vectorized,
@@ -426,6 +432,38 @@ async def recommend_targets(
                 visible_end=observer.astropy_time_to_datetime(window[1])
                 if window
                 else None,
+                exposure=ExposureRecommendation(
+                    optimal_sub_s=safe_round(
+                        calculate_optimal_sub_exposure(
+                            calculate_sky_flux(
+                                loc.bortle_scale or 5,
+                                profile.aperture_mm,
+                                profile.focal_length_mm,
+                                profile.pixel_pitch_um,
+                                profile.quantum_efficiency,
+                            ),
+                            profile.read_noise_e,
+                        ),
+                        1,
+                    ),
+                    total_integration_h=safe_round(
+                        calculate_total_integration_time(
+                            row["magnitude"] if not pd.isna(row["magnitude"]) else 15.0,
+                            row["angular_size"]
+                            if isinstance(row["angular_size"], list)
+                            and len(row["angular_size"]) > 0
+                            else [10.0],
+                            loc.bortle_scale or 5,
+                            profile.aperture_mm,
+                            profile.focal_length_mm,
+                            profile.pixel_pitch_um,
+                            profile.quantum_efficiency,
+                            profile.read_noise_e,
+                        )
+                        / 3600.0,
+                        1,
+                    ),
+                ),
             )
         )
 
