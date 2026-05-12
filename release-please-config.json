@@ -13,15 +13,14 @@
           "path": "services/api/pyproject.toml"
         },
         {
-          "type": "regex",
+          "type": "generic",
           "path": "README.md",
           "patterns": [
-            "STAIRS-Monorepo-Dev v(\\d+\\.\\d+\\.\\d+)",
-            "version: v(\\d+\\.\\d+\\.\\d+)"
+            "STAIRS Astro Imaging Run Scheduler v(\\d+\\.\\d+\\.\\d+)"
           ]
         },
         {
-          "type": "regex",
+          "type": "generic",
           "path": "docker-compose.prod.yaml",
           "patterns": [
             "stairs-api:v(\\d+\\.\\d+\\.\\d+)",
