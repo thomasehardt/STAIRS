@@ -43,6 +43,18 @@ services:
     depends_on:
       - api
 
+  web:
+    build:
+      context: ./services/web
+      dockerfile: Dockerfile
+    container_name: stairs-web
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - api
+
   web-dev:
     build:
       context: ./services/web
