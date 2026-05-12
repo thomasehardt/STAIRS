@@ -1,0 +1,40 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "package-name": "STAIRS",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "services/web/package.json"
+        },
+        {
+          "type": "toml",
+          "path": "services/api/pyproject.toml"
+        },
+        {
+          "type": "regex",
+          "path": "README.md",
+          "patterns": [
+            "STAIRS-Monorepo-Dev v(\\d+\\.\\d+\\.\\d+)",
+            "version: v(\\d+\\.\\d+\\.\\d+)"
+          ]
+        },
+        {
+          "type": "regex",
+          "path": "docker-compose.prod.yaml",
+          "patterns": [
+            "stairs-api:v(\\d+\\.\\d+\\.\\d+)",
+            "stairs-web:v(\\d+\\.\\d+\\.\\d+)",
+            "stairs-cli:v(\\d+\\.\\d+\\.\\d+)"
+          ]
+        }
+      ]
+    }
+  },
+  "plugins": [
+    {
+      "type": "sentence-case"
+    }
+  ]
+}

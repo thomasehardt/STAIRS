@@ -1,4 +1,4 @@
-name: Release
+name: Build and Release Images
 
 on:
   push:
@@ -6,23 +6,7 @@ on:
       - "v*"
 
 jobs:
-  create-release:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    outputs:
-      release_id: ${{ steps.create_release.outputs.id }}
-    steps:
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v3
-        with:
-          generate_release_notes: true
-          draft: false
-          prerelease: false
-
   build-and-push:
-    needs: create-release
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -35,13 +19,16 @@ jobs:
           - web
         include:
           - service: api
-            context: ./services/api
+            context: .
+            dockerfile: ./services/api/Dockerfile
             image_name: stairs-api
           - service: cli
             context: ./services/cli
+            dockerfile: ./services/cli/Dockerfile
             image_name: stairs-cli
           - service: web
             context: ./services/web
+            dockerfile: ./services/web/Dockerfile
             image_name: stairs-web
     steps:
       - name: Checkout repository
@@ -70,6 +57,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

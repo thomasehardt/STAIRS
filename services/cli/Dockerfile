@@ -13,8 +13,9 @@ RUN apt-get update \
 
 WORKDIR /app
 
-# Create a non-root user
-RUN groupadd -r stairs && useradd -r -g stairs stairs
+# Create a non-root user matching host UID/GID
+RUN groupadd -g 1000 stairs && \
+    useradd -u 1000 -g stairs -m stairs
 
 COPY pyproject.toml .
 RUN pip install --no-cache-dir -e .
@@ -27,7 +28,7 @@ USER stairs
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app/src
 ENV MPLBACKEND=Agg
-ENV HOME=/tmp
+ENV HOME=/home/stairs
 
 ENTRYPOINT ["stairs"]
 CMD ["--help"]

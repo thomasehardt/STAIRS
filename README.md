@@ -1,6 +1,7 @@
-# STAIRS Astro Imaging Run Scheduler
+# STAIRS Astro Imaging Run Scheduler v0.1.3
 
-STAIRS is a specialized planning tool designed for astrophotography enthusiasts with smart telescopes (like the [Seestar S50](https://www.seestar.com/products/seestar-s50)) to assist with the planning of imaging sessions. It takes into account telescope specifications, target suitability, sky conditions, and user preferences to score objects.
+STAIRS is a specialized planning tool designed for astrophotography enthusiasts
+with smart telescopes (like the [Seestar S50](https://www.seestar.com/products/seestar-s50)) to assist with the planning of imaging sessions. It takes into account telescope specifications, target suitability, sky conditions, and user preferences to score objects.
 
 ## Overview
 
@@ -97,7 +98,7 @@ Running STAIRS directly on your machine without Docker is useful for development
    **Tip:** You can override default paths using environment variables:
 
    - `CONFIG_FILE`: Path to `config.yaml` (default: `config.yaml`)
-   - `DATA_DIR`: Path to the `data` directory (default: `services/api/data`)
+   - `DATA_DIR`: Path to the `data` directory (default: `data`)
    - `CACHE_DIR`: Path to the `cache` directory (default: `cache`)
    - `LOG_DIR`: Path to the `logs` directory (default: `logs`)
 
@@ -190,7 +191,7 @@ services:
       - "8000:8000"
     volumes:
       - ./config.yaml:/app/config.yaml
-      - ./services/api/data:/app/data:ro
+      - ./data:/app/data:ro
       - ./cache:/app_data/cache
       - ./logs:/app_data/logs
     restart: unless-stopped

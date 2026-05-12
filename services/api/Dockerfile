@@ -2,13 +2,14 @@ FROM python:3.14-slim
 
 WORKDIR /app
 
-# Create a non-root user for security
-RUN groupadd -r stairs && useradd -r -g stairs stairs
+# Create a non-root user for security, matching common host UID/GID
+RUN groupadd -g 1000 stairs && \
+    useradd -u 1000 -g stairs -m stairs
 
-COPY pyproject.toml .
+COPY services/api/pyproject.toml .
 RUN pip install --no-cache-dir .
 
-COPY src/ /app/src/
+COPY services/api/src/ /app/src/
 COPY data/ /app/data/
 # Copy config.yaml if it exists, otherwise it must be mounted
 COPY config.yaml* /app/
@@ -23,7 +24,7 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app
 ENV DATA_DIR=/app/data
 ENV CONFIG_FILE=/app/config.yaml
-ENV HOME=/tmp
+ENV HOME=/home/stairs
 
 # Switch to the non-root user
 USER stairs
