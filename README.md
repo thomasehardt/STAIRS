@@ -25,8 +25,11 @@ A lot of apps will tell you _what_ is in the sky, but not how to build an effici
 ![STAIRS Dashboard](docs/screenshots/dashboard.png)
 _The Sky Dashboard showing current conditions and recommended targets for Nashville, TN._
 
-![Plan Generator](docs/screenshots/planner.png) ![Forecast View](docs/screenshots/forecast.png)
-_Left: AI-Optimized Plan Generator. Right: Multi-site Observation Forecast._
+![Plan Generator](docs/screenshots/planner.png)
+_AI-Optimized Plan Generator._
+
+![Forecast View](docs/screenshots/forecast.png)
+_Multi-site Observation Forecast._
 
 </details>
 
