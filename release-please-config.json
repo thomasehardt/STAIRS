@@ -5,12 +5,14 @@
       "package-name": "STAIRS",
       "extra-files": [
         {
-          "type": "json",
-          "path": "services/web/package.json"
+          "type": "generic",
+          "path": "services/web/package.json",
+          "patterns": ["\"version\": \"(\\d+\\.\\d+\\.\\d+)\""]
         },
         {
-          "type": "toml",
-          "path": "services/api/pyproject.toml"
+          "type": "generic",
+          "path": "services/api/pyproject.toml",
+          "patterns": ["version = \"(\\d+\\.\\d+\\.\\d+)\""]
         },
         {
           "type": "generic",
