@@ -129,10 +129,10 @@ export function TargetDetailPage() {
             </span>
           </div>
           <h1 className="text-5xl font-black tracking-tight">
-            {target.identifier}
+            {target.common_name || target.identifier}
           </h1>
           <p className="text-2xl text-muted-foreground font-medium">
-            {target.common_name || "Deep Sky Object"}
+            {target.common_name ? target.identifier : target.target_type}
           </p>
         </div>
 

@@ -191,11 +191,11 @@ export function TargetCard({
             <div className="flex items-center gap-2 mb-1">
               <Telescope className="w-5 h-5 text-primary shrink-0" />
               <h3 className="text-xl font-black text-foreground group-hover:text-primary transition-colors truncate">
-                {id}
+                {target.common_name || id}
               </h3>
             </div>
             <p className="text-sm font-bold text-muted-foreground uppercase tracking-tight truncate">
-              {target.common_name || "Deep Sky Object"}
+              {target.common_name ? id : target.target_type}
             </p>
           </div>
 

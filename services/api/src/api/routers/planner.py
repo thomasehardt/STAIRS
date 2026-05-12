@@ -361,9 +361,24 @@ async def recommend_targets(
 
     targets_df = catalog_service.conn.execute("SELECT * FROM targets").df()
     latitude = loc.latitude
+
+    # 1. Broad Altitude Filter
     targets_df["theoretical_max_alt"] = 90.0 - np.abs(latitude - targets_df["dec_deg"])
     targets_df = targets_df[
         targets_df["theoretical_max_alt"] > (request.min_alt - 5.0)
+    ].copy()
+
+    # 2. Smart Aperture Filter (Limiting Magnitude)
+    # threshold = 5 * log10(D) + K. For imaging, K around 6.0 is reasonable for
+    # 'reachable'
+    limiting_mag = 5.0 * np.log10(profile.aperture_mm) + 6.0
+    # Also consider objects with no magnitude (often planetary nebulae or faint
+    # clusters)
+    # We'll be slightly more lenient with these if they have a common name
+    targets_df = targets_df[
+        (targets_df["magnitude"].isna())
+        | (targets_df["magnitude"] <= limiting_mag)
+        | (targets_df["common_name"].notna())
     ].copy()
 
     coords = SkyCoord(
