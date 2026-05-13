@@ -7,19 +7,17 @@
         {
           "type": "generic",
           "path": "services/web/package.json",
-          "patterns": ["\"version\": \"(\\d+\\.\\d+\\.\\d+)\""]
+          "patterns": ["\"version\":\\s*\"(\\d+\\.\\d+\\.\\d+)\""]
         },
         {
           "type": "generic",
           "path": "services/api/pyproject.toml",
-          "patterns": ["version = \"(\\d+\\.\\d+\\.\\d+)\""]
+          "patterns": ["version\\s*=\\s*\"(\\d+\\.\\d+\\.\\d+)\""]
         },
         {
           "type": "generic",
           "path": "README.md",
-          "patterns": [
-            "STAIRS Astro Imaging Run Scheduler v(\\d+\\.\\d+\\.\\d+)"
-          ]
+          "patterns": ["Scheduler v(\\d+\\.\\d+\\.\\d+)"]
         },
         {
           "type": "generic",
