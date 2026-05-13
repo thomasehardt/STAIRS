@@ -8,7 +8,6 @@ services:
       - "8000:8000"
     volumes:
       - ./config.yaml:/app/config.yaml
-      - ./services/api/data:/app/data:ro
       - ./cache:/app_data/cache
       - ./logs:/app_data/logs
     environment:
@@ -20,7 +19,6 @@ services:
   web:
     image: ghcr.io/thomasehardt/stairs/stairs-web:v0.3.0 # x-release-please-version
     container_name: stairs-web
-    user: "${UID:-1000}:${GID:-1000}"
     restart: unless-stopped
     ports:
       - "3000:8080"
