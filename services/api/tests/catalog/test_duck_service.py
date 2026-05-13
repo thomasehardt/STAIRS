@@ -1,5 +1,4 @@
 from src.catalog.duck_service import DuckCatalogService
-from src.planner.planner_models import ObservationLocation
 
 
 def test_duck_catalog_service_search(test_db):
