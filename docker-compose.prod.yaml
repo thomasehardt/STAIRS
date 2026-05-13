@@ -1,6 +1,6 @@
 services:
   api:
-    image: ghcr.io/thomasehardt/stairs/stairs-api:v0.1.4
+    image: ghcr.io/thomasehardt/stairs/stairs-api:v0.1.4 # x-release-please-version
     container_name: stairs-api
     user: "${UID:-1000}:${GID:-1000}"
     restart: unless-stopped
@@ -8,7 +8,7 @@ services:
       - "8000:8000"
     volumes:
       - ./config.yaml:/app/config.yaml
-      - ./data:/app/data:ro
+      - ./services/api/data:/app/data:ro
       - ./cache:/app_data/cache
       - ./logs:/app_data/logs
     environment:
@@ -18,7 +18,7 @@ services:
       - CONFIG_FILE=/app/config.yaml
 
   web:
-    image: ghcr.io/thomasehardt/stairs/stairs-web:v0.1.4
+    image: ghcr.io/thomasehardt/stairs/stairs-web:v0.1.4 # x-release-please-version
     container_name: stairs-web
     user: "${UID:-1000}:${GID:-1000}"
     restart: unless-stopped
@@ -32,7 +32,7 @@ services:
       - api
 
   cli:
-    image: ghcr.io/thomasehardt/stairs/stairs-cli:v0.1.4
+    image: ghcr.io/thomasehardt/stairs/stairs-cli:v0.1.4 # x-release-please-version
     container_name: stairs-cli
     user: "${UID:-1000}:${GID:-1000}"
     environment:

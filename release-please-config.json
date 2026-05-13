@@ -5,28 +5,22 @@
       "package-name": "STAIRS",
       "extra-files": [
         {
-          "type": "generic",
+          "type": "json",
           "path": "services/web/package.json",
-          "patterns": ["\"version\":\\s*\"(\\d+\\.\\d+\\.\\d+)\""]
+          "jsonpath": "$.version"
         },
         {
-          "type": "generic",
+          "type": "toml",
           "path": "services/api/pyproject.toml",
-          "patterns": ["version\\s*=\\s*\"(\\d+\\.\\d+\\.\\d+)\""]
+          "jsonpath": "$.project.version"
         },
         {
           "type": "generic",
-          "path": "README.md",
-          "patterns": ["Scheduler v(\\d+\\.\\d+\\.\\d+)"]
+          "path": "README.md"
         },
         {
           "type": "generic",
-          "path": "docker-compose.prod.yaml",
-          "patterns": [
-            "stairs-api:v(\\d+\\.\\d+\\.\\d+)",
-            "stairs-web:v(\\d+\\.\\d+\\.\\d+)",
-            "stairs-cli:v(\\d+\\.\\d+\\.\\d+)"
-          ]
+          "path": "docker-compose.prod.yaml"
         }
       ]
     }
