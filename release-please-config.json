@@ -5,24 +5,24 @@
       "package-name": "STAIRS",
       "extra-files": [
         {
-          "type": "generic",
+          "type": "regex",
           "path": "services/web/package.json",
           "patterns": ["\"version\": \"(\\d+\\.\\d+\\.\\d+)\""]
         },
         {
-          "type": "generic",
+          "type": "regex",
           "path": "services/api/pyproject.toml",
           "patterns": ["version = \"(\\d+\\.\\d+\\.\\d+)\""]
         },
         {
-          "type": "generic",
+          "type": "regex",
           "path": "README.md",
           "patterns": [
             "STAIRS Astro Imaging Run Scheduler v(\\d+\\.\\d+\\.\\d+)"
           ]
         },
         {
-          "type": "generic",
+          "type": "regex",
           "path": "docker-compose.prod.yaml",
           "patterns": [
             "stairs-api:v(\\d+\\.\\d+\\.\\d+)",
