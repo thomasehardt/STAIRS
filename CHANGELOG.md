@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/thomasehardt/STAIRS/compare/STAIRS-v0.2.0...STAIRS-v0.2.1) (2026-05-13)
+
+
+### Bug Fixes
+
+* Fix for release-please (attempt 8) ([d23892b](https://github.com/thomasehardt/STAIRS/commit/d23892b8424c0556b1ca63156eb5cb76c87cf2f6))
+
 ## [0.2.0](https://github.com/thomasehardt/STAIRS/compare/STAIRS-v0.1.4...STAIRS-v0.2.0) (2026-05-13)
 
 
