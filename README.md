@@ -7,6 +7,9 @@ with smart telescopes (like the [Seestar S50](https://www.seestar.com/products/s
 
 A lot of apps will tell you _what_ is in the sky, but not how to build an efficient imaging plan. STAIRS does both and optimizes for specific equipment.
 
+> [!NOTE]
+> If you are looking for instructions on how to run STAIRS via Docker (the recommended method), see [here](#3-running-stairs-via-docker).
+
 ## Core Features
 
 - Optimal Window Calculation: Determines the best start/end times for targets based on altitude thresholds and environment.
@@ -167,9 +170,19 @@ _Tip: Create an alias for easier access: `alias stairs-cli="docker compose run -
 
 ---
 
-## 3. Production Docker (from GHCR.io)
+## 3. Running STAIRS via Docker
 
 For production or simple deployment, you can run STAIRS using pre-built images from the GitHub Container Registry.
+
+### Prerequisites
+
+Prior to running STAIRS via Docker, you will need to do the following:
+
+1. create a file named `config.yaml` (use [.config.yaml.example](.config.yaml.example) as a base).
+1. create directories (this prevents Docker from creating directories/files as `root`):
+   ```bash
+   mkdir -p logs cache
+   ```
 
 ### Using Docker Compose
 
@@ -181,7 +194,7 @@ Run with:
 docker compose -f docker-compose.prod.yaml up -d
 ```
 
-This will start the Web and API layers. You can then use the CLI via the same configuration (see below for aliases).
+This will start the Web and API layers. You can then use the CLI via the same configuration (see [below](#docker-cli-alias) for aliases).
 
 #### Configuration details in `docker-compose.prod.yaml`:
 
@@ -198,29 +211,33 @@ services:
       - ./cache:/app_data/cache
       - ./logs:/app_data/logs
     restart: unless-stopped
+
+   web:
+      image: ghcr.io/thomasehardt/stairs/stairs-web:latest
+      container_name: stairs-web
+      ports:
+        - "3000:80"
+      environment:
+        - VITE_API_URL=http://localhost:8000
+      depends_on:
+        - api
+      restart: unless-stopped
+
+   cli:
+      image: ghcr.io/thomasehardt/stairs/stairs-cli:latest
+      container_name: stairs-cli
+      environment:
+        - API_URL=http://api:8000
+      depends_on:
+        - api
+
 ```
-
-web:
-image: ghcr.io/thomasehardt/stairs/stairs-web:latest
-container_name: stairs-web
-ports: - "3000:80"
-environment: - VITE_API_URL=http://localhost:8000
-depends_on: - api
-restart: unless-stopped
-
-cli:
-image: ghcr.io/thomasehardt/stairs/stairs-cli:latest
-container_name: stairs-cli
-environment: - API_URL=http://api:8000
-depends_on: - api
-
-````
 
 Run with:
 
 ```bash
 docker compose -f docker-compose.prod.yaml up -d
-````
+```
 
 To start the Web and API layers (see below for an alias to use the CLI from Docker).
 
@@ -236,6 +253,7 @@ For help with the cli application, there's a very useful help function:
 
     docker compose run --rm -it cli --help
 
+<a name="docker-cli-alias"></a>
 It is recommended that you create an alias for running the cli ... on Mac/Linux:
 
     alias stairs-cli="docker compose run --rm -it cli"
