@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/thomasehardt/STAIRS/compare/v0.3.0...v0.3.1) (2026-05-13)
+
+
+### Bug Fixes
+
+* Docker fix ([13800c0](https://github.com/thomasehardt/STAIRS/commit/13800c011694f3a1ea2e88015a367e5267580251))
+
 ## [0.3.0](https://github.com/thomasehardt/STAIRS/compare/v0.2.1...v0.3.0) (2026-05-13)
 
 
