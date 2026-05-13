@@ -1,4 +1,4 @@
-# STAIRS Astro Imaging Run Scheduler v0.2.1 <!-- x-release-please-version -->
+# STAIRS Astro Imaging Run Scheduler v0.3.0 <!-- x-release-please-version -->
 
 STAIRS is a specialized planning tool designed for astrophotography enthusiasts
 with smart telescopes (like the [Seestar S50](https://www.seestar.com/products/seestar-s50)) to assist with the planning of imaging sessions. It takes into account telescope specifications, target suitability, sky conditions, and user preferences to score objects.
