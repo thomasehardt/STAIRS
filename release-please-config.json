@@ -11,7 +11,17 @@
         },
         {
           "type": "toml",
+          "path": "pyproject.toml",
+          "jsonpath": "$.project.version"
+        },
+        {
+          "type": "toml",
           "path": "services/api/pyproject.toml",
+          "jsonpath": "$.project.version"
+        },
+        {
+          "type": "toml",
+          "path": "services/cli/pyproject.toml",
           "jsonpath": "$.project.version"
         },
         {
