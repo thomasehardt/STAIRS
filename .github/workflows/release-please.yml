@@ -8,16 +8,78 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  packages: write
 
 jobs:
   release-please:
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
       - uses: googleapis/release-please-action@v4
+        id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
           target-branch: main
+
+  build-and-push:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    strategy:
+      matrix:
+        service:
+          - api
+          - cli
+          - web
+        include:
+          - service: api
+            context: .
+            dockerfile: ./services/api/Dockerfile
+            image_name: stairs-api
+          - service: cli
+            context: ./services/cli
+            dockerfile: ./services/cli/Dockerfile
+            image_name: stairs-cli
+          - service: web
+            context: ./services/web
+            dockerfile: ./services/web/Dockerfile
+            image_name: stairs-web
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Lowercase repository name
+        run: echo "REPO_LOWER=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
+
+      - name: Log in to the container registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ env.REPO_LOWER }}/${{ matrix.image_name }}
+          tags: |
+            type=raw,value=${{ needs.release-please.outputs.tag_name }}
+            type=raw,value=latest
+
+      - name: Build and push docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
