@@ -1,4 +1,3 @@
-from astropy.time import Time
 from src.catalog.duck_service import DuckCatalogService
 from src.planner.planner_models import ObservationLocation
 
