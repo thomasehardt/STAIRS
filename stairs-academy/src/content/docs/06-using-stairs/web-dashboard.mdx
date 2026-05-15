@@ -1,0 +1,66 @@
+---
+title: Web Dashboard
+description: Visual planning and monitoring through the browser.
+---
+
+The STAIRS Web UI provides a browser-based interface for planning sessions, viewing forecasts, and browsing targets. It runs on port 3000 by default.
+
+## Getting Started
+
+Open [http://localhost:3000](http://localhost:3000) after starting STAIRS.
+
+---
+
+## Dashboard
+
+The main dashboard shows:
+
+- **Current conditions** for your default location (temperature, cloud cover, humidity, wind)
+- **Tonight's top targets** ranked by score
+- **Quick stats**: latest weather readings, moon phase, astronomical twilight times
+
+## Plan Generator
+
+The planner page generates a full imaging plan:
+
+1. Select location and telescope profile
+2. Choose date
+3. Click "Generate Plan"
+
+The output is a ranked, scheduled sequence of targets with:
+
+- Score breakdown for each target
+- Optimal time windows
+- Recommended sub-exposure duration
+- Total integration time estimate
+
+## Forecast View
+
+The forecast page shows multi-night predictions:
+
+- **Multi-location comparison** — see how different sites compare
+- **Night quality scores** — relative and absolute
+- **Effective dark hours** — accounting for moon and clouds
+- **Color-coded calendar** — green = good, yellow = marginal, red = poor
+
+## Target Browser
+
+Browse and search the astronomical catalog:
+
+- Filter by type (galaxy, nebula, cluster, etc.)
+- Sort by magnitude, size, or constellation
+- Click any target for detail view with:
+  - Framing preview (FOV fit)
+  - Exposure time calculator results
+  - Seasonal visibility chart
+  - Quality scores
+
+## Session Logging
+
+Log your observing sessions directly from the web interface (see [Session Logging](/stairs-docs/06-using-stairs/session-logging/)).
+
+---
+
+## API Documentation
+
+STAIRS provides a Swagger/OpenAPI interface at [http://localhost:8000/docs](http://localhost:8000/docs) when the API is running. This documents every available endpoint and lets you test requests directly from the browser.

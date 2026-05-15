@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Score Comparison: Two Targets</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 12px 18px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      button {
+        padding: 7px 16px;
+        font-size: 13px;
+        cursor: pointer;
+        background: #444;
+        color: white;
+        border: 1px solid #666;
+        border-radius: 4px;
+      }
+      button:hover {
+        background: #555;
+      }
+      button.active {
+        background: #285;
+        border-color: #4a8;
+      }
+      a.back {
+        color: #88f;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 18px;
+      }
+      #canvas-container {
+        margin-top: 16px;
+        display: flex;
+        justify-content: center;
+      }
+      p {
+        color: #aaa;
+        max-width: 800px;
+        margin: 0 auto 12px auto;
+        line-height: 1.5;
+        font-size: 13px;
+      }
+      input[type="range"] {
+        width: 80px;
+        vertical-align: middle;
+      }
+      label {
+        color: #ccc;
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .val {
+        color: #fff;
+        font-weight: bold;
+        min-width: 28px;
+        text-align: center;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/stairs-docs/05-planning/scoring-pipeline/" class="back"
+      >← Chapter 5: Score Comparison</a
+    >
+    <h1>Score Comparison: Two Targets</h1>
+    <p>
+      Same sky, different targets. See why a small bright object scores higher
+      than a large diffuse nebula under light-polluted skies. Adjust conditions
+      below to see how the gap changes with environment.
+    </p>
+    <div class="controls">
+      <label
+        >Bortle
+        <input type="range" id="bortleSlider" min="1" max="9" value="5" />
+        <span id="bortleVal" class="val">5</span></label
+      >
+      <label
+        >Moon
+        <input type="range" id="moonSlider" min="0" max="100" value="20" />
+        <span id="moonVal" class="val">20%</span></label
+      >
+      <label
+        >Clouds
+        <input type="range" id="cloudSlider" min="0" max="100" value="5" />
+        <span id="cloudVal" class="val">5%</span></label
+      >
+      <button id="swapBtn" style="font-size: 11px">↔ Swap Targets</button>
+    </div>
+    <div id="canvas-container"></div>
+    <script src="scorecomparison.js"></script>
+  </body>
+</html>

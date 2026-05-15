@@ -1,0 +1,100 @@
+---
+title: Troubleshooting
+description: Common issues and how to resolve them.
+---
+
+## API Won't Start
+
+**Symptom**: `docker compose up` fails or the API crashes immediately.
+
+**Check**:
+
+1. Is `config.yaml` valid YAML? Run `python -c "import yaml; yaml.safe_load(open('config.yaml'))"` to verify.
+2. Are directories created? STAIRS expects `logs/` and `cache/` directories.
+3. Is port 8000 already in use? `lsof -i :8000`
+4. Check the logs: `docker compose logs api`
+
+---
+
+## CLI Can't Connect to API
+
+**Symptom**: `stairs-cli status` shows "Could not connect to API."
+
+**Causes**:
+
+- API hasn't finished starting yet — wait a few seconds and retry
+- Running without Docker? Make sure `API_URL` is set correctly
+- Using the wrong Docker Compose file? Ensure you're using `-f docker-compose.prod.yaml` for production
+
+---
+
+## No Targets Found
+
+**Symptom**: `stairs-cli recommend` returns "No suitable targets found."
+
+**Check**:
+
+1. **Bortle scale too high**: Under Bortle 8–9 skies in a city, most DSOs score poorly. Try a dark site location.
+2. **Min altitude too high**: Lower `--min-alt` to 20° to see more targets.
+3. **Wrong season**: Some targets are only visible at certain times of year. Check seasonal visibility.
+4. **Too few catalogs loaded**: Verify catalogs are available with `stairs-cli catalogs`.
+5. **Date issue**: If using `--date`, make sure it's in the correct format (YYYY-MM-DD).
+
+---
+
+## Weather Data Not Loading
+
+**Symptom**: Weather forecasts are empty or show "N/A."
+
+**Check**:
+
+1. Is the weather integration enabled in `config.yaml`? (`integrations.weather.enabled: true`)
+2. Open-Meteo is a free API — no key is needed, but you must have an internet connection.
+3. The API caches weather data. If you just started STAIRS, wait for the first cache refresh (~5 minutes).
+4. Check the logs for API errors: `docker compose logs api | grep weather`
+
+---
+
+## Scores Seem Wrong
+
+**Symptom**: A target you know should be visible is scoring very low.
+
+**Score debugging**:
+
+1. Check the target's angular size — does it fit within your telescope's FOV?
+2. Check surface brightness — a large diffuse nebula will score lower than a compact galaxy of the same magnitude
+3. Is the moon up? Even a crescent moon reduces scores for nearby targets
+4. Check altitude trace — the target might only be above the horizon briefly
+5. Verify your Bortle setting — Bortle 8 in the city is very different from Bortle 2 at a dark site
+
+---
+
+## Performance Issues
+
+**Symptom**: API responses are slow.
+
+- First run: the cache is cold. Ephemeris and weather calculations take time initially. Subsequent runs are faster.
+- Large catalogs: searching across thousands of targets is fast with DuckDB, but complex multi-target planning takes a few seconds.
+- Weather API: Open-Meteo responses can be slow during peak hours. The cache helps with repeated requests.
+
+---
+
+## Cache Issues
+
+STAIRS caches ephemeris and weather data to improve performance.
+
+**Clear the cache**:
+
+```bash
+rm -rf cache/*
+```
+
+The cache will rebuild on the next request.
+
+**Stale data**: If weather data seems old, check the cache timestamps:
+
+```bash
+ls -la cache/
+```
+
+Cache is refreshed based on the configured interval (default: every request re-fetches weather).

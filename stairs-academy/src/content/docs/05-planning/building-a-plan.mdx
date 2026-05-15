@@ -1,0 +1,67 @@
+---
+title: Building an Imaging Plan
+description: How STAIRS turns scores into a schedule.
+---
+
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+Scores are half the story. The other half is **scheduling** — fitting high-scoring targets into the available time windows. STAIRS creates a chronological sequence of targets to image, ordered by score and constrained by rise/set times, block sizes, and meridian flips.
+
+---
+
+## Play With It
+
+<Interactive
+  src="/stairs-docs/interactives/cachevalidation.html"
+  title="Cache Validation"
+  caption="See how STAIRS manages cached weather data to avoid redundant API calls."
+/>
+
+---
+
+## The Details
+
+### The Scheduling Algorithm
+
+1. **Find the observing window**: astronomical twilight to morning twilight
+2. **For each target**, compute its visible window (above min_altitude)
+3. **Score all targets** (OSS × SQS × Bortle)
+4. **Sort by score**, highest first
+5. **Assign blocks**: each target gets a block of configurable duration (default 60 min)
+6. **Fill the night**: highest-scoring target gets first priority for its best time slot
+7. **Continue** until the night is full or all targets are scheduled
+
+### Key Parameters
+
+| Parameter    | Default | What It Does                                     |
+| ------------ | ------- | ------------------------------------------------ |
+| min_altitude | 30°     | Ignore targets below this altitude               |
+| block_size   | 60 min  | How long to spend on each target                 |
+| min_duration | 60 min  | Minimum session length for a target to be viable |
+| max_altitude | 75°     | Penalty for targets too close to zenith          |
+
+### Example Plan
+
+```
+Session for Apr 15, 2026
+Location: Nashville, TN (Bortle 8)
+
+Target              Score  Window          Block
+───────              ─────  ──────          ─────
+M42 (Orion Nebula)   85     8:00 PM - 10:30 PM  60 min
+M31 (Andromeda)     72     8:00 PM - 12:30 AM  60 min
+M45 (Pleiades)      68     9:30 PM - 1:30 AM   60 min
+M81 (Bode's Galaxy) 55     10:00 PM - 4:30 AM  60 min
+
+Total: 4 targets, 4 hours 15 min integration
+Session ends: astronomical twilight at 5:20 AM
+```
+
+---
+
+## In STAIRS
+
+The plan is the main output of the STAIRS application. Open STAIRS on any night, and it will show you a plan like the example above — ranked targets, scheduled time blocks, and estimated total integration time.

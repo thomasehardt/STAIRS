@@ -1,0 +1,60 @@
+---
+title: "Deep Dive: Tracking Math"
+description: The geometry and kinematics of celestial tracking.
+---
+
+## The Big Idea
+
+Tracking a star requires solving the geometry of the rotating celestial sphere. The math is different for Alt-Az and equatorial mounts, and understanding it explains the practical limitations of each design.
+
+---
+
+## The Details
+
+### Equatorial Tracking
+
+An equatorial mount aligned to the celestial pole only needs to move one axis (RA) at a constant rate:
+
+$$\dot{\alpha} = 15.041 \text{ arcseconds/second}$$
+
+The Dec axis stays fixed. The mount's mechanical error (periodic error) is the primary source of tracking error.
+
+### Alt-Az Tracking
+
+Alt-Az tracking requires solving the transformation from equatorial (RA, Dec) to alt-az (Alt, Az) at each moment:
+
+$$A = \arctan\left(\frac{\sin(H)}{\cos(H) \sin(\phi) - \tan(\delta) \cos(\phi)}\right)$$
+
+$$a = \arcsin\left(\sin(\phi) \sin(\delta) + \cos(\phi) \cos(\delta) \cos(H)\right)$$
+
+Where $H$ = hour angle, $\phi$ = latitude, $\delta$ = declination.
+
+The tracking rate is the time derivative of these equations — both axes must move at continuously varying speeds that depend on the target's position in the sky.
+
+### Field Rotation Rate (Derivation)
+
+Field rotation occurs because the Alt-Az mount's axes are not aligned with the sky's rotation. The rotation rate of the field is:
+
+$$\dot{\rho} = \frac{15 \cos(\phi) \cos(A)}{\cos(a)}$$
+
+This formula shows:
+
+- At the **meridian** ($A = 0$): $\dot{\rho}$ is proportional to $\cos(\phi)$, which is maximum at the equator
+- At the **horizon** ($a = 0$): denominator goes to zero, so rotation rate goes to infinity (north/south points)
+- At the **zenith** ($a = 90°$): denominator goes to zero, also undefined — but this is a coordinate singularity, not a physical effect
+
+### Why Alt-Az Is Still Fine for Smart Telescopes
+
+For a 10-second exposure with a typical smart telescope:
+
+- Pixel scale: 2.4″/px
+- Field rotation at mid-latitude: ~0.05°/s = 0.5° in 10s
+- Blur at edge of sensor: ~2–3 pixels
+
+This is small enough that the live stacking alignment (which derotates each frame) handles it easily. Stretch to 60s and the blur is 12–18 pixels — too much to correct cleanly.
+
+---
+
+## In STAIRS
+
+The tracking math is encoded in STAIRS's **Sub-Exposure Optimization** module. The mount profile specifies the maximum sub-exposure duration, which constrains all downstream calculations. For Alt-Az mounts, this is typically 10–20 seconds — a direct consequence of the field rotation physics derived above.

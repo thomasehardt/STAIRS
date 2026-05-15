@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Autoguiding</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 16px;
+        align-items: center;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        background: #444;
+        color: white;
+        border: 1px solid #666;
+        border-radius: 4px;
+        transition: all 0.2s;
+      }
+      button:hover {
+        background: #555;
+      }
+      button.active {
+        background: #c60;
+        border-color: #e80;
+      }
+      a.back {
+        color: #88f;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 20px;
+      }
+      #canvas-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+      p {
+        color: #aaa;
+        max-width: 700px;
+        margin: 0 auto 15px auto;
+        line-height: 1.5;
+      }
+      input[type="range"] {
+        width: 140px;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/stairs-docs/03-mounts/equatorial/" class="back"
+      >← Chapter 3: Autoguiding</a
+    >
+    <h1>Autoguiding</h1>
+    <p>
+      Imperfect tracking and atmospheric refraction cause stars to drift during
+      long exposures. An autoguider uses a separate camera to monitor a guide
+      star and send real-time corrections to the mount, keeping the target
+      centered.
+    </p>
+    <div class="controls">
+      <button id="guideBtn">Enable Guiding</button>
+      <span style="display: flex; gap: 6px; align-items: center">
+        <label>Seeing</label>
+        <input
+          type="range"
+          id="seeingSlider"
+          min="0"
+          max="3"
+          value="1"
+          step="0.1"
+        />
+        <span id="seeingVal">1.0</span>
+      </span>
+      <button id="resetBtn">Reset</button>
+    </div>
+    <div id="canvas-container"></div>
+    <script src="autoguiding.js"></script>
+  </body>
+</html>

@@ -1,0 +1,99 @@
+---
+title: Session Logging
+description: Track what you've captured and build your observation history.
+---
+
+STAIRS includes a session logging system to help you track your astrophotography sessions.
+
+---
+
+## Why Log Sessions?
+
+- **Know what you've captured**: avoid re-imaging targets you've already done well
+- **Track conditions**: note which conditions produced your best results
+- **Build a history**: see your progress over time
+- **Inform planning**: STAIRS can deprioritize targets you've already imaged
+
+---
+
+## Logging a Session
+
+### Via CLI
+
+```bash
+stairs-cli session create \
+  --target M42 \
+  --date 2026-04-15 \
+  --rating 4 \
+  --notes "Great night, Orion nebula core detail visible after 30 min"
+```
+
+### Via Web UI
+
+1. Navigate to the Session Log page
+2. Click "New Session"
+3. Fill in: target, date, optional notes
+4. Rate the session (1–5 stars)
+5. Set status: Captured, Partial, or Failed
+6. Save
+
+---
+
+## Viewing History
+
+### Via CLI
+
+```bash
+stairs-cli session list
+stairs-cli session list --target M31
+stairs-cli session list --status captured
+```
+
+### Via Web UI
+
+The sessions page shows your observation history as a timeline with:
+
+- Color-coded ratings
+- Status badges (Captured/Partial/Failed)
+- Notes and tags
+- Session duration and conditions
+
+---
+
+## Session Fields
+
+| Field        | Description                                                     |
+| ------------ | --------------------------------------------------------------- |
+| **Target**   | The catalog ID of the object imaged                             |
+| **Date**     | Date of the session                                             |
+| **Rating**   | 1–5 subjective quality rating                                   |
+| **Status**   | `Captured`, `Partial`, or `Failed`                              |
+| **Notes**    | Free-text notes about the session                               |
+| **Tags**     | Optional tags (e.g. `#seeing-good`, `#dew`, `#satellite-trail`) |
+| **Duration** | How long you imaged (automatically estimated or manual)         |
+
+---
+
+## Tags
+
+Tags make your session log searchable and filterable:
+
+Common tags:
+
+- `#moon-interference` — moon was up during part of the session
+- `#dew` — dew was a problem
+- `#seeing-good` / `#seeing-poor` — atmospheric conditions
+- `#satellite-trail` — trails visible in frames
+- `#first-light` — first time using a new piece of gear
+
+---
+
+## Viewing Statistics
+
+The dashboard shows summary statistics:
+
+- **Total sessions** logged
+- **Unique targets** captured
+- **Success rate** (Captured / Total)
+- **Observation streak** — consecutive clear-night sessions
+- **Heatmap** — calendar view of session quality by date

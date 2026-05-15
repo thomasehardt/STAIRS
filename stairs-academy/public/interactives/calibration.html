@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Calibration Frames</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        background: #444;
+        color: white;
+        border: 1px solid #666;
+        border-radius: 4px;
+        transition: all 0.2s;
+      }
+      button:hover {
+        background: #555;
+      }
+      button.active {
+        background: #2a6;
+        border-color: #4c8;
+      }
+      a.back {
+        color: #88f;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 20px;
+      }
+      #canvas-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+      p {
+        color: #aaa;
+        max-width: 700px;
+        margin: 0 auto 15px auto;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/stairs-docs/04-stacking/calibration-frames/" class="back"
+      >← Chapter 4: Calibration Frames</a
+    >
+    <h1>Calibration Frames</h1>
+    <p>
+      Raw sensor data contains artifacts beyond the astronomical signal.
+      Calibration frames — Bias, Dark, and Flat — are captured by the camera and
+      used to remove these artifacts. Toggle each frame to see its effect.
+    </p>
+    <div class="controls">
+      <button id="biasBtn">Bias</button>
+      <button id="darkBtn">Dark</button>
+      <button id="flatBtn">Flat</button>
+      <span style="color: #888">|</span>
+      <button id="allBtn">All</button>
+      <button id="resetBtn">None</button>
+    </div>
+    <div id="canvas-container"></div>
+    <script src="calibration.js"></script>
+  </body>
+</html>

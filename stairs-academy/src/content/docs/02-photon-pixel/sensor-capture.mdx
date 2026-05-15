@@ -1,0 +1,104 @@
+---
+title: Sensor Capture
+description: How a CMOS sensor turns photons into electrons and electrons into digital values.
+---
+
+import ManimVideo from "../../../components/ManimVideo.astro";
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+The sensor is a grid of millions of tiny buckets (pixels). During an exposure, photons fill these buckets as electrons. When the exposure ends, an Analog-to-Digital Converter (ADC) measures how full each bucket is and assigns a number — that's your digital image.
+
+---
+
+## Play With It
+
+<Interactive
+  src="/stairs-docs/interactives/sensor_pixel.html"
+  title="Photon to Digital Value"
+  caption="Fire individual photons and watch them knock electrons loose. Click 'Readout' to see the ADC convert charge to a digital number."
+/>
+
+## See It
+
+<ManimVideo
+  src="/stairs-docs/videos/exposure.mp4"
+  caption="As exposure time increases, more photons accumulate on the sensor. Signal builds while thermal noise also appears."
+/>
+
+<Interactive
+  src="/stairs-docs/interactives/exposure.html"
+  title="Long Exposure Simulation"
+  caption="Click 'Open Shutter' to watch photons and thermal noise accumulate on the sensor over time."
+/>
+
+---
+
+## The Details
+
+### The Photoelectric Effect
+
+When a photon hits the silicon in a pixel, it transfers its energy to an electron, knocking it loose. This electron is trapped in a **potential well** — a tiny region of the silicon that holds charge. The longer the shutter is open, the more electrons accumulate.
+
+### Key Sensor Parameters
+
+- **Full Well Capacity**: maximum electrons a pixel can hold (10k–100k e⁻). When full, the pixel saturates (pure white).
+- **Quantum Efficiency (QE)**: the percentage of photons that successfully generate an electron. Modern CMOS sensors achieve 50–80%.
+- **Read Noise**: the electronic noise added when reading the charge. Typically 1–5 e⁻ for modern sensors.
+- **Gain/ISO**: how many digital units each electron represents. Low gain = more headroom. High gain = more sensitivity.
+
+### The ADC Readout
+
+After the exposure:
+
+1. The charge in each pixel is shifted to a readout register
+2. The charge is converted to a voltage
+3. The ADC converts the voltage to a digital number (ADU — Analog-to-Digital Unit)
+4. The number is stored as a pixel value in the image file
+
+For a 14-bit ADC, pixel values range from 0 to 16,383.
+
+---
+
+## In STAIRS
+
+Sensor parameters drive exposure planning. STAIRS uses:
+
+- **Pixel pitch** (µm) to compute pixel scale
+- **Sensor dimensions** to compute field of view
+- **Read noise** in the sub-exposure optimization formula
+- **QE** in light collection rate estimates
+
+---
+
+<DeepDive title="Deep Dive: From Electrons to ADU">
+
+### Gain and Conversion
+
+The gain converts electrons to ADU:
+
+$$\text{ADU} = \frac{\text{electrons}}{g} + \text{offset}$$
+
+Where $g$ is the gain in e⁻/ADU. A gain of 1.0 means each electron = 1 ADU. A gain of 0.5 means 2 electrons = 1 ADU (more headroom but coarser quantization).
+
+### Full Well and Dynamic Range
+
+The sensor's **dynamic range** is the ratio of the maximum signal to the noise floor:
+
+$$DR = \frac{S_{\text{max}}}{N_{\text{read}}}$$
+
+In stops: $DR_{\text{stops}} = \log_2(DR)$
+
+For a sensor with 50,000 e⁻ full well and 3 e⁻ read noise: $DR = 50,000 / 3 \approx 14$ stops.
+
+### The Photon Transfer Curve
+
+Plotting noise vs. signal on a log-log scale reveals three regimes:
+
+1. **Read noise dominated** (low signal): flat line
+2. **Shot noise dominated** (mid signal): slope = 0.5 (Poisson statistics)
+3. **PRNU dominated** (high signal): slope = 1.0 (pixel non-uniformity)
+
+</DeepDive>

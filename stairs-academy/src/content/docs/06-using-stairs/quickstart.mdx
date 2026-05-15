@@ -1,0 +1,117 @@
+---
+title: Quickstart
+description: Get STAIRS running in 5 minutes with Docker.
+---
+
+## Prerequisites
+
+- **Docker** and **Docker Compose** installed on your system
+- A terminal
+
+---
+
+## Step 1: Clone and Configure
+
+```bash
+git clone https://github.com/thomasehardt/STAIRS.git
+cd STAIRS
+cp .config.yaml.example config.yaml
+```
+
+Edit `config.yaml` to set your location and Bortle scale (see [Configuration](/stairs-docs/06-using-stairs/configuration/) for details).
+
+## Step 2: Create Required Directories
+
+```bash
+mkdir -p logs cache
+```
+
+## Step 3: Start STAIRS
+
+```bash
+docker compose -f docker-compose.prod.yaml up -d
+```
+
+This starts the API (port 8000) and Web UI (port 3000).
+
+## Step 4: Verify It's Running
+
+Check the API:
+
+```bash
+curl http://localhost:8000/
+# → {"message": "... API is online ...", "version": "0.3.1", ...}
+```
+
+Open the Web UI at [http://localhost:3000](http://localhost:3000).
+
+## Step 5: Use the CLI
+
+Create an alias for easy CLI access:
+
+```bash
+alias stairs-cli="docker compose -f docker-compose.prod.yaml run --rm -it cli"
+```
+
+Check status:
+
+```bash
+stairs-cli status
+```
+
+---
+
+## Without Docker (Local Development)
+
+If you prefer to run without Docker:
+
+### API
+
+```bash
+cd services/api
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+cd ../..
+export PYTHONPATH=$(pwd)/services/api
+uvicorn src.api.main:app --reload
+```
+
+### CLI
+
+```bash
+cd services/cli
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+stairs --help
+```
+
+### Web UI
+
+```bash
+cd services/web
+npm install
+npm run dev
+```
+
+---
+
+## Environment Variables
+
+Override default paths as needed:
+
+| Variable      | Default       | Purpose                               |
+| ------------- | ------------- | ------------------------------------- |
+| `CONFIG_FILE` | `config.yaml` | Path to configuration file            |
+| `DATA_DIR`    | `data`        | Directory for astronomical data       |
+| `CACHE_DIR`   | `cache`       | Cache directory for ephemeris/weather |
+| `LOG_DIR`     | `logs`        | Log output directory                  |
+
+---
+
+## Next Steps
+
+- [Configure your locations and telescope](/stairs-docs/06-using-stairs/configuration/)
+- [Explore CLI commands](/stairs-docs/06-using-stairs/cli/)
+- [View the Web Dashboard](/stairs-docs/06-using-stairs/web-dashboard/)

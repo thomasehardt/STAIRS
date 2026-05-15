@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Long Exposure & Photons</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 10px;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        background: #444;
+        color: white;
+        border: 1px solid #666;
+        border-radius: 4px;
+      }
+      button:hover {
+        background: #555;
+      }
+      a.back {
+        color: #88f;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 20px;
+      }
+      #canvas-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/stairs-docs/02-photon-pixel/sensor-capture/" class="back"
+      >← Chapter 2: Long Exposure</a
+    >
+    <h1>Long Exposure = More Photons</h1>
+    <p style="color: #aaa; max-width: 600px; margin: 0 auto">
+      Click "Open Shutter" to begin capturing light on the digital sensor.
+      Notice how thermal noise quickly appears, but over time, the signal slowly
+      becomes visible over the noise floor.
+    </p>
+    <div class="controls">
+      <button id="shutterBtn">Open Shutter</button>
+      <button id="resetBtn">Reset Sensor</button>
+    </div>
+    <div id="canvas-container"></div>
+    <script src="exposure.js"></script>
+  </body>
+</html>

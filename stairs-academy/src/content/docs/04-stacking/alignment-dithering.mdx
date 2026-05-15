@@ -1,0 +1,56 @@
+---
+title: Alignment & Dithering
+description: How software keeps stars pinned in place across hundreds of frames.
+---
+
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+Even with good tracking, stars drift between frames. Alignment software detects star positions in each frame and shifts/rotates them to match a reference. **Dithering** deliberately moves the telescope between frames to make this alignment even more effective at removing noise.
+
+---
+
+## The Details
+
+### How Alignment Works
+
+1. **Star detection**: the algorithm finds bright spots (stars) in the image
+2. **Pattern matching**: it identifies the same stars in the reference frame
+3. **Transform calculation**: it computes how much the new frame has shifted, rotated, or scaled relative to the reference
+4. **Warping**: the frame is shifted/rotated to match the reference (sub-pixel precision)
+
+### Plate Solving
+
+A more sophisticated version is **plate solving** — matching the star pattern against a catalog to determine exactly where the telescope is pointing. This gives absolute coordinates rather than just relative alignment.
+
+<Interactive
+  src="/stairs-docs/interactives/platesolve.html"
+  title="Plate Solving Simulation"
+  caption="See how star patterns are matched against a catalog to determine position."
+/>
+
+### Dithering
+
+Dithering is intentionally moving the telescope a few pixels between frames or every few frames. This:
+
+- Spreads hot pixels and dead pixels across different locations in each frame
+- Turns fixed pattern noise into random noise (which stacking can reject)
+- Improves the final image's smoothness
+
+Without dithering, a hot pixel at position (100, 200) appears at (100, 200) in every frame — stacking won't remove it. With dithering, that hot pixel falls on different sky positions, so the stack can reject it.
+
+### Smart Telescopes and Dithering
+
+Many smart telescopes **don't dither** (or have limited dithering capability) because:
+
+- Dithering adds time between frames (settle time)
+- The short exposure / large stack approach naturally handles hot pixels via sigma clipping
+- The mount's precision limits how small a dither can be reliably executed
+
+---
+
+## In STAIRS
+
+Dithering affects the **practical SNR** improvement rate. For smart telescopes without dithering, the effective $\sqrt{n}$ improvement is slightly degraded by residual fixed pattern noise. STAIRS can optionally account for this in its integration time calculations.

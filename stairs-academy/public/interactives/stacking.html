@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive Image Stacking</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background-color: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      #canvas-container {
+        margin: 20px auto;
+        display: flex;
+        justify-content: center;
+      }
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        align-items: center;
+        margin-top: 10px;
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 0 auto;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        background: #444;
+        color: white;
+        border: 1px solid #666;
+        border-radius: 4px;
+      }
+      button:hover {
+        background: #555;
+      }
+      input[type="range"] {
+        vertical-align: middle;
+      }
+      .description {
+        max-width: 800px;
+        margin: 0 auto 20px auto;
+        color: #aaa;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <a
+      href="index.html"
+      style="
+        color: #88f;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 20px;
+      "
+      >← Back to Menu</a
+    >
+    <h1>Interactive Image Stacking (SNR)</h1>
+    <div class="description">
+      <p>
+        This interactive simulation demonstrates how astrophotographers use
+        image stacking to improve Signal-to-Noise Ratio (SNR). Each incoming
+        frame is heavily distorted by random sensor noise. However, because the
+        signal (the galaxy) is constant in every frame, blending them together
+        mathematically reinforces the signal while the random noise averages out
+        to zero.
+      </p>
+    </div>
+
+    <div class="controls">
+      <button id="playPauseBtn">Pause</button>
+      <button id="stepBtn">Step</button>
+      <button id="resetBtn">Reset Stack</button>
+      <label>
+        Speed:
+        <input type="range" id="speedSlider" min="1" max="20" value="5" />
+      </label>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script src="stacking.js"></script>
+  </body>
+</html>

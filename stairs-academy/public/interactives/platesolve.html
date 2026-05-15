@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Plate Solving / Astrometry</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        background: #444;
+        color: white;
+        border: 1px solid #666;
+        border-radius: 4px;
+      }
+      button:hover {
+        background: #555;
+      }
+      button:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      a.back {
+        color: #88f;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 20px;
+      }
+      #canvas-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+      p {
+        color: #aaa;
+        max-width: 700px;
+        margin: 0 auto 15px auto;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/stairs-docs/04-stacking/alignment-dithering/" class="back"
+      >← Chapter 4: Plate Solving</a
+    >
+    <h1>Plate Solving (Astrometry)</h1>
+    <p>
+      Plate solving matches star patterns in an image against a known catalog to
+      determine exactly where the telescope was pointing. The solver detects
+      stars, identifies an asterism, and computes the field center coordinates,
+      rotation, and field of view.
+    </p>
+    <div class="controls">
+      <button id="solveBtn">Solve</button>
+      <button id="resetBtn">New Field</button>
+    </div>
+    <div id="canvas-container"></div>
+    <script src="platesolve.js"></script>
+  </body>
+</html>

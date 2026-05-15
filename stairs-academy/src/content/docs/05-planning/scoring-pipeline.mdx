@@ -1,0 +1,77 @@
+---
+title: The Scoring Pipeline
+description: How STAIRS turns target catalogs, weather forecasts, and telescope profiles into actionable plans.
+---
+
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+STAIRS computes a **score** for every potential target on a given night. The score combines: how good the target is for your telescope (size, brightness), how good the sky conditions are (light pollution, moon, weather), and practical scheduling constraints (rise/set times, meridian flips). The highest-scoring targets become your imaging plan.
+
+---
+
+## Play With It
+
+<Interactive
+  src="/stairs-docs/interactives/scoring.html"
+  title="Final Score Animation"
+  caption="Watch each component of the scoring pipeline contribute to the final target score."
+/>
+
+<Interactive
+  src="/stairs-docs/interactives/scorecomparison.html"
+  title="Score Comparison"
+  caption="Compare two targets under the same conditions. See why one scores higher."
+/>
+
+---
+
+## The Details
+
+### Two-Tier Scoring
+
+STAIRS uses a two-tier scoring system:
+
+**1. Object Suitability Score (OSS)** — property of the target alone (0–100):
+
+- FOV fit: how well the target fits on your sensor (40% weight)
+- Surface brightness: how concentrated the target's light is (30% weight)
+- Altitude: how high the target gets (30% weight)
+
+**2. Absolute Quality Score (AQS)** — OSS modified by tonight's conditions:
+
+- OSS × Sky Quality Score (SQS) multiplier
+- SQS accounts for: weather, moon, target altitude throughout the night
+- Bortle multiplier (light pollution) further scales the score
+
+### The Pipeline
+
+```
+Target Catalog
+     ↓
+  Compute OSS for each target
+  (FOV fit + SB + altitude)
+     ↓
+  Fetch weather forecast
+  (cloud, seeing, humidity, wind)
+     ↓
+  Compute SQS
+  (weather × moon × target altitude trace)
+     ↓
+  Compute AQS = OSS × SQS × Bortle_mult
+     ↓
+  Sort targets by AQS
+     ↓
+  Build observing plan
+  (schedule top targets in available windows)
+     ↓
+  Present ranked plan to user
+```
+
+---
+
+## In STAIRS
+
+This pipeline runs every time you request a plan. The entire architecture is designed to give you a **ranked list of targets + a schedule** so you can go outside knowing exactly what to image and when.

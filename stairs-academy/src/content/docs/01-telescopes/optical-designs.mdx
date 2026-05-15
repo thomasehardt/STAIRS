@@ -1,0 +1,83 @@
+---
+title: Optical Designs
+description: Refractors, reflectors, and the hybrid designs used in smart telescopes.
+---
+
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+There are two basic ways to focus light: bend it with a lens (refractor) or bounce it off a mirror (reflector). Most smart telescopes use a **catadioptric** design — a mix of both — to pack a long focal length into a short tube.
+
+---
+
+## See It
+
+<Interactive
+  src="/stairs-docs/interactives/telescope.html"
+  title="Interactive Telescope Light Path"
+  caption="Drag the slider to trace photons through refractor and reflector designs. Toggle between types to compare."
+/>
+
+---
+
+## The Details
+
+### Refractor
+
+- Uses a glass lens at the front to bend light
+- Simple, sealed design (no dust on optics)
+- Suffers from **chromatic aberration** — different colors focus at different points
+- Used in the **Dwarf II** (wide-angle camera)
+
+### Reflector
+
+- Uses a curved mirror at the back to focus light
+- No chromatic aberration (mirrors reflect all colors equally)
+- Can be made larger for less money
+- Requires occasional collimation (alignment of mirrors)
+
+### Catadioptric (Smart Telescopes)
+
+- Uses both lenses and mirrors
+- "Folds" the light path — long focal length in a short tube
+- Corrects aberrations with built-in lens elements
+- Most common design in smart telescopes (Seestar S50, Vespera)
+
+---
+
+## In STAIRS
+
+The optical design determines the **focal length** and **aperture**, which are the two most important parameters in the telescope profile. STAIRS uses these to compute everything else.
+
+| Telescope       | Aperture | Focal Length | f/ratio | Design       |
+| --------------- | -------- | ------------ | ------- | ------------ |
+| Seestar S50     | 50mm     | 250mm        | f/5     | Catadioptric |
+| Dwarf II (tele) | 24mm     | 86mm         | f/3.6   | Refractor    |
+| Vespera         | 50mm     | 250mm        | f/5     | Catadioptric |
+
+---
+
+<DeepDive title="Deep Dive: Focal Length & Light Cone">
+
+### The Light Cone
+
+Light from a distant object enters the telescope as parallel rays. The lens or mirror bends these rays to converge at the focal plane. The **focal ratio** (f-number) describes how steep this cone is:
+
+$$f/\# = \frac{f}{D}$$
+
+A faster f-ratio (lower number) means:
+
+- Steeper light cone
+- Shorter exposure for same brightness
+- Wider field of view
+- More demanding on sensor alignment
+
+The image surface brightness at the focal plane depends only on f-ratio, not aperture:
+
+$$I_{\text{focal}} \propto \frac{1}{(f/\#)^2}$$
+
+This is why f/5 is f/5 regardless of whether it's a 50mm or 500mm telescope — but the larger aperture collects more total light (over a wider field).
+
+</DeepDive>

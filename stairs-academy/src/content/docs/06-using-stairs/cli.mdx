@@ -1,0 +1,211 @@
+---
+title: CLI Commands
+description: Complete reference for the STAIRS command-line interface.
+---
+
+The STAIRS CLI provides full access to the planning engine from your terminal. It connects to the API, so the API must be running.
+
+## Setup
+
+Create an alias for easy access via Docker:
+
+```bash
+alias stairs-cli="docker compose -f docker-compose.prod.yaml run --rm -it cli"
+```
+
+Or if running locally:
+
+```bash
+pip install -e services/cli
+stairs --help
+```
+
+---
+
+## Global Flags
+
+```bash
+stairs --help     # Show help
+stairs --version  # Show version
+```
+
+---
+
+## Commands
+
+### `status`
+
+Check if the API is running:
+
+```bash
+stairs-cli status
+# → ✓ API is online at http://api:8000 (Status: 200)
+```
+
+### `version`
+
+Show CLI version:
+
+```bash
+stairs-cli version
+# → STAIRS CLI v0.3.1
+```
+
+### `locations`
+
+List all configured observing locations:
+
+```bash
+stairs-cli locations
+```
+
+Output:
+
+```
+              Locations
+┌──────────────┬─────────┬──────────┬───────────┬──────────────┬──────────┬────────┐
+│ Name         │ Default │ Latitude │ Longitude │ Elevation [m]│ Timezone │ Bortle │
+├──────────────┼─────────┼──────────┼───────────┼──────────────┼──────────┼────────┤
+│ My Backyard  │    ✓    │  36.16   │  -86.78   │     163      │   UTC    │   8    │
+│ Pogue Creek  │         │  36.28   │  -84.92   │     500      │   UTC    │   2    │
+└──────────────┴─────────┴──────────┴───────────┴──────────────┴──────────┴────────┘
+```
+
+### `telescopes`
+
+List all configured telescope profiles:
+
+```bash
+stairs-cli telescopes
+```
+
+### `catalogs`
+
+List available astronomical catalogs:
+
+```bash
+stairs-cli catalogs
+```
+
+### `weather`
+
+Get weather forecast for a location:
+
+```bash
+stairs-cli weather --days 3
+stairs-cli weather --days 5 --location "Pogue Creek"
+```
+
+Options:
+
+- `--days`, `-d`: Number of days to forecast (1–14, default: 1)
+- `--location`, `-l`: Location name (overrides default)
+
+Cloud cover is color-coded: green (< 10%), yellow, red (> 50%).
+
+### `imaging-forecast`
+
+Show astronomical night periods and imaging quality for upcoming nights:
+
+```bash
+stairs-cli imaging-forecast --days 7
+stairs-cli imaging-forecast --days 7 --location all
+stairs-cli imaging-forecast --days 14 --date 2026-06-01
+```
+
+Options:
+
+- `--days`, `-d`: Number of nights (1–30, default: 7)
+- `--location`, `-l`: Location name(s), or `all` for all locations
+- `--date`: Start date (YYYY-MM-DD)
+
+Output columns:
+
+- **Night Start/End**: Astronomical twilight times (local timezone)
+- **Dark Hrs**: Total hours of astronomical night
+- **Eff. Hrs**: Effective hours after accounting for moon and clouds
+- **Relative**: Quality score relative to best possible (0–100%)
+- **Absolute**: Quality score with Bortle multiplier applied (0–100%)
+
+### `search`
+
+Search for astronomical targets:
+
+```bash
+stairs-cli search "M31"
+stairs-cli search "Orion Nebula"
+stairs-cli search "NGC"
+```
+
+Options:
+
+- `--limit`, `-n`: Max results (default: 10)
+
+### `target`
+
+Get detailed information and framing preview for a specific target:
+
+```bash
+stairs-cli target M31
+stairs-cli target NGC7000 --telescope "Seestar S50"
+```
+
+Shows:
+
+- Coordinates (RA/Dec), magnitude, angular size
+- Seasonal visibility bar
+- OSS and AQS quality scores
+- Exposure recommendations (sub-exposure, total integration)
+- ASCII framing preview (sensor rectangle over target circle)
+- Visibility window with peak altitude
+
+### `etc`
+
+Standalone Exposure Time Calculator:
+
+```bash
+stairs-cli etc 8.5
+stairs-cli etc 8.5 --bortle 4 --telescope "Seestar S50" --size 15
+```
+
+Arguments:
+
+- `magnitude`: Target apparent magnitude (required)
+
+Options:
+
+- `--bortle`, `-b`: Bortle scale (1–9, defaults to your location)
+- `--telescope`, `-t`: Telescope profile name
+- `--size`: Target angular size in arcminutes (default: 10)
+
+Outputs:
+
+- Sky flux (e⁻/px/s)
+- Practical sub-exposure (seconds)
+- Optimal sub-exposure minimum (seconds)
+- Total integration time for SNR 10 (hours)
+
+### `recommend`
+
+Get top recommended targets for tonight:
+
+```bash
+stairs-cli recommend
+stairs-cli recommend --location "Pogue Creek"
+stairs-cli recommend --telescope "Seestar S50" --min-alt 25
+```
+
+Options:
+
+- `--location`, `-l`: Location name
+- `--telescope`, `-t`: Telescope profile name
+- `--min-alt`: Minimum altitude threshold (default: 30)
+- `--date`: Target date (YYYY-MM-DD, defaults to tonight)
+
+Output:
+
+- Target name and catalog ID
+- Type and constellation
+- OSS (relative) and AQS (absolute) scores
+- Visibility window (local time)
+- Sub-exposure and total integration time

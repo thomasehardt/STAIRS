@@ -1,0 +1,79 @@
+---
+title: How Stacking Works
+description: The step-by-step pipeline from raw frames to a stacked result.
+---
+
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+Stacking isn't just "average a bunch of frames." The pipeline involves: **calibrating** each frame (remove sensor artifacts), **aligning** them (stars move between frames), **rejecting** bad pixels (satellites, cosmic rays), and finally **combining** them into one clean image.
+
+---
+
+## The Details
+
+### The Full Pipeline
+
+```
+Raw Frames
+    ↓
+Calibration (subtract dark, divide by flat)
+    ↓
+Debayering (if color sensor)
+    ↓
+Star Detection (find stars in each frame)
+    ↓
+Alignment (shift/rotate to match a reference)
+    ↓
+Outlier Rejection (sigma clipping)
+    ↓
+Integration (average or median combine)
+    ↓
+Stacked Result
+```
+
+### Step 1: Calibration
+
+Each raw frame is calibrated to remove sensor artifacts:
+
+- **Dark frame subtraction**: removes thermal noise (dark current) and fixed pattern noise
+- **Flat field division**: corrects for vignetting (darker corners) and dust shadows
+- **Bias frame subtraction**: removes the electronic offset
+
+These calibration frames are taken separately (darks at same temperature, flats at twilight).
+
+### Step 2: Alignment
+
+Stars drift, the mount wobbles, field rotation happens. Before stacking, every frame must be aligned to a common reference:
+
+1. Detect star positions in the reference frame
+2. Detect star positions in the new frame
+3. Compute the transformation (shift, rotate, scale)
+4. Apply the transformation to the new frame
+
+Smart telescopes do this in real time as each frame arrives.
+
+### Step 3: Outlier Rejection
+
+Not all pixels are trustworthy. **Sigma clipping** rejects outliers:
+
+- Satellite trails: bright line through one frame
+- Cosmic ray hits: single bright pixel
+- Aircraft lights: moving bright spot
+
+For each pixel position, the algorithm computes the mean and standard deviation across all frames, then rejects pixels that deviate too far from the mean before averaging the rest.
+
+### Step 4: Integration
+
+Finally, the surviving pixel values are combined. Common methods:
+
+- **Average**: good SNR, but sensitive to outliers
+- **Median**: robust to outliers, but slightly lower SNR
+- **Sigma-clipped mean**: best quality — rejects outliers, then averages
+
+---
+
+## In STAIRS
+
+The stacking algorithm's performance determines how many frames are needed to reach a given SNR. STAIRS doesn't stack images itself (that's the telescope's job), but it accounts for the efficiency of on-device stacking when estimating total integration time. Real-time stacking on a smart telescope's processor is less sophisticated than PixInsight, so more total integration may be needed.

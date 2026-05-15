@@ -1,0 +1,47 @@
+---
+interface Props {
+  title?: string;
+}
+const { title } = Astro.props;
+---
+
+<details class="deep-dive">
+  <summary>{title ?? "Deep Dive"}</summary>
+  <div class="deep-dive-content">
+    <slot />
+  </div>
+</details>
+
+<style is:global>
+  details.deep-dive {
+    margin: 2rem 0;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    background: var(--sl-color-gray-7);
+  }
+  details.deep-dive summary {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--sl-color-text-accent);
+    background: var(--sl-color-gray-6);
+    user-select: none;
+  }
+  details.deep-dive summary:hover {
+    background: var(--sl-color-gray-5);
+  }
+  details.deep-dive[open] summary {
+    border-bottom: 1px solid var(--sl-color-gray-5);
+  }
+  details.deep-dive .deep-dive-content {
+    padding: 1rem 1.25rem;
+  }
+  details.deep-dive .deep-dive-content > :first-child {
+    margin-top: 0;
+  }
+  details.deep-dive .deep-dive-content > :last-child {
+    margin-bottom: 0;
+  }
+</style>

@@ -1,0 +1,91 @@
+---
+title: Sky Quality Score
+description: The dynamic multiplier that accounts for tonight's conditions.
+---
+
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+A spectacular target is useless if it's cloudy, if the moon is washing out the sky, or if it only rises for 20 minutes before dawn. The **Sky Quality Score** (SQS) is a 0–1 multiplier that captures all the dynamic factors for a specific target on a specific night.
+
+---
+
+## Play With It
+
+<Interactive
+  src="/stairs-docs/interactives/nightfinder.html"
+  title="Astronomical Night Finder"
+  caption="See how STAIRS determines the next viable night by tracking the Sun's altitude."
+/>
+
+<Interactive
+  src="/stairs-docs/interactives/bortle.html"
+  title="Light Pollution & Bortle Scale"
+  caption="Drag the Bortle slider to see how light pollution washes out faint detail."
+/>
+
+---
+
+## The Details
+
+### SQS Components
+
+**Weather multiplier** (0–1):
+
+- Cloud cover: if > 90%, multiplier = 0
+- Humidity: if > 85%, multiplier = 0.85
+- Seeing (atmospheric turbulence): FWHM > 4″ → 0.7×
+- Each condition compounds: 70% clouds × 85% humidity × 70% seeing = 0.42× total
+
+**Moon multiplier** (0–1):
+Depends on the moon's phase, altitude, and angular separation from the target:
+
+- New moon: 1.0 (no penalty)
+- Full moon overhead: μ 0.1 (sky is heavily washed out)
+- Formula: $1 - (\text{illumination} \times 0.5 \times \text{moon altitude} / 90)$
+
+**Target altitude trace** (0–1):
+The target's altitude changes throughout the night. SQS samples the target's altitude at multiple times and scores based on how much time it spends in the "sweet spot" (30–75°).
+
+**Night quality**:
+When is it truly dark? STAIRS tracks the Sun's altitude below -18° (astronomical night) to determine the available imaging window.
+
+### The Multiplier Chain
+
+```
+SQS = weather_mult × moon_mult × altitude_trace_mult
+
+AQS = OSS × SQS × Bortle_mult
+```
+
+---
+
+## In STAIRS
+
+The SQS is computed fresh each time you run a plan. It queries:
+
+- **Open-Meteo API** for current weather forecast
+- **Ephemeris calculations** (via astroplan) for moon/sun/target positions
+- **Your configured Bortle scale** for light pollution
+
+The result is a dynamic score that changes nightly.
+
+---
+
+<DeepDive title="Deep Dive: SQS Edge Cases">
+
+### When No Night Exists
+
+In polar summers (above ~66° latitude), the Sun never drops below -18°. STAIRS scans forward up to 14 days to find the next viable night. If none exists, it reports the condition clearly.
+
+### Circumpolar Targets
+
+Targets near the celestial pole never rise or set — they're always above the horizon. STAIRS detects this edge case and uses the end of the night window as the target's available time instead.
+
+### Meridian Penalty
+
+Targets within 5° of the meridian get a 0.8× multiplier. This accounts for the increased field rotation and tracking challenges when the telescope is near its mechanical limit.
+
+</DeepDive>

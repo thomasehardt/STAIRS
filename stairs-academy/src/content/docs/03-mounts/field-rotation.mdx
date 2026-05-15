@@ -1,0 +1,79 @@
+---
+title: Field Rotation
+description: Why Alt-Az images rotate, and how smart telescopes work around it.
+---
+
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+An Alt-Az mount keeps the telescope level with the ground. But the sky doesn't rotate level — it rotates around the celestial pole. The misalignment between the mount's axes and the sky's rotation axis causes the field of view to **rotate** during long exposures.
+
+---
+
+## Play With It
+
+<Interactive
+  src="/stairs-docs/interactives/fieldrotation.html"
+  title="Field Rotation Visualizer"
+  caption="See how the field rotates around the center of the frame during an Alt-Az tracked exposure."
+/>
+
+<Interactive
+  src="/stairs-docs/interactives/alignment.html"
+  title="Mount Alignment Mechanics"
+  caption="Adjust your latitude and see how the EQ mount's RA axis aligns with the sky's rotation axis."
+/>
+
+---
+
+## The Details
+
+### Why It Happens
+
+Imagine pointing your phone at a ceiling fan and trying to keep one blade centered in the frame while rotating your whole body. Even though you keep the blade in the center, the other blades appear to rotate around it. The same happens with Alt-Az tracking: the guide star stays centered, but everything else rotates around it.
+
+### How Much Rotation?
+
+Field rotation depends on three factors:
+
+- **Target declination**: worst at the celestial equator, zero at the poles
+- **Observer latitude**: worse at mid-latitudes, better near the equator
+- **Time since meridian**: worst after meridian crossing
+
+The rotation rate can reach several arcseconds per minute — enough to blur stars in a 30-second exposure at 400× magnification.
+
+### Smart Telescope Mitigation
+
+Smart telescopes use **live stacking** with short exposures (10–20s) and real-time alignment. Each frame is rotationally aligned before being added to the stack. This works as long as the rotation between successive frames is small enough for the alignment algorithm to handle.
+
+Some smart telescopes (like the Seestar S50) also have a **derotation** algorithm that compensates for field rotation when stacking.
+
+---
+
+## In STAIRS
+
+Field rotation is why Alt-Az mounts have a hard 10–20s sub-exposure limit in STAIRS. This constraint is embedded in:
+
+- **Sub-exposure optimization** — the calculated optimal sub time is clipped to the mount's maximum
+- **Total integration time** — more frames needed, so more total time to reach target SNR
+- **Target scoring** — targets near the meridian get a penalty because rotation is worse there
+
+---
+
+<DeepDive title="Deep Dive: Field Rotation Rate">
+
+### Rotation Rate Formula
+
+The instantaneous field rotation rate for an Alt-Az mount is:
+
+$$\dot{\rho} = \frac{15 \cos(\phi) \cos(A)}{\cos(a)}$$
+
+Where $\dot{\rho}$ = rotation rate (°/s), $\phi$ = observer latitude, $A$ = target azimuth, $a$ = target altitude.
+
+At its worst (target near zenith at mid-latitudes), this can be several degrees per hour. At its best (target on the meridian), rotation is momentarily zero but changes sign — the frame stops rotating and starts rotating the other way.
+
+For a 50mm telescope with 2.4″/px pixel scale, a rotation rate of 1°/hour means stars at the edge of the frame will trail by about 2 pixels in a 20-second exposure — noticeable but acceptable for live stacking.
+
+</DeepDive>

@@ -1,0 +1,82 @@
+---
+title: Equatorial Mounts
+description: How tilting the mount to match Earth's axis simplifies tracking to a single motor.
+---
+
+import ManimVideo from "../../../components/ManimVideo.astro";
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+An equatorial mount tilts its main axis (Right Ascension, or RA) to point at the celestial pole. This aligns one axis of the mount with Earth's rotation axis. Now the mount only needs to rotate that one axis at a constant speed to track any star — the second axis (Declination) stays locked.
+
+---
+
+## See It
+
+<ManimVideo
+  src="/stairs-docs/videos/mount-alignment.mp4"
+  caption="The equatorial mount's RA axis is parallel to Earth's axis. Only one motor needs to run to track."
+/>
+
+---
+
+## The Details
+
+### Polar Alignment
+
+Setting up an equatorial mount requires **polar alignment** — adjusting the mount so its RA axis points at the celestial pole. In the northern hemisphere, you aim at Polaris (the North Star).
+
+Misalignment causes **drift** — the target slowly moves in Dec, requiring corrections. The better the polar alignment, the longer you can expose without guiding corrections.
+
+### Tracking is Simple
+
+Once aligned, the mount rotates the RA axis at **sidereal rate**: 15.041 arcseconds per second (one full rotation per sidereal day). The Dec axis stays fixed.
+
+This is much simpler than the Alt-Az's varying dual-axis tracking. It also means the image doesn't rotate relative to the sensor.
+
+### Advantages
+
+- **No field rotation** — exposures can be 10–60 minutes
+- **Simple tracking** — single axis at constant speed
+- **Efficient for traditional AP** — one sub can capture more signal
+- **Easier guiding** — only RA corrections needed for short exposures
+
+### Disadvantages
+
+- Requires polar alignment (takes time to do well)
+- Bulky — needs counterweights and a sturdy tripod
+- More expensive for equivalent payload capacity
+- Not practical for grab-and-go setups
+- Not used in consumer smart telescopes
+
+<Interactive
+  src="/stairs-docs/interactives/autoguiding.html"
+  title="Autoguiding"
+  caption="See how a guide camera monitors a star and sends corrections to keep the mount on track."
+/>
+
+## In STAIRS
+
+STAIRS supports equatorial mounts in its profile system. When configured, the sub-exposure time limit increases from 10–20s to whatever the user specifies (typically 60–600s), allowing STAIRS to compute significantly shorter total imaging sessions.
+
+---
+
+<DeepDive title="Deep Dive: Sidereal Rate">
+
+### Why 15.041 arcseconds/second?
+
+A sidereal day (one rotation of Earth relative to the fixed stars) is 23h 56m 4.09s = 86,164 seconds. One full rotation = 360° = 1,296,000 arcseconds.
+
+$$\text{Sidereal rate} = \frac{1,296,000}{86,164} = 15.041 \text{ arcseconds/second}$$
+
+A solar day is slightly longer (24h) because Earth has moved along its orbit — it must rotate ~1° extra to bring the Sun back to the same position.
+
+### Periodic Error
+
+Even the best gear trains have imperfections. **Periodic error** is the small oscillation in tracking caused by gear imperfections in the worm drive. It repeats with each worm rotation (typically 4–10 minutes).
+
+Good mounts have periodic error < 10 arcseconds peak-to-peak. This can be corrected by **autoguiding** — a secondary camera that monitors a guide star and sends real-time corrections.
+
+</DeepDive>

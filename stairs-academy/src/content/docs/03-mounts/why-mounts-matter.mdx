@@ -1,0 +1,54 @@
+---
+title: Why Mounts Matter
+description: The Earth is spinning. Your mount has to compensate. How it does so determines everything.
+---
+
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+The Earth rotates once every 24 hours. To keep a celestial object in the field of view, the telescope must move to counteract this rotation. The **mount** is the mechanism that does this. The type of mount determines how long your exposures can be, how accurately you track, and what kinds of targets you can image.
+
+---
+
+## The Details
+
+### The Basic Problem
+
+From our perspective on Earth, the entire sky appears to rotate around the celestial poles once per day. Stars rise in the east, arc across the sky, and set in the west. At 400× magnification, a star moves across the field of view in less than a second.
+
+Without tracking, you get star trails — pretty for artistic photos but useless for deep-sky imaging.
+
+### Two Approaches
+
+There are two fundamentally different ways to build a mount:
+
+|                      | Alt-Az                                      | Equatorial                                 |
+| -------------------- | ------------------------------------------- | ------------------------------------------ |
+| **Axes**             | Altitude (up/down) and Azimuth (left/right) | Right Ascension (RA) and Declination (Dec) |
+| **Alignment**        | Level with horizon                          | One axis aligned to celestial pole         |
+| **Tracking**         | Both axes must move continuously            | Only RA axis moves                         |
+| **Field rotation**   | Yes                                         | No                                         |
+| **Complexity**       | Simpler, cheaper                            | More complex, more expensive               |
+| **Smart telescopes** | Almost all use this                         | Rare (too bulky)                           |
+
+### Why Smart Telescopes Use Alt-Az
+
+Alt-Az mounts are:
+
+- **Simpler to set up** — no polar alignment needed. Just place on a flat surface.
+- **More compact** — no counterweights, no heavy tripod needed.
+- **Cheaper** — fewer precision parts.
+
+The tradeoff is **field rotation** — the image rotates over time, limiting exposures to 10–30 seconds before stars trail. Smart telescopes compensate by live-stacking many short exposures.
+
+---
+
+## In STAIRS
+
+The mount type is fundamental to STAIRS's planning. The **Sub-Exposure Optimization** module uses the mount type to determine the maximum allowable exposure time:
+
+- Alt-Az: 10–20s max (set by field rotation limit)
+- Equatorial: 30–600s (set by tracking accuracy)
+
+This limit feeds into every downstream calculation: required number of frames, total integration time, and viability scoring.

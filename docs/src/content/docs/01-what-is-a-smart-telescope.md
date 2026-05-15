@@ -1,17 +1,41 @@
-# What is a Smart Telescope?
+---
+title: What is a Smart Telescope?
+description: An introduction to smart telescope hardware.
+---
 
-_This guide is part of the [STAIRS Learning Path](README.md). STAIRS (Smart Telescope Astronomical Image Rating System) is a tool used to optimize and score astronomical imaging runs._
+_This guide is part of the [STAIRS Learning Path](index.md). STAIRS (Smart Telescope Astronomical Image Rating System) is a tool used to optimize and score astronomical imaging runs._
 
 ## Basics
 
 Let's start with "what is a telescope"? In simplest terms, and for our purposes, we can think of a telescope as a bucket for collecting light. On the open end of the bucket, there is a lens to collect light from a more concentrated area, and light collects at the bottom. With an optical telescope, your eye is the bottom of the bucket.
 
 <figure>
-    <img src="images/smart-telescopes.jpg" width="640" height="480"/>
+    <img src="/images/smart-telescopes.jpg" width="640" height="480"/>
     <figcaption><i>fig 1: Seestar S50 and Meade ETX-125EC</i></figcaption>
 </figure>
 
 In the most basic sense, a smart telescope is a telescope that takes care of a lot of the manual work of using a telescope. For the usage of STAIRS, this means the telescope has these features:
+
+```mermaid
+flowchart TD
+    Start[User Selects Target in App] --> GOTO[Auto-Positioning: GOTO]
+    GOTO --> AF[Automatic Focus]
+    AF --> Loop
+
+    subgraph Imaging [Imaging Process]
+        Loop[Capture Loop]
+        Track[Object Tracking]
+        Exp[Sensor Exposure]
+        Stack[Image Stacking & Noise Reduction]
+
+        Loop --> Track
+        Track --> Exp
+        Exp --> Stack
+        Stack -- Repeat --> Loop
+    end
+
+    Loop --> Final[Final Image Delivered to App]
+```
 
 | Feature                   | What it Means                                                                         | Why it is Important                                                                     |
 | ------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
@@ -42,8 +66,8 @@ rear optics
 There is one key feature of the objective lens: its diameter (i.e., how wide it is). This is referred to as the _aperture_ and is measured in mm. It determines how much light your telescope can capture. The larger the aperture, the more light you can collect.
 
 <figure>
-    <img src="images/refracting-telescope.png" alt="refracting-telescope" width="360" height="600">
-    <figcaption><i>fig 2: refracting telescope</i></figcaption>
+    <img src="/images/refracting-telescope.svg" alt="refracting-telescope diagram" width="400" height="250">
+    <figcaption><i>fig 2: refracting telescope optical path</i></figcaption>
 </figure>
 
 #### Mirrors
@@ -59,8 +83,8 @@ secondary mirror
 : This mirror intercepts this light and directs it towards the eyepiece or sensor.
 
 <figure>
-    <img src="images/reflecting-telescope.png" alt="reflecting-telescope" width="442" height="580">
-    <figcaption><i>fig 3: reflecting telescope</i></figcaption>
+    <img src="/images/reflecting-telescope.svg" alt="reflecting-telescope diagram" width="400" height="250">
+    <figcaption><i>fig 3: reflecting telescope optical path</i></figcaption>
 </figure>
 
 ### The Sensor

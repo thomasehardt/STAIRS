@@ -1,0 +1,159 @@
+---
+title: Configuration
+description: Complete reference for the config.yaml file.
+---
+
+STAIRS uses a single YAML configuration file (`config.yaml`) to define your locations, telescope profiles, planning preferences, and integration settings.
+
+---
+
+## Minimal Configuration
+
+Only three things are required:
+
+```yaml
+locations:
+  - name: My Backyard
+    latitude: 36.16
+    longitude: -86.78
+    bortle_scale: 5
+```
+
+STAIRS will use sensible defaults for everything else.
+
+---
+
+## Full Reference
+
+### Locations
+
+Define one or more observing locations:
+
+```yaml
+locations:
+  - name: Nashville, TN, USA
+    default: true
+    latitude: 36.16
+    longitude: -86.78
+    elevation_m: 163
+    bortle_scale: 8
+  - name: Pogue Creek Canyon
+    latitude: 36.28
+    longitude: -84.92
+    elevation_m: 500
+    bortle_scale: 2
+  - name: Obed Scenic River
+    latitude: 36.1
+    longitude: -84.72
+    elevation_m: 393
+    bortle_scale: 3
+```
+
+| Field          | Required | Default | Description                                         |
+| -------------- | -------- | ------- | --------------------------------------------------- |
+| `name`         | Yes      | —       | Unique name for this location                       |
+| `default`      | No       | `false` | Set to `true` on one location to mark it as default |
+| `latitude`     | Yes      | —       | Decimal degrees (north positive)                    |
+| `longitude`    | Yes      | —       | Decimal degrees (east positive)                     |
+| `elevation_m`  | No       | `0`     | Elevation in meters                                 |
+| `bortle_scale` | Yes      | —       | Bortle Dark-Sky Scale (1–9)                         |
+
+### Planning
+
+```yaml
+planning:
+  default_telescope: Seestar S50
+  min_altitude: 30.0
+  max_altitude: 75.0
+  min_duration_minutes: 60
+  block_size_minutes: 60
+  min_top_threshold: 50.0
+```
+
+| Field                  | Required | Default       | Description                                      |
+| ---------------------- | -------- | ------------- | ------------------------------------------------ |
+| `default_telescope`    | No       | first profile | Name of the default telescope profile            |
+| `min_altitude`         | No       | `30.0`        | Minimum altitude (degrees) for target visibility |
+| `max_altitude`         | No       | `75.0`        | Maximum altitude (degrees) before zenith penalty |
+| `min_duration_minutes` | No       | `60`          | Minimum session length for a target to be viable |
+| `block_size_minutes`   | No       | `60`          | Default duration for each target block           |
+| `min_top_threshold`    | No       | `50.0`        | Minimum score threshold for recommendations      |
+
+### Weather Integration
+
+```yaml
+integrations:
+  weather:
+    enabled: true
+    provider: open-meteo
+    api_key: null
+    units: C
+```
+
+| Field      | Required | Default      | Description                                    |
+| ---------- | -------- | ------------ | ---------------------------------------------- |
+| `enabled`  | No       | `true`       | Enable weather fetching                        |
+| `provider` | No       | `open-meteo` | Weather provider (currently only Open-Meteo)   |
+| `api_key`  | No       | `null`       | API key (not needed for Open-Meteo, it's free) |
+| `units`    | No       | `C`          | Temperature units: `C` or `F`                  |
+
+### Logging
+
+```yaml
+logging:
+  level: INFO
+  max_size_mb: 10
+  backup_count: 5
+```
+
+| Field          | Required | Default | Description                                    |
+| -------------- | -------- | ------- | ---------------------------------------------- |
+| `level`        | No       | `INFO`  | Log level: `DEBUG`, `INFO`, `WARNING`, `ERROR` |
+| `max_size_mb`  | No       | `10`    | Maximum log file size before rotation          |
+| `backup_count` | No       | `5`     | Number of rotated log files to keep            |
+
+---
+
+## Telescope Profiles
+
+Telescope profiles are stored in `data/profiles.json`. The default profiles include:
+
+| Profile         | Aperture | Focal Length | f/ratio | Sensor           |
+| --------------- | -------- | ------------ | ------- | ---------------- |
+| Seestar S50     | 50mm     | 250mm        | f/5     | 1936×1096, 2.9µm |
+| Dwarf II (Tele) | 24mm     | 86mm         | f/3.6   | —                |
+| Dwarf II (Wide) | 6.8mm    | 14mm         | f/2.0   | —                |
+
+You can add your own profiles by editing this file or using the API.
+
+---
+
+## Example: Full Config
+
+```yaml
+locations:
+  - name: My Backyard
+    default: true
+    latitude: 36.16
+    longitude: -86.78
+    elevation_m: 163
+    bortle_scale: 8
+
+planning:
+  default_telescope: Seestar S50
+  min_altitude: 30.0
+  max_altitude: 75.0
+  min_duration_minutes: 60
+  block_size_minutes: 60
+
+integrations:
+  weather:
+    enabled: true
+    provider: open-meteo
+    units: C
+
+logging:
+  level: INFO
+  max_size_mb: 10
+  backup_count: 5
+```

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Narrowband & Hubble Palette</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      button {
+        padding: 8px 18px;
+        font-size: 14px;
+        cursor: pointer;
+        background: #444;
+        color: white;
+        border: 1px solid #666;
+        border-radius: 4px;
+        transition: all 0.15s;
+      }
+      button:hover {
+        background: #555;
+      }
+      button.active {
+        border-width: 2px;
+      }
+      a.back {
+        color: #88f;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 20px;
+      }
+      #canvas-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+      p {
+        color: #aaa;
+        max-width: 700px;
+        margin: 0 auto 15px auto;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/stairs-docs/02-photon-pixel/bayer-filter/" class="back"
+      >← Chapter 2: Narrowband</a
+    >
+    <h1>Narrowband &amp; the Hubble Palette</h1>
+    <p>
+      Narrowband filters isolate specific emission lines from ionized gases in
+      nebulae. H-alpha (656 nm) traces hydrogen, OIII (500 nm) traces doubly
+      ionized oxygen, and SII (672 nm) traces sulfur. The Hubble Palette maps
+      SII &rarr; Red, H&alpha; &rarr; Green, OIII &rarr; Blue for the iconic
+      golden-blue false-color image.
+    </p>
+    <div class="controls">
+      <button id="haBtn" style="border-color: #f44">H&alpha;</button>
+      <button id="o3Btn" style="border-color: #48f">OIII</button>
+      <button id="s2Btn" style="border-color: #f44">SII</button>
+      <button id="hubbleBtn" class="active" style="border-color: #fa0">
+        Hubble Palette (SHO)
+      </button>
+    </div>
+    <div id="canvas-container"></div>
+    <script src="narrowband.js"></script>
+  </body>
+</html>

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Alt-Az Tracking &amp; Field Rotation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 12px 18px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      button {
+        padding: 7px 16px;
+        font-size: 13px;
+        cursor: pointer;
+        background: #444;
+        color: white;
+        border: 1px solid #666;
+        border-radius: 4px;
+      }
+      button:hover {
+        background: #555;
+      }
+      button.active {
+        background: #285;
+        border-color: #4a8;
+      }
+      a.back {
+        color: #88f;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 18px;
+      }
+      #canvas-container {
+        margin-top: 16px;
+        display: flex;
+        justify-content: center;
+      }
+      p {
+        color: #aaa;
+        max-width: 800px;
+        margin: 0 auto 12px auto;
+        line-height: 1.5;
+        font-size: 13px;
+      }
+      input[type="range"] {
+        width: 90px;
+        vertical-align: middle;
+      }
+      label {
+        color: #ccc;
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .val {
+        color: #fff;
+        font-weight: bold;
+        min-width: 28px;
+        text-align: center;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/stairs-docs/03-mounts/field-rotation/" class="back"
+      >← Chapter 3: Field Rotation</a
+    >
+    <h1>Alt-Az Tracking &amp; Field Rotation</h1>
+    <p>
+      Smart telescopes use Alt-Az mounts — they track by moving in altitude
+      (up/down) and azimuth (left/right). Unlike equatorial mounts, this causes
+      the field of view to rotate over time. The rotation is strongest near the
+      horizon and zero at the meridian.
+    </p>
+    <div class="controls">
+      <button id="playBtn">▶ Play</button>
+      <label
+        >Speed
+        <input type="range" id="speedSlider" min="1" max="10" value="3" />
+        <span id="speedVal" class="val">3×</span></label
+      >
+      <button id="resetBtn">Reset</button>
+    </div>
+    <div id="canvas-container"></div>
+    <script src="fieldrotation.js"></script>
+  </body>
+</html>

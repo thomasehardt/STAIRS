@@ -1,4 +1,7 @@
-# The Physics of Light Collection
+---
+title: The Physics of Light Collection
+description: How photons are captured and converted into data.
+---
 
 To best understand how STAIRS calculates the ideal timing for your image runs, we must look at the journey of light from distant objects to your smart telescope. This process is a conversion of energy: from photons to electrons to data.
 

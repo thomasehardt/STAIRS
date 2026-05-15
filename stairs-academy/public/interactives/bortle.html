@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Light Pollution & Bortle Scale</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        background: #444;
+        color: white;
+        border: 1px solid #666;
+        border-radius: 4px;
+      }
+      button:hover {
+        background: #555;
+      }
+      a.back {
+        color: #88f;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 20px;
+      }
+      #canvas-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+      p {
+        color: #aaa;
+        max-width: 700px;
+        margin: 0 auto 15px auto;
+        line-height: 1.5;
+      }
+      input[type="range"] {
+        width: 200px;
+      }
+      label {
+        color: #ddd;
+      }
+      .bortle-label {
+        color: #ff9;
+        font-weight: bold;
+        min-width: 120px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/stairs-docs/05-planning/sqs/" class="back"
+      >← Chapter 5: Bortle Scale</a
+    >
+    <h1>Light Pollution &amp; the Bortle Scale</h1>
+    <p>
+      The Bortle Dark-Sky Scale measures night sky brightness from pristine
+      wilderness (1) to inner-city glare (9). Increase the slider to see how
+      light pollution washes out stars, reduces contrast, and limits what you
+      can observe or photograph.
+    </p>
+    <div class="controls">
+      <span style="display: flex; gap: 10px; align-items: center">
+        <label>Bortle</label>
+        <input
+          type="range"
+          id="bortleSlider"
+          min="1"
+          max="9"
+          value="1"
+          step="1"
+        />
+        <span id="bortleDisplay" class="bortle-label">Class 1</span>
+      </span>
+      <label
+        ><input type="checkbox" id="showTarget" checked /> Show Nebula</label
+      >
+    </div>
+    <div id="canvas-container"></div>
+    <script src="bortle.js"></script>
+  </body>
+</html>

@@ -1,0 +1,94 @@
+---
+title: "Deep Dive: The SNR Equation"
+description: The complete signal-to-noise ratio calculation, its components, and practical implications.
+---
+
+import Interactive from "../../../components/Interactive.astro";
+
+## The Big Idea
+
+The SNR equation is the single most important formula in astrophotography. It tells you how long you need to expose, how many frames you need, and what quality to expect. Every planning decision flows from it.
+
+---
+
+## The Full Equation
+
+$$\text{SNR} = \frac{S \cdot t}{\sqrt{S \cdot t + N_{\text{sky}} \cdot t + N_{\text{dark}} \cdot t + N_{\text{read}}^2}}$$
+
+Where:
+
+- $S$ = target signal (e⁻/pixel/s)
+- $t$ = total integration time (s)
+- $N_{\text{sky}}$ = sky background (e⁻/pixel/s) — light pollution
+- $N_{\text{dark}}$ = dark current (e⁻/pixel/s) — thermal noise
+- $N_{\text{read}}$ = read noise (e⁻) — per-frame noise from readout
+
+### Breaking Down the Components
+
+#### Target Signal
+
+$$S = F_{\text{target}} \cdot A \cdot QE \cdot T_{\text{optics}} \cdot \frac{1}{n_{\text{pixels}}}$$
+
+The target's flux (photons/m²/s), collected by the aperture area $A$, multiplied by sensor QE and optical transmission, divided over the number of pixels the target covers.
+
+#### Sky Background
+
+$$N_{\text{sky}} = F_{\text{sky}} \cdot A \cdot QE \cdot \text{pixel\_area}_{\text{sky}}$$
+
+The sky glow contributes the same per-pixel background in every frame. This is the noise term that limits deep-sky imaging under light-polluted skies.
+
+#### Dark Current
+
+$$N_{\text{dark}} \propto T^2 \cdot e^{-E_a / kT}$$
+
+Doubles every 6–8°C rise in sensor temperature. This is why cooled cameras exist. For an uncooled smart telescope, dark current can be significant in warm weather.
+
+#### Read Noise
+
+$N_{\text{read}}$ is fixed per frame regardless of exposure length. This is why you want to "swamp" read noise with sky noise — make the sky noise term dominate so that read noise becomes negligible.
+
+---
+
+### SNR After Stacking $n$ Frames
+
+$$\text{SNR}_{\text{stack}} = \frac{n \cdot S \cdot t_{\text{sub}}}{\sqrt{n(S + N_{\text{sky}} + N_{\text{dark}})t_{\text{sub}} + n N_{\text{read}}^2}}$$
+
+Simplifying:
+
+$$\text{SNR}_{\text{stack}} = \sqrt{n} \cdot \frac{S \cdot t_{\text{sub}}}{\sqrt{(S + N_{\text{sky}} + N_{\text{dark}})t_{\text{sub}} + N_{\text{read}}^2}}$$
+
+The $\sqrt{n}$ term outside is the stacking benefit. The term inside is the single-frame SNR.
+
+---
+
+### Practical Implications
+
+**Rule of thumb — Alt-Az with 10s subs:**
+
+- Per-frame SNR for a faint nebula (mag 10): ~0.5
+- To reach SNR = 5 (detection): need 100 frames (17 minutes)
+- To reach SNR = 10 (good image): need 400 frames (67 minutes)
+- To reach SNR = 20 (excellent): need 1,600 frames (4.4 hours)
+
+This explains both the "wow" factor of live stacking (the image emerges in the first few minutes) and its limitation (getting truly clean images takes hours).
+
+---
+
+## Visualizing SNR
+
+<Interactive
+  src="/stairs-docs/interactives/histogram.html"
+  title="Histogram Stretch"
+  caption="Raw data is linear and nearly black. Drag sliders to adjust black point, midtones, and white point to reveal the hidden signal."
+/>
+
+---
+
+## In STAIRS
+
+This entire equation is baked into STAIRS's exposure planning module. Given a telescope profile, target magnitude, sky conditions, and desired SNR, STAIRS computes:
+
+- Total integration time needed
+- Number of sub-frames
+- Feasibility (can this be done in one night?)
+- Whether switching to a different target would be more efficient

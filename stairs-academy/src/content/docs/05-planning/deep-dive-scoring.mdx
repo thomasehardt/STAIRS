@@ -1,0 +1,111 @@
+---
+title: "Deep Dive: Scoring Math"
+description: The complete mathematical formulation of STAIRS's scoring pipeline.
+---
+
+## The Big Idea
+
+Every score in STAIRS is a computed function of physical parameters: target properties (magnitude, size, coordinates), telescope properties (aperture, focal length, sensor), and environmental conditions (Bortle, moon, weather). This page documents every formula.
+
+---
+
+## Object Suitability Score
+
+### FOV Fit (40% weight)
+
+Given target angular size $s$ and sensor field of view $F$ (shorter dimension in arcminutes):
+
+$$\text{FOV score} = \exp\left(-\frac{(s - \mu)^2}{2\sigma^2}\right) \times 100$$
+
+Where:
+
+- $\mu = 0.35 \times F$ (ideal target occupies 35% of FOV)
+- $\sigma = 0.2 \times F$ (width of the Gaussian)
+
+Special cases:
+
+- If $s > F$: target clips the sensor, score capped at 0.2×
+- If $s < 0.05 \times F$: target too small, score capped at 0.3×
+
+### Surface Brightness Score (30% weight)
+
+$$\text{SB} = m + 2.5 \times \log_{10}(A)$$
+
+Where $m$ = integrated magnitude, $A$ = target angular area in arcminutes².
+
+$$\text{SB score} = \max\left(0, \frac{24 - \text{SB}}{24 - 18}\right) \times 100$$
+
+For point sources (stars): minimum area = 3″ × 3″ PSF.
+
+### Altitude Score (30% weight)
+
+$$\text{Alt score} = \max\left(0, \frac{h_{\text{peak}} - h_{\text{min}}}{90 - h_{\text{min}}}\right) \times 100$$
+
+Where $h_{\text{peak}}$ = peak altitude during the night, $h_{\text{min}}$ = minimum usable altitude (default 30°).
+
+### OSS
+
+$$\text{OSS} = 0.4 \times \text{FOV score} + 0.3 \times \text{SB score} + 0.3 \times \text{Alt score}$$
+
+---
+
+## Sky Quality Score
+
+### Weather Multiplier
+
+$$w = w_{\text{cloud}} \times w_{\text{humidity}} \times w_{\text{seeing}}$$
+
+$$w_{\text{cloud}} = \begin{cases} 0 & \text{if cloud cover} > 90\% \\ 1 - \frac{\text{cloud} - 20}{80 - 20} & \text{if } 20\% \leq \text{cloud} \leq 90\% \\ 1 & \text{if cloud cover} < 20\% \end{cases}$$
+
+$$w_{\text{humidity}} = \begin{cases} 0.85 & \text{if humidity} > 85\% \\ 1 & \text{otherwise} \end{cases}$$
+
+$$w_{\text{seeing}} = \begin{cases} 0.7 & \text{if seeing (FWHM)} > 4'' \\ 1 & \text{otherwise} \end{cases}$$
+
+### Moon Multiplier
+
+$$m = 1 - \left(\text{illumination} \times 0.5 \times \frac{\text{moon altitude}}{90}\right)$$
+
+### Altitude Trace
+
+The target's altitude is sampled at 5 points across the night. The fraction of time above $h_{\text{min}}$ determines this component.
+
+### SQS
+
+$$\text{SQS} = w \times m \times a$$
+
+Where $a$ = altitude trace score (0–1).
+
+---
+
+## Absolute Quality Score
+
+$$\text{AQS} = \text{OSS} \times \text{SQS} \times b$$
+
+Where $b$ = Bortle multiplier (1.0 for Bortle 1, decreasing to ~0.05 for Bortle 9).
+
+The Bortle multiplier curve:
+
+$$b = \max\left(0.05, \frac{10 - \text{Bortle}}{9}\right)$$
+
+---
+
+## Sub-Exposure Calculation
+
+### Optimal Sub-Exposure
+
+$$t_{\text{sub}} = \min\left(t_{\text{max}}, \frac{10 \times \sigma_r^2}{S_{\text{sky}}}\right)$$
+
+Where $t_{\text{max}}$ = mount limit (10–20s for Alt-Az, configurable for EQ),
+$\sigma_r$ = read noise (e⁻), $S_{\text{sky}}$ = sky signal (e⁻/pixel/s).
+
+### Sky Signal
+
+$$S_{\text{sky}} = F_{\text{sky}} \times A \times QE$$
+
+Where $F_{\text{sky}}$ = sky flux derived from Bortle scale, $A$ = aperture area, $QE$ = quantum efficiency.
+
+### Total Integration Time
+
+$$t_{\text{total}} = \left(\frac{\text{SNR}_{\text{target}}}{\text{SNR}_{\text{sub}}}\right)^2 \times t_{\text{sub}}$$
+
+Where $\text{SNR}_{\text{target}}$ = desired SNR (default 10), $\text{SNR}_{\text{sub}}$ = single-sub SNR.

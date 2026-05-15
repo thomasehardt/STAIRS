@@ -1,0 +1,91 @@
+---
+title: "Deep Dive: Aperture & Focal Ratio"
+description: The physics behind light collection, resolution limits, and why f-ratio matters.
+---
+
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+Aperture and focal ratio are the two most important numbers describing any telescope. Aperture determines how much light you collect. Focal ratio determines how that light is spread out at the sensor.
+
+---
+
+## The Details
+
+### Aperture: Light-Gathering Power
+
+The amount of light a telescope collects is proportional to its **area**:
+
+$$\text{Area} = \pi \left(\frac{D}{2}\right)^2$$
+
+Doubling the aperture gives 4× the light. Going from 50mm to 100mm means you can see objects 1.5 magnitudes fainter in the same exposure time. This is why aperture drives the **limiting magnitude**:
+
+$$m_{\text{lim}} \approx 2 + 5 \log_{10}(D_{\text{mm}})$$
+
+For a 50mm telescope, $m_{\text{lim}} \approx 10.5$ (under dark skies). For a 200mm telescope, $m_{\text{lim}} \approx 13.5$.
+
+### The Resolution Limit
+
+The **Rayleigh criterion** gives the minimum angular separation two stars can have and still be resolved:
+
+$$\theta = 1.22 \frac{\lambda}{D}$$
+
+In arcseconds, for visible light ($\lambda = 550\text{nm}$):
+
+$$\theta \approx \frac{116}{D_{\text{mm}}}$$
+
+| Aperture | Resolution | Sees detail on Moon as small as |
+| -------- | ---------- | ------------------------------- |
+| 50mm     | 2.3″       | 4.4 km                          |
+| 100mm    | 1.2″       | 2.2 km                          |
+| 200mm    | 0.6″       | 1.1 km                          |
+
+### Focal Ratio & Image Brightness
+
+The focal ratio determines the **convergence angle** of the light cone. This controls:
+
+1. **Image scale** — larger f-ratio = more magnification = smaller field of view
+2. **Image brightness at the sensor** — f/4 is 4× brighter per pixel than f/8
+
+The image scale (arcseconds per pixel) is:
+
+$$\text{Pixel Scale} = \frac{206.265 \times p}{f}$$
+
+Where $p$ = pixel pitch in µm and $f$ = focal length in mm.
+
+### The Aperture-Focal Ratio Tradeoff
+
+Same aperture, different f-ratios:
+
+| Focal Ratio | Focal Length (at 50mm) | Pixel Scale (2.9µm) | FOV (IMX462) |
+| ----------- | ---------------------- | ------------------- | ------------ |
+| f/4         | 200mm                  | 3.0″/px             | 1.6° × 0.9°  |
+| f/5         | 250mm                  | 2.4″/px             | 1.3° × 0.7°  |
+| f/6         | 300mm                  | 2.0″/px             | 1.1° × 0.6°  |
+
+Faster f-ratio = wider field, brighter image, but lower resolution. Slower = narrower field, dimmer image, but finer detail. There's no free lunch.
+
+---
+
+## In STAIRS
+
+These calculations are built into STAIRS's telescope profile system. When you enter aperture and focal length (or select a preset like Seestar S50), STAIRS computes:
+
+- Field of view dimensions (for FOV fit scoring)
+- Pixel scale (for target sampling adequacy)
+- Light gathering capability integrated throughout exposure planning
+
+---
+
+<DeepDive title="Derivation: Why f-ratio determines focal plane brightness">
+
+Consider light from an extended object (like a nebula). Each point on the object sends parallel rays into the telescope. The aperture $D$ collects them. The sensor is at the focal plane, distance $f$ from the lens/mirror.
+
+The light from one sky point is spread over an area on the sensor that depends only on $f$ (the magnification). The total power collected is proportional to $D^2$ (aperture area). The area it's spread over is proportional to $f^2$ (magnification squared). So the **power per pixel** is:
+
+$$\frac{\text{power}}{\text{pixel}} \propto \frac{D^2}{f^2} = \frac{1}{(f/\#)^2}$$
+
+This is why surface brightness at the focal plane depends only on f-ratio, not aperture.
+
+</DeepDive>

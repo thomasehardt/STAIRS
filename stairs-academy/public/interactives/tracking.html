@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Alt-Az vs EQ Tracking</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+      }
+      a.back {
+        color: #88f;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 20px;
+      }
+      #canvas-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/stairs-docs/03-mounts/alt-az/" class="back"
+      >← Chapter 3: Alt-Az Mounts</a
+    >
+    <h1>Mount Tracking: Alt-Az vs Equatorial</h1>
+    <p style="color: #aaa; max-width: 800px; margin: 0 auto">
+      Simulate a 2-minute long exposure on both mounts. Observe how the Alt-Az
+      sensor suffers from field rotation (creating star trails), while the
+      Equatorial sensor tracks the sky perfectly.
+    </p>
+    <div class="controls">
+      <label
+        >Exposure Time:
+        <input
+          type="range"
+          id="timeSlider"
+          min="0"
+          max="120"
+          value="0"
+          style="width: 300px"
+      /></label>
+    </div>
+    <div id="canvas-container"></div>
+    <script src="tracking.js"></script>
+  </body>
+</html>

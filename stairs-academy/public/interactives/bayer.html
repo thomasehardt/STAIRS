@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Bayer Filter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        background: #444;
+        color: white;
+        border: 1px solid #666;
+        border-radius: 4px;
+      }
+      button:hover {
+        background: #555;
+      }
+      a.back {
+        color: #88f;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 20px;
+      }
+      #canvas-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+      p {
+        color: #aaa;
+        max-width: 700px;
+        margin: 0 auto 15px auto;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/stairs-docs/02-photon-pixel/bayer-filter/" class="back"
+      >← Chapter 2: Bayer Filter</a
+    >
+    <h1>Bayer Filter</h1>
+    <p>
+      Each pixel in a digital camera sensor is colorblind — it only measures
+      intensity. A Bayer filter array places red, green, and blue filters over
+      individual pixels so each one captures only one color channel. The Scene
+      panel shows the true image, Bayer Raw shows what each pixel captures (only
+      its filter's channel), and Debayered shows the reconstructed image after
+      demosaicing. In Single mode photons land one at a time; in Parallel mode
+      all pixels accumulate simultaneously.
+    </p>
+    <div class="controls" style="flex-wrap: wrap; justify-content: center">
+      <button id="fireBtn">Fire Photon</button>
+      <button id="autoBtn">Auto</button>
+      <button id="resetBtn">Reset</button>
+      <button id="adcBtn">Readout</button>
+      <button id="stepBtn" style="display: none">Step</button>
+      <span
+        style="display: flex; gap: 8px; align-items: center; margin-left: 8px"
+      >
+        <label><input type="radio" name="filter" value="R" /> R</label>
+        <label><input type="radio" name="filter" value="G" /> G</label>
+        <label><input type="radio" name="filter" value="B" /> B</label>
+        <label
+          ><input type="radio" name="filter" value="random" checked />
+          Rnd</label
+        >
+        <label style="color: #888">|</label>
+        <label style="color: #aaa">Filter</label>
+      </span>
+      <span
+        style="display: flex; gap: 8px; align-items: center; margin-left: 8px"
+      >
+        <label
+          ><input type="radio" name="mode" value="individual" checked />
+          Single</label
+        >
+        <label
+          ><input type="radio" name="mode" value="parallel" /> Parallel</label
+        >
+        <label
+          ><input type="radio" name="mode" value="debayer" /> Debayer</label
+        >
+        <label style="color: #888">|</label>
+        <label style="color: #aaa">Mode</label>
+      </span>
+      <span
+        style="display: flex; gap: 8px; align-items: center; margin-left: 8px"
+        id="expTimeGroup"
+      >
+        <label
+          ><input type="radio" name="exptime" value="10" checked /> 10s</label
+        >
+        <label><input type="radio" name="exptime" value="20" /> 20s</label>
+        <label><input type="radio" name="exptime" value="30" /> 30s</label>
+        <label style="color: #888">|</label>
+        <label style="color: #aaa">Exp.</label>
+      </span>
+      <label
+        >Rate:
+        <input
+          type="range"
+          id="speedSlider"
+          min="1"
+          max="20"
+          value="5"
+          style="width: 100px"
+      /></label>
+    </div>
+    <div id="canvas-container"></div>
+    <script src="bayer.js"></script>
+  </body>
+</html>

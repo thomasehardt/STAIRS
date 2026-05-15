@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cache Validation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 12px 18px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      button {
+        padding: 7px 16px;
+        font-size: 13px;
+        cursor: pointer;
+        background: #444;
+        color: white;
+        border: 1px solid #666;
+        border-radius: 4px;
+      }
+      button:hover {
+        background: #555;
+      }
+      a.back {
+        color: #88f;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 18px;
+      }
+      #canvas-container {
+        margin-top: 16px;
+        display: flex;
+        justify-content: center;
+      }
+      p {
+        color: #aaa;
+        max-width: 800px;
+        margin: 0 auto 12px auto;
+        line-height: 1.5;
+        font-size: 13px;
+      }
+      label {
+        color: #ccc;
+        font-size: 13px;
+      }
+      .val {
+        color: #fff;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/stairs-docs/05-planning/building-a-plan/" class="back"
+      >← Chapter 5: Cache Validation</a
+    >
+    <h1>Cache Validation</h1>
+    <p>
+      STAIRS caches weather and ephemeris data with timestamps. Stale data
+      (older than the refresh interval) triggers a re-fetch from Open-Meteo.
+      Fresh data is used directly. This avoids redundant API calls while keeping
+      forecasts current.
+    </p>
+    <div class="controls">
+      <button id="fetchBtn">\u26A1 Simulate API Fetch</button>
+      <button id="resetBtn">\u21BA Reset</button>
+    </div>
+    <div id="canvas-container"></div>
+    <script src="cachevalidation.js"></script>
+  </body>
+</html>

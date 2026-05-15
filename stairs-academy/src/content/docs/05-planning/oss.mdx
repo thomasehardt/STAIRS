@@ -1,0 +1,70 @@
+---
+title: Object Suitability Score
+description: How well suited is this target for your specific telescope?
+---
+
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+Not every target works with every telescope. A huge nebula like the Heart Nebula is too big for the Seestar S50's field of view — you'd only see a small piece. A tiny galaxy looks beautiful but only covers a few pixels. The **Object Suitability Score** (OSS) quantifies this match.
+
+---
+
+## Play With It
+
+<Interactive
+  src="/stairs-docs/interactives/subexposure.html"
+  title="Sub-Exposure Optimization"
+  caption="Explore how target brightness, Bortle scale, and sensor properties interact in the OSS calculation."
+/>
+
+---
+
+## The Details
+
+### OSS = FOV Fit (40%) + Surface Brightness (30%) + Altitude (30%)
+
+### FOV Fit
+
+Targets come in different angular sizes. A galaxy might be 10 arcminutes across; a nebula might be 60 arcminutes. Your sensor has a fixed field of view (e.g., the Seestar S50 sees 77 × 43 arcminutes).
+
+- **Target too small**: occupies only a few pixels — not enough detail (score penalty)
+- **Target too big**: doesn't fit on the sensor (score penalty)
+- **Just right**: fills a good portion of the frame (score = 100)
+
+The score follows a **Gaussian decay** centered on the ideal target size (about 30–40% of the sensor's shorter dimension).
+
+### Surface Brightness
+
+Surface brightness measures how concentrated the target's light is:
+
+$$\text{SB} = \text{mag} + 2.5 \times \log_{10}(\text{angular area})$$
+
+A magnitude 8 star has SB ≈ 8 (tiny area). A magnitude 8 nebula spread over 30 arcminutes has SB ≈ 18 (much dimmer per pixel).
+
+Higher SB = fainter = harder to image = lower score.
+
+### Altitude Score
+
+Targets near the horizon:
+
+- Light travels through more atmosphere (more extinction)
+- More atmospheric dispersion (color fringing)
+- More likely to be blocked by trees/buildings/horizon
+- Shorter time available before they set
+
+Targets near zenith (> 75°):
+
+- Awkward for Alt-Az tracking
+- Increased field rotation rate
+- Penalty applied
+
+The ideal altitude range is 30–75°.
+
+---
+
+## In STAIRS
+
+OSS is computed once per target (it doesn't depend on the date or weather). STAIRS pre-computes OSS for all targets in your configured catalogs, then applies the dynamic SQS multiplier when you request a plan.

@@ -1,0 +1,127 @@
+---
+title: What Is STAIRS?
+description: The problem STAIRS solves and how it fits into your astrophotography workflow.
+---
+
+## The Big Idea
+
+STAIRS is a planning tool that answers one question: **"What should I image tonight, and when?"**
+
+A lot of apps tell you what's in the sky. STAIRS tells you what you should actually **point your telescope at** — ranked by how well the target fits your specific equipment, your sky conditions, and your schedule.
+
+---
+
+## The Problem
+
+Smart telescopes like the Seestar S50, Dwarf II, and Vespera make it easy to _capture_ images. But they leave the _planning_ to you:
+
+- Which targets are visible from my backyard tonight?
+- Will this galaxy fit on my sensor, or is it too big/small?
+- How long do I need to expose to get a decent image?
+- Is the moon going to wash out my target?
+- Should I image M42 for an hour, then switch to M31?
+
+Most people end up scrolling through sky charts, guessing, and hoping for the best. STAIRS turns this into a data-driven process.
+
+---
+
+## How STAIRS Works
+
+STAIRS combines three layers of information:
+
+### 1. Target Catalog
+
+A database of thousands of deep-sky objects (NGC, IC, Messier, Barnard, etc.) with:
+
+- Coordinates (RA/Dec)
+- Magnitude and surface brightness
+- Angular size
+- Target type (galaxy, nebula, cluster, etc.)
+- Constellation and seasonal visibility
+
+### 2. Your Equipment Profile
+
+A telescope profile includes:
+
+- Aperture and focal length
+- Sensor dimensions and pixel pitch
+- Mount type (Alt-Az vs equatorial)
+
+STAIRS uses this to compute field of view, pixel scale, and light collection rate.
+
+### 3. Current Conditions
+
+Fetched in real time:
+
+- **Weather**: cloud cover, humidity, temperature, wind, seeing (from Open-Meteo)
+- **Light pollution**: your configured Bortle scale
+- **Moon**: phase, altitude, position relative to each target
+- **Sun**: twilight times (astronomical, nautical, civil)
+
+### The Output
+
+A ranked, scheduled plan:
+
+```
+Target              Score  Window          Block
+M42 (Orion Nebula)   85    8:00 PM - 10:30 PM  60 min
+M31 (Andromeda)     72    8:00 PM - 12:30 AM  60 min
+M45 (Pleiades)      68    9:30 PM - 1:30 AM   60 min
+```
+
+---
+
+## Killer Features
+
+### Multi-Night Planning
+
+Most planning apps only tell you what's visible _tonight_. STAIRS scans **up to 14 nights ahead** and scores each one. This means you can plan your entire week:
+
+- See which nights are cloud-free _before_ you get your hopes up
+- Know that Wednesday will be your best chance for that dim galaxy (new moon, clear skies)
+- Get an alert when a rare target reaches peak altitude later this week
+
+The multi-night forecast shows you, for each night: astronomical twilight start/end, effective dark hours (after moon and clouds), and a quality score color-coded so you can spot the good nights instantly.
+
+```
+Imaging Forecast: Pogue Creek Canyon (UTC)
+┌────────────┬──────────┬──────────┬─────────┬─────────┬──────────┬──────────┬───────────┐
+│ Date       │ Start    │ End      │ Dark Hr │ Eff. Hr │ Relative │ Absolute │ Notes     │
+├────────────┼──────────┼──────────┼─────────┼─────────┼──────────┼──────────┼───────────┤
+│ 2026-04-15 │ 20:47    │ 05:13    │   8.4   │   7.9   │   92%    │   91%    │           │
+│ 2026-04-16 │ 20:45    │ 05:14    │   8.5   │   4.3   │   55%    │   54%    │ Bright Mn │
+│ 2026-04-17 │ 20:43    │ 05:16    │   8.5   │   2.1   │   28%    │   26%    │ Clouds    │
+│ 2026-04-18 │ 20:41    │ 05:17    │   8.6   │   8.1   │   87%    │   84%    │           │
+└────────────┴──────────┴──────────┴─────────┴─────────┴──────────┴──────────┴───────────┘
+```
+
+### Multi-Site Comparison
+
+If you have multiple observing locations — a light-polluted backyard and a dark mountain site — STAIRS can **compare conditions side by side** and tell you which site will be better on any given night. This is invaluable for deciding whether to make the drive to your dark site.
+
+See the [Multi-Night & Multi-Site Planning](/stairs-docs/06-using-stairs/multi-night/) page for details.
+
+---
+
+## What STAIRS Is Not
+
+- **Not a telescope controller** — it doesn't slew your mount or capture images
+- **Not a planetarium** — it doesn't render the night sky visually (though it uses astroplan under the hood)
+- **Not a stacking engine** — it doesn't process your images
+
+STAIRS is a **planning layer** that sits _between_ the catalog and your telescope's app. It tells you _what_ to image and _when_ — your telescope's app handles the actual capture.
+
+---
+
+## Who Is STAIRS For?
+
+| User Type                     | Value                                                                                 |
+| ----------------------------- | ------------------------------------------------------------------------------------- |
+| **New smart telescope owner** | Don't know what to image? STAIRS picks targets that fit your scope.                   |
+| **Experienced imager**        | Want to optimize your night? STAIRS schedules targets to maximize usable hours.       |
+| **Multi-location observer**   | Have a dark site and a city location? Compare scores and decide where to go.          |
+| **Session logger**            | Want to track what you've captured? STAIRS logs your sessions with notes and ratings. |
+
+---
+
+Ready to get started? Head to the [Quickstart Guide](/stairs-docs/06-using-stairs/quickstart/).

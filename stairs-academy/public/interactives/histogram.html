@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Histogram Stretch</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      button {
+        padding: 8px 18px;
+        font-size: 14px;
+        cursor: pointer;
+        background: #444;
+        color: white;
+        border: 1px solid #666;
+        border-radius: 4px;
+      }
+      button:hover {
+        background: #555;
+      }
+      a.back {
+        color: #88f;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 20px;
+      }
+      #canvas-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+      p {
+        color: #aaa;
+        max-width: 700px;
+        margin: 0 auto 15px auto;
+        line-height: 1.5;
+      }
+      input[type="range"] {
+        width: 100px;
+        vertical-align: middle;
+      }
+      label {
+        color: #ccc;
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .val {
+        color: #fff;
+        font-weight: bold;
+        min-width: 35px;
+        text-align: center;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/stairs-docs/04-stacking/deep-dive-snr/" class="back"
+      >← Chapter 4: Histogram</a
+    >
+    <h1>Histogram Stretch</h1>
+    <p>
+      Raw astrophotography data is linear — most pixels are bunched near zero,
+      making the image appear almost black. A histogram stretch re-maps the
+      pixel values to reveal faint detail by adjusting the black point, midtones
+      (gamma), and white point.
+    </p>
+    <div class="controls">
+      <label
+        >Black
+        <input type="range" id="blackSlider" min="0" max="100" value="0" />
+        <span id="blackVal" class="val">0%</span></label
+      >
+      <label
+        >Gamma
+        <input type="range" id="gammaSlider" min="1" max="50" value="10" />
+        <span id="gammaVal" class="val">1.0</span></label
+      >
+      <label
+        >White
+        <input type="range" id="whiteSlider" min="0" max="100" value="100" />
+        <span id="whiteVal" class="val">100%</span></label
+      >
+      <button id="autoBtn">Auto Stretch</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+    <div id="canvas-container"></div>
+    <script src="histogram.js"></script>
+  </body>
+</html>

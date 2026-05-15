@@ -1,0 +1,40 @@
+---
+interface Props {
+  src: string;
+  title?: string;
+  caption?: string;
+  height?: number;
+}
+const { src, title, caption, height = 500 } = Astro.props;
+---
+
+<figure class="interactive-embed">
+  <iframe
+    src={src}
+    title={title ?? "Interactive Simulation"}
+    loading="lazy"
+    style={{ height: `${height}px` }}
+    allow="fullscreen"
+  ></iframe>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  figure.interactive-embed {
+    margin: 1.5rem 0;
+    text-align: center;
+  }
+  figure.interactive-embed iframe {
+    width: 100%;
+    max-width: 900px;
+    border-radius: 0.5rem;
+    border: 1px solid var(--sl-color-gray-5);
+    background: #111;
+  }
+  figure.interactive-embed figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--sl-color-gray-3);
+    font-style: italic;
+  }
+</style>

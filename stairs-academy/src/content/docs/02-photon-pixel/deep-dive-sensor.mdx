@@ -1,0 +1,73 @@
+---
+title: "Deep Dive: QE, Read Noise & Gain"
+description: The sensor specifications that determine image quality and drive exposure decisions.
+---
+
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+Three sensor parameters determine how good your images will be: **Quantum Efficiency** (how many photons become electrons), **Read Noise** (the electronic background hum), and **Gain** (how finely you measure the charge). Understanding these helps you choose optimal exposure settings.
+
+---
+
+## The Details
+
+### Quantum Efficiency (QE)
+
+QE is the percentage of photons that successfully create a detectable electron. It varies with wavelength:
+
+- Most silicon sensors peak in the near-infrared (600–800nm)
+- Typical QE at peak: 60–80% for modern back-illuminated CMOS
+- QE drops off sharply below 400nm (UV) and above 1000nm (IR)
+
+**Back-illuminated (BSI) sensors** rearrange the silicon layers so light hits the photodiode directly instead of passing through metal circuitry first. This can boost QE by 30–50%.
+
+### Read Noise
+
+Read noise is the uncertainty introduced when reading the charge from each pixel. It's measured in electrons (e⁻). Lower is better.
+
+Typical values:
+
+- Ancient CCDs: 10–20 e⁻
+- Modern CMOS: 1–5 e⁻
+- Best-in-class: < 1 e⁻
+
+Read noise sets the floor for your signal. If your target delivers only 2 e⁻ per pixel per second, and your read noise is 3 e⁻, a single 10-second frame has SNR ≈ 0.6 — essentially noise. You need to stack many frames to overcome this.
+
+### Gain (Conversion Gain)
+
+Gain determines how many electrons equal one ADU (Analog-to-Digital Unit):
+
+$$g = \frac{\text{electrons}}{\text{ADU}}$$
+
+- **Low gain** (high e⁻/ADU): more headroom, better dynamic range, coarser quantization
+- **High gain** (low e⁻/ADU): more sensitivity, less headroom, finer quantization
+
+Most astrophotography cameras have a "unity gain" setting where 1 e⁻ = 1 ADU, which is a good balance.
+
+---
+
+<DeepDive title="Sub-Exposure Optimization Formula">
+
+### Swamping the Read Noise
+
+The goal is to expose long enough that **sky noise** dominates **read noise**. The ratio is:
+
+$$\text{Swamp Ratio} = \frac{S_{\text{sky}} \cdot t}{\sigma_r^2}$$
+
+Where $S_{\text{sky}}$ = sky signal (e⁻/pixel/s), $t$ = exposure time (s), $\sigma_r$ = read noise (e⁻).
+
+A ratio of 10× is the standard target — sky noise should be 10× larger than read noise.
+
+The optimal sub-exposure time is:
+
+$$t_{\text{sub}} = \frac{10 \cdot \sigma_r^2}{S_{\text{sky}}}$$
+
+For a typical smart telescope under Bortle 5 skies: $\sigma_r = 3\text{e}^-$, $S_{\text{sky}} \approx 5\text{e}^-/\text{pixel/s}$:
+
+$$t_{\text{sub}} = \frac{10 \cdot 9}{5} = 18 \text{ seconds}$$
+
+This nicely matches the 10–20s limit imposed by Alt-Az tracking.
+
+</DeepDive>

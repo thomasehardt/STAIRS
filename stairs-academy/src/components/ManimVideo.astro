@@ -1,0 +1,35 @@
+---
+interface Props {
+  src: string;
+  caption?: string;
+  poster?: string;
+}
+const { src, caption, poster } = Astro.props;
+---
+
+<figure class="manim-video">
+  <video controls preload="metadata" {poster ? { poster } : {}}>
+    <source src={src} type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  figure.manim-video {
+    margin: 1.5rem 0;
+    text-align: center;
+  }
+  figure.manim-video video {
+    max-width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid var(--sl-color-gray-5);
+    background: #000;
+  }
+  figure.manim-video figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--sl-color-gray-3);
+    font-style: italic;
+  }
+</style>

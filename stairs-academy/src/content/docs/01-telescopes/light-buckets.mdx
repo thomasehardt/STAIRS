@@ -1,0 +1,94 @@
+---
+title: Telescopes Are Light Buckets
+description: The single most important idea in all of astronomy.
+---
+
+import DeepDive from "../../../components/DeepDive.astro";
+import ManimVideo from "../../../components/ManimVideo.astro";
+
+## The Big Idea
+
+A telescope is just a bucket for light. Your eye's pupil is about 5mm at night. A typical smart telescope has a 50mm aperture — that's **100x more light**. That's the whole game: collect more photons, see fainter things.
+
+Everything else — magnification, resolution, tracking — exists to support this one job.
+
+---
+
+## See It
+
+<ManimVideo
+  src="/stairs-docs/videos/telescope-light-path.mp4"
+  caption="Photons from a distant object travel through the telescope optics and converge on the sensor."
+/>
+
+---
+
+## The Details
+
+### Aperture Is Everything
+
+The **aperture** is the diameter of the main light-collecting element (lens or mirror). It determines how many photons per second the telescope captures.
+
+Bigger aperture = more light = shorter exposures = fainter objects visible.
+
+**Key terms:**
+
+- **Aperture (D):** diameter in mm — 50mm on most smart telescopes
+- **Focal length (f):** distance the light travels inside the telescope before coming to focus
+- **Focal ratio (f/D):** f-number, like a camera lens — f/5 means focal length is 5× the aperture
+
+### The Resolution Limit
+
+A bigger aperture doesn't just collect more light — it also resolves finer detail. The theoretical limit is:
+
+```
+resolution (arcseconds) ≈ 116 / D(mm)
+```
+
+For a 50mm telescope, that's about 2.3 arcseconds. For reference, a full moon is 1800 arcseconds across.
+
+---
+
+## In STAIRS
+
+When you configure a telescope profile in STAIRS, the aperture and focal length drive:
+
+- **Field of view** calculation — how much sky fits on your sensor
+- **Pixel scale** — arcseconds per pixel (determines sampling)
+- **Light collection rate** — used to estimate required exposure time
+
+---
+
+<DeepDive title="Deep Dive: Light Collection Physics">
+
+### How Many Photons?
+
+A 0th-magnitude star delivers about:
+
+$$F_0 \approx 10^{10} \ \text{photons} / \text{m}^2 / \text{s}$$
+
+through a standard photometric band. A telescope of aperture $D$ collects:
+
+$$F_{\text{tel}} = F_0 \cdot \frac{\pi D^2}{4} \cdot 10^{-0.4m} \cdot QE \cdot T$$
+
+Where:
+
+- $m$ = apparent magnitude of the target
+- $QE$ = quantum efficiency of the sensor (0–1)
+- $T$ = transmission of the optics (typically 0.7–0.9)
+
+For a magnitude 10 target with a 50mm telescope at QE=0.7:
+
+$$F_{\text{tel}} \approx 10^{10} \cdot \frac{\pi (0.05)^2}{4} \cdot 10^{-0.4 \cdot 10} \cdot 0.7 \approx 5500 \ \text{photons/s}$$
+
+That's spread across the sensor's pixels, so each pixel gets a fraction.
+
+### Why Magnitude Is Logarithmic
+
+A difference of 5 magnitudes = exactly 100× in brightness. Each magnitude step is:
+
+$$\frac{I_1}{I_2} = 10^{-0.4(m_1 - m_2)}$$
+
+So a magnitude 5 star is 100× brighter than a magnitude 10 star.
+
+</DeepDive>

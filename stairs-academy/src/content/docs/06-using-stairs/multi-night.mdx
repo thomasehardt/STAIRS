@@ -1,0 +1,185 @@
+---
+title: Multi-Night & Multi-Site Planning
+description: Plan your astrophotography across multiple nights and compare observing locations.
+---
+
+## The Big Idea
+
+The night sky changes constantly — weather shifts, the moon waxes and wanes, targets rise earlier each week. STAIRS lets you look **ahead** across multiple nights and **compare** multiple locations, so you can decide _when_ and _where_ to observe before you even step outside.
+
+---
+
+## Multi-Night Forecast
+
+### The Problem
+
+Smart telescope owners often do this:
+
+1. Check the weather app — "looks clear tonight!"
+2. Set up the telescope
+3. Discover the moon is washing out everything
+4. OR discover it's suddenly cloudy
+5. Give up and go back inside
+
+STAIRS solves this by giving you a **14-day imaging forecast** that accounts for _all_ the factors: weather, moon phase, light pollution, and target visibility.
+
+### How It Works
+
+For each night in the forecast window, STAIRS computes:
+
+| Metric                 | What It Means                                        |
+| ---------------------- | ---------------------------------------------------- |
+| **Astronomical Night** | When the Sun is 18° below the horizon — truly dark   |
+| **Dark Hours**         | Total hours between twilight start and end           |
+| **Effective Hours**    | Dark hours reduced by moon and clouds                |
+| **Relative Score**     | Quality relative to the best possible night (0–100%) |
+| **Absolute Score**     | Quality with Bortle penalty applied (0–100%)         |
+| **Notes**              | Key factors: "Bright Moon", "Clouds", "Short Night"  |
+
+### Via CLI
+
+```bash
+# 7-night forecast for default location
+stairs-cli imaging-forecast
+
+# 14-night forecast for all locations
+stairs-cli imaging-forecast --days 14 --location all
+
+# Starting from a specific date
+stairs-cli imaging-forecast --days 7 --date 2026-06-01
+```
+
+The output color-codes the scores: **green** (≥70%) means go for it, **yellow** means marginal, **red** (<30%) means stay home.
+
+### Via Web UI
+
+The Forecast page shows a multi-night calendar with:
+
+- Color-coded quality blocks per night
+- Toggle between locations
+- Click any night to see detailed conditions
+
+### Practical Use Cases
+
+**Finding your best night:**
+
+```
+Mon Apr 15 → 92% ← Clear, new moon, great!
+Tue Apr 16 → 55% ← Moon is up
+Wed Apr 17 → 28% ← Clouds rolling in
+Thu Apr 18 → 87% ← Clear again, waning moon
+```
+
+You'd plan your most challenging target (faint galaxy, large nebula) for Monday, and save brighter targets for Thursday.
+
+**Planning a multi-target campaign:**
+Some targets are only visible late at night, others right after sunset. STAIRS's multi-night view helps you plan which targets to attempt on which night based on their visibility windows.
+
+**Rare target alerts:**
+Some objects (comets, certain planetary nebulae) are only well-placed for a few nights per year. The multi-night forecast catches these windows.
+
+---
+
+## Multi-Site Comparison
+
+### The Problem
+
+If you have two locations — say, a Bortle 8 backyard and a Bortle 2 dark site an hour away — the weather can be completely different at each one. Cloud cover varies by location, temperature differs, and even the moon's effect changes with local topography.
+
+### How It Works
+
+STAIRS can generate forecasts for **all your configured locations simultaneously**:
+
+```bash
+# Compare all locations side by side
+stairs-cli imaging-forecast --days 5 --location all
+```
+
+This outputs a separate table for each location. You can see at a glance:
+
+```
+My Backyard (Bortle 8):
+  Wed: 92% ← Great score, but you're in the city
+  Thu: 45% ← Clouds
+  Fri: 12% ← Rain
+
+Pogue Creek (Bortle 2):
+  Wed: 67% ← Slightly cloudy at the dark site
+  Thu: 88% ← Perfect at the dark site!
+  Fri: 34% ← Clouds
+```
+
+You'd decide: drive to Pogue Creek on Thursday for pristine dark skies, or stay home Wednesday for a decent city session.
+
+### Configuring Multiple Locations
+
+In your `config.yaml`, add as many locations as you want:
+
+```yaml
+locations:
+  - name: My Backyard
+    default: true
+    latitude: 36.16
+    longitude: -86.78
+    bortle_scale: 8
+
+  - name: Pogue Creek Canyon
+    latitude: 36.28
+    longitude: -84.92
+    bortle_scale: 2
+
+  - name: Obed Scenic River
+    latitude: 36.1
+    longitude: -84.72
+    bortle_scale: 3
+```
+
+The `default: true` flag marks which location is used when you don't specify one.
+
+---
+
+## Combining Multi-Night + Multi-Site
+
+The real power comes from combining both features. You can ask: **"Which night at which location gives me the best chance?"**
+
+```bash
+stairs-cli imaging-forecast --days 7 --location all
+```
+
+This generates a complete grid: 7 nights × N locations. You scan for the green cells and plan accordingly.
+
+### Example Decision Matrix
+
+| Date | Backyard (B8) | Pogue Creek (B2) | Obed (B3) |
+| ---- | ------------- | ---------------- | --------- |
+| Mon  | 85%           | 72%              | 80%       |
+| Tue  | 55%           | 90% ←            | 62%       |
+| Wed  | 12%           | 34%              | 28%       |
+| Thu  | 45%           | 15%              | 75% ←     |
+| Fri  | 88% ←         | 82%              | 70%       |
+| Sat  | 60%           | 88% ←            | 85%       |
+| Sun  | 95% ←         | 40%              | 55%       |
+
+Interpretation:
+
+- **Monday**: stay home (backyard is fine)
+- **Tuesday**: drive to Pogue Creek (best score + dark skies)
+- **Wednesday**: nobody's night — take a break
+- **Thursday**: drive to Obed
+- **Friday**: stay home (backyard is great)
+- **Saturday**: drive to Pogue Creek again
+- **Sunday**: stay home
+
+---
+
+## In the Scoring Pipeline
+
+Multi-night and multi-site planning aren't separate features — they're the same scoring pipeline run across different time ranges and locations. Each night gets its own SQS (Sky Quality Score), and each location gets its own weather and light pollution data. The same formulas apply, just parameterized by time and place.
+
+---
+
+## Next Steps
+
+- [Configure multiple locations](/stairs-docs/06-using-stairs/configuration/)
+- [Use the CLI's imaging forecast](/stairs-docs/06-using-stairs/cli/#imaging-forecast)
+- [Explore the Web Dashboard](/stairs-docs/06-using-stairs/web-dashboard/)

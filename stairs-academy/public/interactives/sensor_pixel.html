@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Photon to Digital Value</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 10px;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        background: #444;
+        color: white;
+        border: 1px solid #666;
+        border-radius: 4px;
+      }
+      button:hover {
+        background: #555;
+      }
+      a.back {
+        color: #88f;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 20px;
+      }
+      #canvas-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/stairs-docs/02-photon-pixel/sensor-capture/" class="back"
+      >← Chapter 2: Sensor Capture</a
+    >
+    <h1>From Photon to Pixel Value</h1>
+    <p style="color: #aaa; max-width: 800px; margin: 0 auto">
+      Click "Fire Photon" to see the Photoelectric Effect in action. Photons hit
+      the silicon, knocking electrons loose into a "potential well" (the
+      bucket). Finally, click "Readout" to convert that charge into a digital
+      brightness value via the ADC.
+    </p>
+    <div class="controls">
+      <button id="fireBtn">Fire Photon</button>
+      <button id="readoutBtn">Readout Sensor</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+    <div id="canvas-container"></div>
+    <script src="sensor_pixel.js"></script>
+  </body>
+</html>

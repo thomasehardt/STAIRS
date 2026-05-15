@@ -1,0 +1,55 @@
+/* STAIRS Academy custom styles */
+
+/* Better KaTeX rendering */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0;
+}
+
+/* Callout box styling */
+.callout {
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  border-left: 4px solid var(--sl-color-accent);
+  background: var(--sl-color-gray-7);
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.callout.warning {
+  border-left-color: var(--sl-color-orange);
+}
+
+.callout.tip {
+  border-left-color: var(--sl-color-green);
+}
+
+/* Table styling (better contrast for docs) */
+.content table {
+  font-size: 0.9rem;
+}
+
+.content th {
+  background: var(--sl-color-gray-6);
+}
+
+/* Card grid improvements */
+.card-grid {
+  margin: 1.5rem 0;
+}
+
+/* Video/interactive spacing */
+.manim-video + .interactive-embed,
+.interactive-embed + .manim-video {
+  margin-top: 2rem;
+}
+
+/* Deep dive callout on chapter pages */
+.deep-dive-callout {
+  margin-top: 3rem;
+  padding: 1rem;
+  border-top: 2px dashed var(--sl-color-gray-5);
+  text-align: center;
+  color: var(--sl-color-gray-3);
+  font-size: 0.9rem;
+}

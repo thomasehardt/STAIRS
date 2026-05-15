@@ -1,0 +1,106 @@
+---
+title: Why Stack Images
+description: One frame is noisy. Many frames averaged together reveal detail that's invisible in any single frame.
+---
+
+import ManimVideo from "../../../components/ManimVideo.astro";
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+A single short exposure of a faint nebula looks like random noise — you can barely see anything. But the **signal** (the nebula) is the same in every frame, while the **noise** is random and different each time. By averaging many frames together, the signal adds up while the noise averages toward zero. This is **stacking**.
+
+---
+
+## See It
+
+<ManimVideo
+  src="/stairs-docs/videos/image-stacking.mp4"
+  caption="Watch the galaxy emerge from noise as each new frame is stacked. The signal accumulates, the noise cancels out."
+/>
+
+## Play With It
+
+<Interactive
+  src="/stairs-docs/interactives/stacking.html"
+  title="Interactive Stacking Simulator"
+  caption="Adjust the number of frames and watch SNR improve in real time."
+/>
+
+<Interactive
+  src="/stairs-docs/interactives/snrintegration.html"
+  title="SNR vs Integration Time"
+  caption="See the √N curve: how SNR improves as you add more total integration time."
+/>
+
+---
+
+## The Details
+
+### Why It Works
+
+Each frame contains:
+
+- **Signal (S)**: light from the target — the same in every frame
+- **Noise (N)**: random fluctuations — different in every frame
+
+When you average $n$ frames:
+
+- Signal: $S \times n$ (adds linearly)
+- Noise: $\sqrt{N_1^2 + N_2^2 + ...} \approx \sqrt{n} \times N$ (adds in quadrature)
+
+SNR improvement: $\text{SNR}_n = \sqrt{n} \times \text{SNR}_1$
+
+**To double SNR, you need 4× the frames.** To improve SNR by 10×, you need 100× the frames. This is the fundamental law of astrophotography — there's no shortcut.
+
+### The Analogy
+
+Imagine trying to hear a whisper in a crowded room:
+
+- One listen: you barely hear it over the noise
+- Listen 100 times and average: the whisper becomes clear because the random noise cancels out
+
+Stacking does the same for light.
+
+---
+
+## In STAIRS
+
+The $\sqrt{n}$ relationship is central to STAIRS's planning engine. Given a target brightness, sky conditions, and sensor properties, STAIRS computes:
+
+- How many frames are needed to reach a target SNR (typically SNR = 10)
+- How much total integration time that requires
+- Whether the target is feasible in a single night
+
+---
+
+<DeepDive title="Deep Dive: The Root-N Law">
+
+### Mathematical Proof
+
+Let each frame have signal $S$ and noise $\sigma$. After stacking $n$ frames:
+
+$$S_{\text{stack}} = \sum_{i=1}^{n} S_i = nS$$
+
+$$\sigma_{\text{stack}} = \sqrt{\sum_{i=1}^{n} \sigma_i^2} = \sqrt{n}\sigma$$
+
+$$\text{SNR}_{\text{stack}} = \frac{nS}{\sqrt{n}\sigma} = \sqrt{n} \cdot \frac{S}{\sigma} = \sqrt{n} \cdot \text{SNR}_1$$
+
+The improvement scales as $\sqrt{n}$. This assumes uncorrelated noise — which is approximately true for shot noise (the dominant noise source in astrophotography).
+
+### The Cost of Dimness
+
+If the per-frame SNR is very low (< 1), the target is effectively invisible in individual frames. But stacking can still recover it:
+
+| Per-frame SNR | Frames needed for SNR=5 | Frames needed for SNR=10 |
+| ------------- | ----------------------- | ------------------------ |
+| 0.1           | 2,500                   | 10,000                   |
+| 0.2           | 625                     | 2,500                    |
+| 0.5           | 100                     | 400                      |
+| 1.0           | 25                      | 100                      |
+| 2.0           | 7                       | 25                       |
+
+This table explains why smart telescopes need many frames. A typical 10-second Alt-Az sub might have SNR ≈ 0.3–0.5 on a faint nebula, requiring hundreds of frames.
+
+</DeepDive>

@@ -1,0 +1,69 @@
+---
+title: Calibration Frames
+description: Dark, flat, and bias frames — the cleanup crew of astrophotography.
+---
+
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+Your camera sensor has imperfections: some pixels are more sensitive than others, some always read high (hot pixels), and dust on the optics casts shadows. **Calibration frames** are special exposures that map these imperfections so they can be mathematically removed from your science frames.
+
+---
+
+## Play With It
+
+<Interactive
+  src="/stairs-docs/interactives/calibration.html"
+  title="Calibration Frame Simulator"
+  caption="Toggle each calibration frame (Dark, Flat, Bias) to see its effect on the final image."
+/>
+
+---
+
+## The Details
+
+### The Three Types
+
+**Dark frames** (same exposure time, same temperature as lights):
+
+- Capture thermal noise (dark current)
+- Hot pixels and amp glow
+- Subtracted from light frames
+- Take 10–20 at the end of the session
+
+**Flat frames** (uniformly illuminated, short exposure):
+
+- Capture vignetting (darker corners)
+- Dust shadows
+- Divided into light frames
+- Take at twilight (20–30 frames)
+
+**Bias frames** (shortest possible exposure):
+
+- Capture read noise pattern
+- Subtracted from darks and flats
+- Take 50–100 once per session
+
+### The Math
+
+$$I_{\text{calibrated}} = \frac{I_{\text{raw}} - I_{\text{dark}}}{I_{\text{flat}} - I_{\text{bias}}}$$
+
+Where each term is a **master** frame (median or average of many individual calibration frames).
+
+### Smart Telescopes and Calibration
+
+Most smart telescopes handle calibration internally:
+
+- **Dark frames**: some take them automatically at startup
+- **Flat frames**: some use built-in LED panels or take them at twilight
+- **Bias frames**: built into the sensor's reference
+
+The quality of the internal calibration varies between models. Some handle it transparently, others may not do any calibration at all.
+
+---
+
+## In STAIRS
+
+STAIRS doesn't handle calibration frames directly (that's the telescope's firmware), but the quality of calibration affects the **achievable SNR**. Better calibration = less fixed pattern noise = closer to the theoretical $\sqrt{n}$ stacking improvement.

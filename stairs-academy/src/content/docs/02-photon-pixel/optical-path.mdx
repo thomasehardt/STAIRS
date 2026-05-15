@@ -1,0 +1,87 @@
+---
+title: The Optical Path
+description: Tracing a photon's journey from outer space to the sensor.
+---
+
+import ManimVideo from "../../../components/ManimVideo.astro";
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+A photon travels for millions of years through space, enters your telescope's aperture, reflects off two mirrors (or passes through lenses), and lands on a silicon sensor. The entire journey through the telescope happens in a few billionths of a second.
+
+---
+
+## See It
+
+<ManimVideo
+  src="/stairs-docs/videos/telescope-light-path.mp4"
+  caption="Photons arrive as parallel rays, reflect off the primary and secondary mirrors, and converge at the sensor."
+/>
+
+## Play With It
+
+<Interactive
+  src="/stairs-docs/interactives/telescope.html"
+  title="Interactive Light Path"
+  caption="Drag the slider to advance photons step-by-step through the optical system. Toggle between refractor and reflector designs."
+/>
+
+---
+
+## The Details
+
+### Step-by-Step Journey
+
+1. **Arrival**: Photons that left a galaxy 10 million years ago finally reach Earth. They enter the telescope as nearly parallel rays (the target is effectively at infinity).
+
+2. **Collection**: The aperture (primary lens or mirror) intercepts these photons. A 50mm aperture collects ~100× more than your eye.
+
+3. **Focusing**: The primary mirror (in a Cassegrain reflector) or lens (in a refractor) bends the parallel rays toward a focal point.
+
+4. **Secondary Optics**: In catadioptric smart telescopes, a secondary mirror reflects the light back through a hole in the primary, "folding" the optical path to fit in a short tube.
+
+5. **Sensor**: The converging rays land on the CMOS sensor. If focus is correct, each point on the target maps to a single pixel (or a small cluster of pixels).
+
+### Optical Path Differences
+
+| Design                    | Path Length  | Elements            | Smart Telescope Example |
+| ------------------------- | ------------ | ------------------- | ----------------------- |
+| Refractor                 | Straight     | 2–6 lenses          | Dwarf II (wide cam)     |
+| Reflector (Newtonian)     | Folded 90°   | 2 mirrors           | Less common in smart    |
+| Catadioptric (Cassegrain) | Folded twice | Mirrors + corrector | Seestar S50, Vespera    |
+
+---
+
+## In STAIRS
+
+STAIRS doesn't directly model optical paths — but the **focal length** and **sensor size** determine the field of view, which is critical for target selection. A target that's too big won't fit on the sensor. One that's too small won't have enough pixels to resolve detail.
+
+---
+
+<DeepDive title="Deep Dive: Why Parallel Rays?">
+
+### The Infinity Assumption
+
+Astronomical targets are so far away that light rays from any single point on the target arrive as **effectively parallel**. The angle between two rays from the same star is:
+
+$$\theta \approx \frac{D_{\text{telescope}}}{\text{distance to star}}$$
+
+For a 50mm telescope and a star 10 light-years away:
+
+$$\theta \approx \frac{0.05\text{m}}{9.5 \times 10^{16}\text{m}} \approx 5 \times 10^{-19} \text{ radians}$$
+
+That's completely negligible. The rays are parallel to within an undetectable margin.
+
+### Why the Secondary Mirror Doesn't Block Everything
+
+You might wonder: doesn't the secondary mirror (in a Cassegrain design) block light from reaching the primary? Yes — it creates a **central obstruction**. But the obstruction is small (typically 30–40% of the aperture diameter by area), so the light loss is modest (10–15%). The tradeoff is worth it for the compact form factor.
+
+**Central obstruction effect on contrast:**
+
+$$\text{Transmission} = 1 - \left(\frac{D_{\text{obs}}}{D}\right)^2$$
+
+For a 40% obstruction: $1 - 0.4^2 = 0.84$ (84% transmission).
+
+</DeepDive>

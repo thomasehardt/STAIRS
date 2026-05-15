@@ -1,0 +1,84 @@
+---
+title: What Makes a Telescope "Smart"
+description: The key differences between traditional telescopes and the all-in-one smart telescope.
+---
+
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+A smart telescope is a regular telescope with a **camera, computer, and WiFi** built into one sealed package. You control it from your phone. There's no eyepiece, no laptop, no cable management — just point and shoot.
+
+---
+
+## See It
+
+Coming soon: animation comparing the traditional astrophotography workflow vs. the smart telescope (EAA) workflow.
+
+---
+
+## The Details
+
+### Traditional Astrophotography
+
+1. Set up telescope, mount, guide scope, camera, filter wheel, computer
+2. Polar align the mount
+3. Balance the payload
+4. Slew to target, plate-solve to center
+5. Focus manually
+6. Take calibration frames (darks, flats, biases)
+7. Acquire 50–300 individual frames
+8. Transfer to computer
+9. Process in PixInsight or similar (hours of work)
+
+### Smart Telescope / EAA Workflow
+
+1. Place telescope on flat surface, power on
+2. Connect via WiFi app
+3. Select target from catalog
+4. Telescope slews, plate-solves, and centers automatically
+5. Auto-focus runs
+6. Live stacking begins — you see the image improve in real time
+7. Save the result to your phone
+
+The smart telescope does everything after step 3 automatically. This is called **Electronically Assisted Astronomy (EAA)** .
+
+### What's Inside a Smart Telescope
+
+- **Optical tube** (catadioptric, typically 50mm aperture)
+- **CMOS sensor** with built-in ADC
+- **Filter wheel** (clear, dual-band Hα+OIII, maybe solar)
+- **Focus motor** with auto-focus algorithm
+- **Alt-Az mount** with go-to capability
+- **GPS + WiFi + battery**
+- **Dew heater** around the front lens
+
+All running custom firmware that handles plate-solving, alignment, live stacking, and image processing on-device.
+
+---
+
+## In STAIRS
+
+STAIRS bridges the gap between what the telescope tells you (target name, exposure time) and what you actually need (is this target even feasible tonight?). It adds the planning layer that smart telescope apps are missing.
+
+---
+
+<DeepDive title="Deep Dive: EAA vs Traditional AP SNR">
+
+### The Real Difference
+
+In traditional AP, you take many subs and process them in software that can do sophisticated rejection, drizzling, and deconvolution. In EAA (live stacking), you're limited to simpler real-time algorithms running on the telescope's onboard processor.
+
+The key difference:
+
+| Factor             | Traditional           | EAA/Smart              |
+| ------------------ | --------------------- | ---------------------- |
+| Sub length         | 30s–600s              | 10s–20s (Alt-Az limit) |
+| Total integration  | 2–20 hours            | 10–60 minutes          |
+| Processing         | PixInsight (post-hoc) | On-device (real-time)  |
+| Calibration frames | Essential             | Often skipped          |
+| Dithering          | Yes                   | Rarely                 |
+
+The shorter sub-exposure limit (due to Alt-Az field rotation) is the main constraint. STAIRS accounts for this when estimating how many nights you'll need to reach a good SNR.
+
+</DeepDive>

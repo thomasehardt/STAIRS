@@ -1,0 +1,111 @@
+---
+title: Color & the Bayer Filter
+description: How a colorblind sensor captures full-color images.
+---
+
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+Every pixel in a camera sensor is colorblind — it only measures intensity. To capture color, a **Bayer filter** places red, green, and blue filters over individual pixels in a specific pattern. The camera then uses math (demosaicing/debayering) to reconstruct full color at every pixel.
+
+---
+
+## Play With It
+
+<Interactive
+  src="/stairs-docs/interactives/bayer.html"
+  title="Bayer Filter Simulation"
+  caption="Toggle between 'Raw Bayer' and 'Debayered' to see how the camera reconstructs color. In Single mode, watch individual photons pass through colored filters."
+/>
+
+---
+
+## The Details
+
+### The Bayer Pattern
+
+The standard Bayer array uses a 2×2 repeating pattern:
+
+```
+R  G
+G  B
+```
+
+Green gets twice as many pixels because the human eye is most sensitive to green light. This means:
+
+- 50% of pixels capture green
+- 25% capture red
+- 25% capture blue
+
+### Demosaicing (Debayering)
+
+The camera firmware interpolates between neighboring pixels to estimate the missing color channels at each pixel. For example, a pixel with a red filter needs its green and blue values estimated from surrounding green and blue pixels.
+
+There are many algorithms, from simple bilinear interpolation to sophisticated AI-based methods. Better algorithms produce sharper images with fewer artifacts.
+
+### Monochrome vs Color
+
+Some astrophotographers use **monochrome cameras** (no Bayer filter) with external filter wheels. This gives:
+
+- Higher resolution (every pixel captures all light)
+- Higher sensitivity (no filter absorption losses)
+- Ability to use narrowband filters more efficiently
+- But requires multiple exposures through different filters
+
+Smart telescopes use color sensors for convenience — you get a color image from a single session.
+
+---
+
+## In STAIRS
+
+Color sensing matters for **surface brightness calculations** — the Bayer filter absorbs ~50-70% of incoming photons (depending on target color). STAIRS accounts for this in its integration time estimates.
+
+---
+
+## Narrowband Imaging
+
+<Interactive
+  src="/stairs-docs/interactives/narrowband.html"
+  title="Narrowband & the Hubble Palette"
+  caption="Explore how narrowband filters isolate specific emission lines (Hα, OIII, SII) and how the Hubble Palette maps them to RGB."
+/>
+
+---
+
+<DeepDive title="Deep Dive: Bayer Filter Efficiency">
+
+### Quantum Efficiency Loss from Bayer
+
+A typical Bayer filter passes:
+
+- ~95% of green light
+- ~90% of red light
+- ~80% of blue light
+- ~0% of light outside these bands
+
+The **effective QE** of a color sensor is approximately:
+
+$$QE_{\text{eff}} \approx QE_{\text{mono}} \times 0.25 \times (T_R + 2T_G + T_B)$$
+
+Where $T$ is the transmission of each filter. Typical effective QE: 25–35% of the monochrome QE.
+
+### Why Green Has Two Pixels
+
+The Bayer pattern doubles green pixels because:
+
+$$V_{\text{luminance}} = 0.299 R + 0.587 G + 0.114 B$$
+
+The human visual system derives most of its spatial information from the green channel. Doubling green pixels improves perceived sharpness.
+
+### Narrowband Imaging with a Color Sensor
+
+With a dual-band filter (Hα + OIII), the color sensor captures:
+
+- Hα (red) in the R pixels
+- OIII (blue-green) in the G and B pixels
+
+The result is a false-color image where Hα appears red and OIII appears cyan/teal — the classic "HOO" palette that works well with smart telescopes.
+
+</DeepDive>

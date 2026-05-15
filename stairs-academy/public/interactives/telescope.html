@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Telescope Light Path</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+      }
+      a.back {
+        color: #88f;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 20px;
+      }
+      #canvas-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+      select {
+        padding: 8px;
+        font-size: 15px;
+        background: #444;
+        color: white;
+        border: 1px solid #666;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <a href="/stairs-docs/01-telescopes/optical-designs/" class="back"
+      >← Chapter 1: Optical Designs</a
+    >
+    <h1>Telescope Light Path</h1>
+    <p
+      style="
+        color: #aaa;
+        max-width: 650px;
+        margin: 0 auto 15px auto;
+        line-height: 1.5;
+      "
+    >
+      Interactive cross-sections of different telescope designs. Use the slider
+      to trace photons through the optical path.
+    </p>
+    <div class="controls">
+      <label
+        >Telescope:
+        <select id="telescopeType">
+          <option value="reflector">Reflector (Cassegrain)</option>
+          <option value="refractor">Refractor</option>
+        </select>
+      </label>
+      <label
+        >Light Path:
+        <input
+          type="range"
+          id="progressSlider"
+          min="0"
+          max="100"
+          value="0"
+          style="width: 280px"
+      /></label>
+    </div>
+    <div id="canvas-container"></div>
+    <script src="telescope.js"></script>
+  </body>
+</html>
