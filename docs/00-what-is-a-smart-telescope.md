@@ -1,5 +1,7 @@
 # What is a Smart Telescope?
 
+_This guide is part of the [STAIRS Learning Path](README.md). STAIRS (Smart Telescope Astronomical Image Rating System) is a tool used to optimize and score astronomical imaging runs._
+
 ## Basics
 
 Let's start with "what is a telescope"? In simplest terms, and for our purposes, we can think of a telescope as a bucket for collecting light. On the open end of the bucket, there is a lens to collect light from a more concentrated area, and light collects at the bottom. With an optical telescope, your eye is the bottom of the bucket.

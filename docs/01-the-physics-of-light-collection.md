@@ -23,9 +23,19 @@ Finally, the photon hits the telescope's objective lens. Because of the effects 
 
 From here, the photon travels towards the sensor and strikes a silicon pixel.
 
-## Converting Light to Data (the Photoelectric Effect)
+## Converting Light to Data
 
-The telescope's sensor is made up of millions of individual pixels (or "photosites") that convert the photon to energy. When the photon hits the silicon surface of a pixel, it interacts with the atoms contained in the pixel in a crystal lattice. If the photon has enough energy - specifically, greater than the "work function" ($\Phi$) of the silicon, it can knock an electron loose which promotes it from the valence band to the conduction band. The energy of the photon is defined by its frequency (since all photons have no mass): $$E\ =\ h \times f$$ where $h$ is Planck's constant, and $f$ is the frequency of the light. As stated above, if $E\ \gt\ \Phi$, the leftover energy becomes kinetic energy for the electron: $$K_{max}\ = \ h \times f - \Phi$$
+The telescope's sensor is made up of millions of individual pixels (or "photosites") that convert the photon to energy. When the photon hits the silicon surface of a pixel, it knocks an electron loose.
+
+> ### Advanced: The Photoelectric Effect
+>
+> The process of turning light into electricity is governed by the photoelectric effect. If a photon has enough energy—specifically, greater than the "work function" ($\Phi$) of the silicon—it can knock an electron loose, promoting it from the valence band to the conduction band. The energy of the photon is defined by its frequency:
+>
+> $$E\ =\ h \times f$$
+>
+> where $h$ is Planck's constant, and $f$ is the frequency of the light. If $E\ \gt\ \Phi$, the leftover energy becomes kinetic energy for the electron:
+>
+> $$K_{max}\ = \ h \times f - \Phi$$
 
 So, every photon with enough energy releases an electron? No! There's another factor that comes into play here: the quantum efficiency ($QE$) of the pixel. For example, only $80\%$ of photons that _could_ release an electron _do_ release an electron (if the $QE$ is $0.8$ or $80\%$).
 
