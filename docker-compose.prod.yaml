@@ -37,3 +37,10 @@ services:
       - API_URL=http://api:8000
     depends_on:
       - api
+
+  docs:
+    image: ghcr.io/thomasehardt/stairs/stairs-docs:v0.3.1 # x-release-please-version
+    container_name: stairs-docs
+    restart: unless-stopped
+    ports:
+      - "4000:8080"

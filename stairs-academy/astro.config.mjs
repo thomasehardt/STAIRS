@@ -19,7 +19,7 @@ export default defineConfig({
           href: "https://github.com/thomasehardt/STAIRS",
         },
       ],
-      customCss: ["./src/styles/custom.css"],
+      customCss: ["katex/dist/katex.min.css", "./src/styles/custom.css"],
       editLink: {
         baseUrl: "https://github.com/thomasehardt/STAIRS/edit/main/stairs-docs",
       },
@@ -151,5 +151,15 @@ export default defineConfig({
   markdown: {
     remarkPlugins: [remarkMath],
     rehypePlugins: [rehypeKatex],
+  },
+  server: {
+    host: true,
+  },
+  vite: {
+    server: {
+      watch: {
+        usePolling: true,
+      },
+    },
   },
 });

@@ -101,7 +101,7 @@ Options:
 - `--days`, `-d`: Number of days to forecast (1–14, default: 1)
 - `--location`, `-l`: Location name (overrides default)
 
-Cloud cover is color-coded: green (< 10%), yellow, red (> 50%).
+Cloud cover is color-coded: green (&lt; 10%), yellow, red (&gt; 50%).
 
 ### `imaging-forecast`
 
@@ -209,3 +209,22 @@ Output:
 - OSS (relative) and AQS (absolute) scores
 - Visibility window (local time)
 - Sub-exposure and total integration time
+
+### `session`
+
+Manage your observation sessions and logs:
+
+```bash
+stairs-cli session create --target M42 --date 2026-04-15 --rating 4 --notes "Great night"
+stairs-cli session list
+stairs-cli session list --target M31
+stairs-cli session list --status captured
+```
+
+Options for `create`:
+
+- `--target`, `-t`: Target ID (e.g., M42)
+- `--date`, `-d`: Session date (YYYY-MM-DD)
+- `--rating`, `-r`: Quality rating (1-5)
+- `--status`, `-s`: Status (captured, partial, failed)
+- `--notes`, `-n`: Free text notes about the session

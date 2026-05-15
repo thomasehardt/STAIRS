@@ -642,7 +642,7 @@ function draw() {
   if (showADC) {
     text("READOUT \u2014 exposure ended.", rx, iy);
     iy += 15;
-    text("Each pixel\u2019s charge converted", rx, iy);
+    text("Each pixel's charge converted", rx, iy);
     iy += 14;
     text("to 12-bit ADC (0\u20134095).", rx, iy);
     iy += 18;
@@ -891,7 +891,7 @@ function drawDebayerView() {
   } else if (debStage === "values") {
     fill(160);
     textSize(11);
-    text("Each neighbor\u2019s value is", rx, iy);
+    text("Each neighbor's value is", rx, iy);
     iy += 16;
     text("shown. The average fills", rx, iy);
     iy += 16;

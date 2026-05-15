@@ -78,6 +78,12 @@
         font-size: 12px;
       }
     </style>
+    <style>
+      canvas {
+        max-width: 100%;
+        height: auto !important;
+      }
+    </style>
   </head>
   <body>
     <a href="/stairs-docs/05-planning/sqs/" class="back"
@@ -85,16 +91,16 @@
     >
     <h1>Astronomical Night Finder</h1>
     <p>
-      STAIRS determines when it\u2019s dark enough to image by tracking the
-      Sun\u2019s altitude below -18\u00b0. It scans forward up to 14 days to
-      find the next viable night window, handling edge cases like polar summer
-      where the Sun never sets.
+      STAIRS determines when it's dark enough to image by tracking the Sun's
+      altitude below -18&deg;. It scans forward up to 14 days to find the next
+      viable night window, handling edge cases like polar summer where the Sun
+      never sets.
     </p>
     <div class="controls">
       <label
         >Latitude
         <input type="range" id="latSlider" min="-60" max="60" value="36" />
-        <span id="latVal" class="val">36</span>\u00b0</label
+        <span id="latVal" class="val">36&deg;</span></label
       >
       <label
         >Day of year

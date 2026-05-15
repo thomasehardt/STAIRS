@@ -72,3 +72,27 @@ services:
       - VITE_API_URL=http://localhost:8000
     depends_on:
       - api
+
+  docs:
+    build:
+      context: ./stairs-academy
+      dockerfile: Dockerfile.dev
+    container_name: stairs-docs
+    user: "${UID:-1000}:${GID:-1000}"
+    ports:
+      - "4321:4321"
+    volumes:
+      - ./stairs-academy:/app
+    restart: unless-stopped
+
+  docs-dev:
+    build:
+      context: ./stairs-academy
+      dockerfile: Dockerfile.dev
+    container_name: stairs-docs-dev
+    user: "${UID:-1000}:${GID:-1000}"
+    ports:
+      - "4321:4321"
+    volumes:
+      - ./stairs-academy:/app
+      - /app/node_modules

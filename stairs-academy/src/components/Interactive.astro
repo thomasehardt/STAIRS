@@ -9,13 +9,22 @@ const { src, title, caption, height = 500 } = Astro.props;
 ---
 
 <figure class="interactive-embed">
-  <iframe
-    src={src}
-    title={title ?? "Interactive Simulation"}
-    loading="lazy"
-    style={{ height: `${height}px` }}
-    allow="fullscreen"
-  ></iframe>
+  <div class="embed-container">
+    <div class="toolbar">
+      <span class="toolbar-title">{title ?? "Interactive Simulation"}</span>
+      <a href={src} target="_blank" rel="noopener noreferrer" class="open-link" title="Open in new window">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        <span>Open</span>
+      </a>
+    </div>
+    <iframe
+      src={src}
+      title={title ?? "Interactive Simulation"}
+      loading="lazy"
+      style={{ height: `${height}px` }}
+      allow="fullscreen"
+    ></iframe>
+  </div>
   {caption && <figcaption>{caption}</figcaption>}
 </figure>
 
@@ -24,15 +33,49 @@ const { src, title, caption, height = 500 } = Astro.props;
     margin: 1.5rem 0;
     text-align: center;
   }
-  figure.interactive-embed iframe {
+  .embed-container {
     width: 100%;
     max-width: 900px;
+    margin: 0 auto;
     border-radius: 0.5rem;
     border: 1px solid var(--sl-color-gray-5);
     background: #111;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: var(--sl-color-gray-6);
+    border-bottom: 1px solid var(--sl-color-gray-5);
+    font-size: 0.85rem;
+  }
+  .toolbar-title {
+    color: var(--sl-color-gray-2);
+    font-weight: 500;
+  }
+  .open-link {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--sl-color-accent);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .open-link:hover {
+    color: var(--sl-color-white);
+  }
+  figure.interactive-embed iframe {
+    width: 100%;
+    border: none;
+    background: #111;
+    display: block;
   }
   figure.interactive-embed figcaption {
-    margin-top: 0.5rem;
+    margin-top: 0.75rem;
     font-size: 0.875rem;
     color: var(--sl-color-gray-3);
     font-style: italic;

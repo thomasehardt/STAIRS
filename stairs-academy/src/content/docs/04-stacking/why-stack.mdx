@@ -45,7 +45,7 @@ Each frame contains:
 - **Signal (S)**: light from the target — the same in every frame
 - **Noise (N)**: random fluctuations — different in every frame
 
-When you average $n$ frames:
+When you **sum** (integrate) $n$ frames:
 
 - Signal: $S \times n$ (adds linearly)
 - Noise: $\sqrt{N_1^2 + N_2^2 + ...} \approx \sqrt{n} \times N$ (adds in quadrature)
@@ -91,7 +91,7 @@ The improvement scales as $\sqrt{n}$. This assumes uncorrelated noise — which 
 
 ### The Cost of Dimness
 
-If the per-frame SNR is very low (< 1), the target is effectively invisible in individual frames. But stacking can still recover it:
+If the per-frame SNR is very low (&lt; 1), the target is effectively invisible in individual frames. But stacking can still recover it:
 
 | Per-frame SNR | Frames needed for SNR=5 | Frames needed for SNR=10 |
 | ------------- | ----------------------- | ------------------------ |
