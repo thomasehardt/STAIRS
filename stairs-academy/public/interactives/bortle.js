@@ -287,7 +287,7 @@ function draw() {
   iy += 5;
   fill(255);
   textSize(22);
-  text(info.sb.toFixed(1) + " mag/\u25A1\u2033", rx, iy + 20);
+  text(info.sb.toFixed(1) + " mag/□″", rx, iy + 20);
   iy += 40;
 
   fill(140);

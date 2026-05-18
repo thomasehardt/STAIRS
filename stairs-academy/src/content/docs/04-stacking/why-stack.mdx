@@ -3,7 +3,6 @@ title: Why Stack Images
 description: One frame is noisy. Many frames averaged together reveal detail that's invisible in any single frame.
 ---
 
-import ManimVideo from "../../../components/ManimVideo.astro";
 import Interactive from "../../../components/Interactive.astro";
 import DeepDive from "../../../components/DeepDive.astro";
 
@@ -15,23 +14,18 @@ A single short exposure of a faint nebula looks like random noise — you can ba
 
 ## See It
 
-<ManimVideo
-  src="/stairs-docs/videos/image-stacking.mp4"
-  caption="Watch the galaxy emerge from noise as each new frame is stacked. The signal accumulates, the noise cancels out."
-/>
-
-## Play With It
-
 <Interactive
   src="/stairs-docs/interactives/stacking.html"
-  title="Interactive Stacking Simulator"
-  caption="Adjust the number of frames and watch SNR improve in real time."
+  title="Real-time Stacking Simulator"
+  height={580}
+  caption="Adjust the speed and watch the galaxy emerge from the noise floor as frames accumulate. The random noise cancels out while the constant signal reinforces itself."
 />
 
 <Interactive
   src="/stairs-docs/interactives/snrintegration.html"
-  title="SNR vs Integration Time"
-  caption="See the √N curve: how SNR improves as you add more total integration time."
+  title="The Root-N Law Visualized"
+  height={700}
+  caption="Watch the Signal-to-Noise Ratio (SNR) grow as the square root of integration time. This curve shows why the first few minutes feel magical, but deep cleaning takes hours."
 />
 
 ---
@@ -44,6 +38,39 @@ Each frame contains:
 
 - **Signal (S)**: light from the target — the same in every frame
 - **Noise (N)**: random fluctuations — different in every frame
+
+<div style="display: flex; flex-direction: column; align-items: center; margin: 2rem 0; gap: 1rem;">
+  <div style="display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center;">
+    <svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+      <rect width="200" height="150" fill="#111" rx="8" />
+      {/*   Very noisy background   */}
+      <filter id="noise">
+        <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" />
+      </filter>
+      <rect width="200" height="150" filter="url(#noise)" opacity="0.6" />
+      {/*   Very faint signal   */}
+      <ellipse cx="100" cy="75" rx="30" ry="15" fill="white" opacity="0.1" />
+      <text x="100" y="140" fill="white" font-size="12" text-anchor="middle">Single Frame (Low SNR)</text>
+    </svg>
+
+    <div style="display: flex; align-items: center; font-size: 24px; color: var(--sl-color-gray-4);">+</div>
+
+    <svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+      <rect width="200" height="150" fill="#111" rx="8" />
+      {/*   Smooth background   */}
+      <filter id="lessNoise">
+        <feTurbulence type="fractalNoise" baseFrequency="0.4" numOctaves="1" stitchTiles="stitch" />
+      </filter>
+      <rect width="200" height="150" filter="url(#lessNoise)" opacity="0.2" />
+      {/*   Clear signal   */}
+      <ellipse cx="100" cy="75" rx="35" ry="18" fill="white" opacity="0.6" />
+      <ellipse cx="100" cy="75" rx="15" ry="8" fill="white" opacity="0.8" />
+      <text x="100" y="140" fill="white" font-size="12" text-anchor="middle">Stacked Result (High SNR)</text>
+    </svg>
+
+  </div>
+  <p style="font-size: 0.9rem; color: var(--sl-color-gray-3);">Noise averages out while signal reinforces.</p>
+</div>
 
 When you **sum** (integrate) $n$ frames:
 

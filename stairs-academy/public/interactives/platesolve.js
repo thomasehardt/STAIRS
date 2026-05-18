@@ -148,7 +148,7 @@ function draw() {
         dd = floor(dec),
         dm = abs(round((dec - dd) * 60));
       let sign = dec >= 0 ? "+" : "-";
-      text(sign + abs(dd) + "\u00B0 " + dm + "'", ox + s + 4, oy + i * sp);
+      text(sign + abs(dd) + "° " + dm + "'", ox + s + 4, oy + i * sp);
     }
 
     let cx2 = ox + s / 2,
@@ -277,7 +277,7 @@ function draw() {
     textSize(20);
     text("RA 05h 34m 31s", rx, iy + 20);
     iy += 28;
-    text("Dec +02\u00B0 12' 18\"", rx, iy + 20);
+    text("Dec +02° 12' 18\"", rx, iy + 20);
     iy += 45;
 
     fill(200);
@@ -286,7 +286,7 @@ function draw() {
     iy += 5;
     fill(255);
     textSize(20);
-    text("28.4' \u00D7 28.4'", rx, iy + 20);
+    text("28.4' × 28.4'", rx, iy + 20);
     iy += 40;
 
     fill(200);
@@ -295,7 +295,7 @@ function draw() {
     iy += 5;
     fill(255);
     textSize(20);
-    text("87.3\u00B0", rx, iy + 20);
+    text("87.3°", rx, iy + 20);
     iy += 40;
 
     fill(200);

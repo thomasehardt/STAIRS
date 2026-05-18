@@ -3,7 +3,6 @@ title: Alt-Az Mounts
 description: How altitude-azimuth mounts work, and why they're the standard for smart telescopes.
 ---
 
-import ManimVideo from "../../../components/ManimVideo.astro";
 import Interactive from "../../../components/Interactive.astro";
 import DeepDive from "../../../components/DeepDive.astro";
 
@@ -15,17 +14,11 @@ An Alt-Az mount has two axes: **altitude** (tilt up/down) and **azimuth** (rotat
 
 ## See It
 
-<ManimVideo
-  src="/stairs-docs/videos/mount-tracking.mp4"
-  caption="An Alt-Az mount must move both axes at different speeds to follow a star across the sky."
-/>
-
-## Play With It
-
 <Interactive
   src="/stairs-docs/interactives/tracking.html"
   title="Alt-Az vs EQ Tracking"
-  caption="Simulate a long exposure on both mounts. Watch the Alt-Az image develop field rotation while the EQ image stays sharp."
+  height={530}
+  caption="Simulate a long exposure on both mounts. Watch the Alt-Az image develop field rotation (star trails) while the Equatorial mount stays aligned with the sky."
 />
 
 ---

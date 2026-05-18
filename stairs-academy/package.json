@@ -12,8 +12,10 @@
   "dependencies": {
     "@astrojs/mdx": "^4.2.6",
     "@astrojs/starlight": "^0.39.2",
+    "@types/p5": "^1.7.7",
     "astro": "^6.3.1",
     "katex": "^0.16.11",
+    "p5": "^1.11.13",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
     "sharp": "^0.34.5"

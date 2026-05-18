@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>The Photoelectric Effect</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .val {
+        color: #88f;
+        font-weight: bold;
+        min-width: 40px;
+        display: inline-block;
+      }
+      #canvas-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+      p {
+        color: #aaa;
+        max-width: 700px;
+        margin: 0 auto 15px auto;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>The Photoelectric Effect</h1>
+    <p>
+      Photons hit the silicon lattice and knock electrons loose. Only photons
+      with enough energy (shorter wavelength) can overcome the silicon's "work
+      function" to create a photoelectron.
+    </p>
+    <div class="controls">
+      <label>
+        Energy (Wavelength):
+        <input type="range" id="waveSlider" min="300" max="900" value="500" />
+        <span id="waveVal" class="val">500nm</span>
+      </label>
+      <label>
+        Intensity (Flux):
+        <input type="range" id="fluxSlider" min="1" max="10" value="3" />
+        <span id="fluxVal" class="val">3</span>
+      </label>
+      <button id="resetBtn">↺ Reset Electrons</button>
+    </div>
+    <div id="canvas-container"></div>
+    <script src="photoelectric.js"></script>
+  </body>
+</html>

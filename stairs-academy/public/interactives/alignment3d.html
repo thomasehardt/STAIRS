@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>3D Mount Mechanics</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .val {
+        color: #88f;
+        font-weight: bold;
+        min-width: 40px;
+        display: inline-block;
+      }
+      #canvas-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+      p {
+        color: #aaa;
+        max-width: 750px;
+        margin: 0 auto 15px auto;
+        line-height: 1.5;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>3D Mount Mechanics</h1>
+    <p>
+      Compare how Alt-Az and Equatorial mounts track a star. The Alt-Az mount is
+      fixed to the ground, while the EQ mount's primary axis is tilted to stay
+      parallel with the Earth's rotation axis.
+    </p>
+    <div class="controls">
+      <label>
+        Latitude:
+        <input type="range" id="latSlider" min="0" max="90" value="45" />
+        <span id="latVal" class="val">45°</span>
+      </label>
+      <label>
+        View:
+        <select id="viewSelect">
+          <option value="perspective">Perspective</option>
+          <option value="top">Top Down</option>
+          <option value="side">Side View</option>
+        </select>
+      </label>
+      <button id="resetBtn">↺ Reset Time</button>
+    </div>
+    <div id="canvas-container"></div>
+    <script src="alignment3d.js"></script>
+  </body>
+</html>

@@ -1,0 +1,80 @@
+---
+title: "The Atmosphere: Seeing & Transparency"
+description: How the air above you limits your resolution and dims your targets.
+---
+
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+The atmosphere is the final "lens" in your optical system, and unfortunately, it's a very poor one. Even with the best telescope in the world, the moving air above you determines how sharp your images will be (**Seeing**) and how much light actually reaches your sensor (**Transparency**).
+
+---
+
+## Play With It
+
+<Interactive
+  src="/stairs-docs/interactives/seeing.html"
+  title="Atmospheric Seeing Simulation"
+  height={580}
+  caption="Adjust the atmospheric turbulence (seeing) and notice how stars bloat and detail is lost. High turbulence 'smears' the light over multiple pixels."
+/>
+
+---
+
+## The Details
+
+### Seeing (Stability)
+
+"Seeing" refers to the stability of the air. When air layers with different temperatures mix, they refract light in random directions.
+
+- **Good Seeing**: The air is still. Stars are pinpoint dots. You can resolve fine detail on planets and galaxies.
+- **Poor Seeing**: The air is turbulent. Stars "twinkle" and appear as bloated, boiling blobs. High-resolution detail is washed out.
+
+Seeing is measured in arcseconds (FWHM - Full Width at Half Maximum). Most locations have seeing between 1.5" and 3.0".
+
+### Transparency (Clarity)
+
+Transparency is a measure of how clear the air is — specifically, how much light is blocked by water vapor, dust, or smoke.
+
+- **High Transparency**: The sky is "inky black." Faint stars are easy to see.
+- **Low Transparency**: The sky looks milky or hazy. Even if it's "clear" (no clouds), the signal from your target is being absorbed by the haze.
+
+### Atmospheric Extinction
+
+As you look closer to the horizon, you are looking through more atmosphere. This is called **airmass**.
+
+- At **90° (Zenith)**, you are looking through 1.0 airmass.
+- At **30° altitude**, you are looking through 2.0 airmasses.
+- At **15° altitude**, you are looking through 3.9 airmasses.
+
+More airmass means more light is absorbed (extinction) and more turbulence (poorer seeing). This is why STAIRS penalizes targets below 30°.
+
+---
+
+## In STAIRS
+
+The atmosphere is a key component of the **Sky Quality Score (SQS)**:
+
+- **Seeing Multiplier**: If forecasted seeing is > 4.0", a penalty is applied because detail will be lost.
+- **Humidity Multiplier**: High humidity often correlates with poor transparency and increased risk of dew.
+- **Altitude Trace**: STAIRS tracks the target's altitude throughout the night to ensure you image it when airmass is lowest.
+
+---
+
+<DeepDive title="Deep Dive: The Fried Parameter (r0)">
+
+### Turbulence Physics
+
+The quality of seeing is physically described by the **Fried parameter** ($r_0$). It represents the diameter of a telescope that would have the same resolution as a perfect telescope limited by the atmosphere.
+
+$$\theta_{\text{seeing}} \approx 0.98 \frac{\lambda}{r_0}$$
+
+If $r_0 = 10\text{cm}$, your 50mm telescope is "diffraction limited" (the telescope is the bottleneck). If $r_0 = 3\text{cm}$ (very poor seeing), the atmosphere is the bottleneck, and even a small smart telescope will show bloated stars.
+
+### Scintillation
+
+Twinkling (scintillation) is caused by small-scale density fluctuations in the upper atmosphere. It primarily affects the _brightness_ of the star, while seeing affects its _position and shape_. For long exposures, scintillation averages out, but seeing remains as a constant blur.
+
+</DeepDive>

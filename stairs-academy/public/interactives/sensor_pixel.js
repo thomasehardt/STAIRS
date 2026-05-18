@@ -111,11 +111,11 @@ function draw() {
   let adcY = 150;
   fill(40);
   stroke(150);
-  rect(adcX - 40, adcY - 40, 80, 80, 5);
+  rect(adcX - 45, adcY - 45, 90, 90, 5);
   fill(255);
   noStroke();
-  textSize(14);
-  text("ADC", adcX, adcY - 45);
+  textSize(18);
+  text("ADC", adcX, adcY - 55);
 
   if (isReadingOut) {
     readoutProgress += 0.02;
@@ -127,24 +127,24 @@ function draw() {
 
     stroke(0, 255, 0);
     strokeWeight(2);
-    line(pixelX + pixelW / 2, pixelY, adcX - 40, adcY);
+    line(pixelX + pixelW / 2, pixelY, adcX - 45, adcY);
   }
 
   // 5. Display Value
   if (digitalValue !== null) {
     fill(0, 255, 0);
-    textSize(32);
+    textSize(36);
     text(digitalValue, adcX, adcY + 10);
-    textSize(16);
-    text("Digital Value", adcX, adcY + 60);
+    textSize(18);
+    text("Digital Value", adcX, adcY + 70);
   }
 
   // Explanatory Text
   textAlign(LEFT);
   fill(200);
-  textSize(14);
+  textSize(16);
   if (electrons.length > 0 && !isReadingOut && digitalValue === null) {
-    text("Electrons accumulated: " + electrons.length, 50, 400);
-    text("This represents stored charge (analog signal).", 50, 420);
+    text("Electrons accumulated: " + electrons.length, 50, 420);
+    text("Stored charge (analog signal).", 50, 445);
   }
 }

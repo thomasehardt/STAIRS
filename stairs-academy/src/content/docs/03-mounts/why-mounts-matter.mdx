@@ -23,6 +23,36 @@ Without tracking, you get star trails — pretty for artistic photos but useless
 
 There are two fundamentally different ways to build a mount:
 
+<div style="display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; margin: 2rem 0;">
+  <div style="text-align: center;">
+    <svg width="200" height="180" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+      <rect x="80" y="140" width="40" height="10" fill="#666" />
+      <rect x="95" y="80" width="10" height="60" fill="#888" />
+      <line x1="100" y1="140" x2="100" y2="20" stroke="#ff4444" stroke-width="2" stroke-dasharray="4" />
+      <text x="110" y="30" fill="#ff4444" font-size="10">Altitude Axis</text>
+      <circle cx="100" cy="145" r="30" fill="none" stroke="#4444ff" stroke-width="2" stroke-dasharray="4" />
+      <text x="135" y="155" fill="#4444ff" font-size="10">Azimuth Axis</text>
+      <rect x="60" y="70" width="80" height="20" fill="#aaa" rx="4" />
+      <text x="100" y="175" fill="white" font-size="12" text-anchor="middle" font-weight="bold">Alt-Az Mount</text>
+    </svg>
+    <p style="font-size: 0.8rem; color: #888;">Moves Up/Down & Left/Right</p>
+  </div>
+
+  <div style="text-align: center;">
+    <svg width="200" height="180" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+      <rect x="80" y="140" width="40" height="10" fill="#666" />
+      <g transform="rotate(-45, 100, 140)">
+        <rect x="95" y="60" width="10" height="80" fill="#888" />
+        <line x1="100" y1="140" x2="100" y2="0" stroke="#44ff44" stroke-width="2" stroke-dasharray="4" />
+        <text x="110" y="20" fill="#44ff44" font-size="10">RA Axis (Aligned to Pole)</text>
+        <rect x="60" y="50" width="80" height="20" fill="#aaa" rx="4" />
+      </g>
+      <text x="100" y="175" fill="white" font-size="12" text-anchor="middle" font-weight="bold">Equatorial Mount</text>
+    </svg>
+    <p style="font-size: 0.8rem; color: #888;">Axis tilted to Earth's tilt</p>
+  </div>
+</div>
+
 |                      | Alt-Az                                      | Equatorial                                 |
 | -------------------- | ------------------------------------------- | ------------------------------------------ |
 | **Axes**             | Altitude (up/down) and Azimuth (left/right) | Right Ascension (RA) and Declination (Dec) |

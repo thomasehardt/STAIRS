@@ -33,15 +33,15 @@ function drawReflector(cx, cy, t) {
 
   fill(255);
   noStroke();
-  textSize(16);
+  textSize(18);
   textAlign(CENTER);
   text("Primary Mirror", cx + 200, cy - 145);
   text("Secondary Mirror", cx - 150, cy - 60);
   text("Sensor", cx + 240, cy + 65);
 
   fill(150);
-  textSize(13);
-  text("Light enters \u2192", cx - 310, cy + 5);
+  textSize(15);
+  text("Light enters →", cx - 310, cy + 5);
 
   let photons = [
     { y: -90, pX: 180, sY: -25 },
@@ -150,19 +150,19 @@ function drawRefractor(cx, cy, t) {
 
   fill(255);
   noStroke();
-  textSize(16);
+  textSize(18);
   textAlign(CENTER);
   text("Objective Lens", lensX, tubeTop - 18);
   text("Diagonal (Amici Prism)", prismX, tubeBot + 35);
   text("Sensor", sensorX, sensorY - 22);
 
   fill(150);
-  textSize(13);
-  text("Parallel light enters \u2192", cx - 330, cy + 5);
+  textSize(15);
+  text("Parallel light enters →", cx - 330, cy + 5);
 
   fill(180, 200, 255, 120);
-  textSize(12);
-  text("45\u00B0 fold mirror inside prism", prismX, tubeTop + 20);
+  textSize(14);
+  text("45° fold mirror inside prism", prismX, tubeTop + 20);
 
   let refractPhotons = [{ y: -65 }, { y: -32 }, { y: 32 }, { y: 65 }];
 

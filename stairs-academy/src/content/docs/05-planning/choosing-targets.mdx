@@ -1,0 +1,70 @@
+---
+title: "Choosing the Right Target"
+description: How to match your target selection to your sky conditions and equipment.
+---
+
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+Not all targets are created equal. A bright star cluster can be imaged from the middle of a city, while a faint galaxy might require a two-hour drive to a dark mountain site. Successful planning starts with choosing the right target for your specific environment.
+
+---
+
+## Target Categories
+
+### 1. Star Clusters (Bortle 1–9)
+
+- **Examples**: M13 (Hercules Cluster), M45 (The Pleiades).
+- **Why**: They are bright, point-like, and highly concentrated.
+- **Strategy**: Excellent for beginners and city observers. They look great even in short integration times.
+
+### 2. Emission Nebulae (Bortle 1–8 with filters)
+
+- **Examples**: M42 (Orion), NGC 7000 (North American).
+- **Why**: They emit light at specific wavelengths (Hα, OIII).
+- **Strategy**: Use a **Narrowband (Dual-Band) filter**. This allows you to image them effectively even from light-polluted backyards.
+
+### 3. Galaxies (Bortle 1–4 preferred)
+
+- **Examples**: M31 (Andromeda), M51 (Whirlpool).
+- **Why**: They are "broadband" targets — they emit light across the whole spectrum.
+- **Strategy**: Very difficult in cities because light pollution washes out the faint outer arms. Best saved for dark sites.
+
+---
+
+## See It
+
+<Interactive
+  src="/stairs-docs/interactives/scorecomparison.html"
+  title="Target Score Comparison"
+  height={720}
+  caption="Compare a bright galaxy core vs. a diffuse nebula under different Bortle levels. Notice how the 'Winner' changes as you increase light pollution."
+/>
+
+---
+
+## The STAIRS Approach
+
+STAIRS automates this decision-making process through the **Absolute Quality Score (AQS)**. It penalizes diffuse, broadband targets in city locations while rewarding targets that "fit" your conditions.
+
+**When evaluating recommendations, look for:**
+
+- **High OSS**: The target fits your telescope's field of view.
+- **High SQS**: The sky is clear, and the moon is away.
+- **High AQS**: The net result is a high-quality imaging opportunity.
+
+---
+
+<DeepDive title="Deep Dive: Contrast vs. Brightness">
+
+### The Signal-to-Noise Ratio (SNR) Limit
+
+In a city (Bortle 8), the "noise" from the sky background can be 100× brighter than the "signal" from a faint galaxy arm. Even with stacking, the amount of time required to see the signal increases exponentially:
+
+$$t_{\text{needed}} \propto \frac{1}{\text{Contrast}^2}$$
+
+If you move from a city (Contrast = 0.1) to a dark site (Contrast = 1.0), you need **100× less time** to reach the same image quality. This is why "dark site time" is the most valuable resource in astrophotography.
+
+</DeepDive>

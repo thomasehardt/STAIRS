@@ -66,15 +66,15 @@ function draw() {
 
   // Status text
   fill(255);
-  textSize(24);
+  textSize(28);
   textAlign(CENTER);
-  text(`Exposure Time: ${exposureTime.toFixed(1)} s`, cx, cy - 200);
+  text(`Exposure Time: ${exposureTime.toFixed(1)} s`, cx, cy - 210);
 
   if (isExposing) {
     fill(255, 0, 0);
-    ellipse(cx - 150, cy - 206, 12, 12);
-    textSize(16);
+    ellipse(cx - 160, cy - 216, 14, 14);
+    textSize(18);
     textAlign(LEFT);
-    text("RECORDING", cx - 135, cy - 200);
+    text("RECORDING", cx - 142, cy - 210);
   }
 }

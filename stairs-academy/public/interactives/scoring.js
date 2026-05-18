@@ -269,27 +269,27 @@ function draw() {
     fill(col[0], col[1], col[2], alpha);
     noStroke();
     textAlign(CENTER, TOP);
-    textSize(10);
+    textSize(13);
     text(s.label, x + cardW / 2, rowY + 5);
-    textSize(16);
+    textSize(20);
     textStyle(BOLD);
     text(
       (i < 4 ? nf(s.score, 1, 0) : nf(s.score, 1, 1)) + (i === 4 ? "%" : ""),
       x + cardW / 2,
-      rowY + 22,
+      rowY + 24,
     );
     textStyle(NORMAL);
-    textSize(7.5);
+    textSize(11);
     fill(150, 150, 170, alpha);
-    text(s.detail, x + cardW / 2, rowY + 45);
+    text(s.detail, x + cardW / 2, rowY + 48);
 
     // Arrow between cards
     if (i < steps.length - 1) {
       let ax = x + cardW + 2;
       fill(80, 80, 100, alpha);
       noStroke();
-      textSize(12);
-      text("→", ax, rowY + cardH / 2 - 6);
+      textSize(15);
+      text("→", ax, rowY + cardH / 2 - 8);
     }
   }
 
@@ -299,7 +299,7 @@ function draw() {
     let fx = 20,
       fy = rowY + cardH + 25,
       fw = 820,
-      fh = 55;
+      fh = 65;
     fill(30, 30, 45, 240);
     stroke(60, 60, 90);
     strokeWeight(1);
@@ -307,7 +307,7 @@ function draw() {
     fill(s.col[0], s.col[1], s.col[2], 255);
     noStroke();
     textAlign(LEFT, TOP);
-    textSize(13);
+    textSize(16);
     textStyle(BOLD);
     text(
       s.label +
@@ -319,7 +319,7 @@ function draw() {
       fy + 10,
     );
     textStyle(NORMAL);
-    textSize(11);
+    textSize(14);
     fill(200);
     let desc = "";
     if (step === 0)
@@ -329,18 +329,17 @@ function draw() {
         "' get max score. Too small or too large → penalized.";
     if (step === 1)
       desc =
-        "Surface brightness combines magnitude and angular area. Diffuse objects have lower SB even if total mag is bright.";
+        "Surface brightness combines magnitude and angular area. Diffuse objects have lower SB.";
     if (step === 2)
       desc =
         "Score based on peak altitude above " +
         MIN_ALT +
-        "°. Higher is better — less atmosphere to look through.";
+        "°. Higher is better — less atmosphere.";
     if (step === 3)
-      desc =
-        "OSS = FOV×0.4 + SB×0.3 + ALT×0.3. FOV weight is highest, reflecting its importance for framing.";
+      desc = "OSS = FOV×0.4 + SB×0.3 + ALT×0.3. FOV weight is highest (40%).";
     if (step === 4)
       desc =
-        "SQS combines weather (cloud, humidity, seeing), moon quality, zenith/meridian penalties into 0–1 multiplier.";
+        "SQS combines weather (cloud, humidity, seeing), moon, zenith/meridian penalties into 0–1 mult.";
     if (step === 5)
       desc =
         "Final Relative Score = OSS × SQS. Current value: " +
@@ -350,25 +349,25 @@ function draw() {
       desc =
         "AQS = Relative × BortleMult(" +
         nf(bortleMult, 2) +
-        "). Under Bortle " +
+        "). Bortle " +
         BORTLE +
-        ", light pollution cuts the score by " +
+        " pollution cuts score by " +
         nf((1 - bortleMult) * 100, 1, 0) +
         "%.";
     fill(160);
     noStroke();
-    textSize(10);
-    text(desc, fx + 15, fy + 30);
+    textSize(13);
+    text(desc, fx + 15, fy + 35);
   }
 
   // Target info — top left
   fill(255);
   noStroke();
   textAlign(LEFT, TOP);
-  textSize(16);
+  textSize(20);
   text(target.name, 20, 20);
   fill(140);
-  textSize(11);
+  textSize(14);
   text(
     target.type +
       "  |  Mag: " +
@@ -381,20 +380,20 @@ function draw() {
       target.alt +
       "°",
     20,
-    42,
+    45,
   );
 
   // Arrow keys hint
   fill(80);
   textAlign(LEFT, TOP);
-  textSize(9);
-  text("← → to change target", 20, 65);
+  textSize(12);
+  text("← → to change target", 20, 70);
 
   // Right panel — score gauge
   let gx = 640,
     gy = 25,
     gw = 200,
-    gh = 160;
+    gh = 170;
   fill(25, 25, 35);
   noStroke();
   rect(gx, gy, gw, gh, 6);
@@ -406,7 +405,7 @@ function draw() {
   fill(200);
   noStroke();
   textAlign(CENTER, TOP);
-  textSize(12);
+  textSize(16);
   text("Final Scores", gx + gw / 2, gy + 10);
 
   let bars = [
@@ -416,29 +415,29 @@ function draw() {
     { label: "AQS", val: aqs, col: [255, 100, 255], active: true },
   ];
 
-  let barY = gy + 30;
+  let barY = gy + 35;
   for (let b of bars) {
     let bw = map(b.val, 0, 100, 0, gw - 30);
     fill(40, 40, 50);
     noStroke();
-    rect(gx + 15, barY, gw - 30, 16, 2);
+    rect(gx + 15, barY, gw - 30, 18, 2);
     fill(b.col[0], b.col[1], b.col[2], b.active ? 255 : 150);
-    rect(gx + 15, barY, bw, 16, 2);
+    rect(gx + 15, barY, bw, 18, 2);
     fill(200);
     noStroke();
     textAlign(LEFT, TOP);
-    textSize(9);
+    textSize(12);
     text(b.label, gx + 18, barY + 3);
     textAlign(RIGHT, TOP);
-    text(nf(b.val, 1, 1), gx + gw - 15, barY + 3);
-    barY += 22;
+    text(nf(b.val, 1, 1), gx + gw - 18, barY + 3);
+    barY += 24;
   }
 
   // Bortle indicator
   barY += 5;
   fill(100);
   textAlign(CENTER, TOP);
-  textSize(9);
+  textSize(12);
   text(
     "Bortle " + BORTLE + "  (mult: ×" + nf(bortleMult, 2) + ")",
     gx + gw / 2,
@@ -449,14 +448,14 @@ function draw() {
   let cx = 20,
     cy = 310,
     cw = 580,
-    ch = 55;
+    ch = 65;
   fill(25, 25, 35);
   noStroke();
   rect(cx, cy, cw, ch, 5);
   fill(150);
   noStroke();
   textAlign(LEFT, TOP);
-  textSize(10);
+  textSize(13);
   text(
     "Conditions:  Bortle " +
       BORTLE +
@@ -472,21 +471,21 @@ function draw() {
       HUMIDITY +
       "%",
     cx + 10,
-    cy + 6,
+    cy + 8,
   );
   fill(80);
-  textSize(9);
+  textSize(12);
   text(
     "These affect SQS (Sky Quality Score), reducing the raw OSS down to the final relative score.",
     cx + 10,
-    cy + 22,
+    cy + 26,
   );
   fill(120);
-  textSize(8);
+  textSize(11);
   text(
     "Tip: Click the controls above the canvas to adjust conditions and see how scores change.",
     cx + 10,
-    cy + 38,
+    cy + 45,
   );
 }
 

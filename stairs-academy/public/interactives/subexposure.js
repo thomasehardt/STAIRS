@@ -74,7 +74,7 @@ function draw() {
   textAlign(CENTER, BOTTOM);
   text("Sub-exposure time (s)", px + pw / 2, py + ph + 18);
   textAlign(LEFT, TOP);
-  text("Noise (e\u207b\u00b9)", px - 5, py + 5);
+  text("Noise (e⁻¹)", px - 5, py + 5);
 
   // Grid lines
   for (let t = 0; t <= maxT; t += 10) {
@@ -136,11 +136,7 @@ function draw() {
   noStroke();
   textSize(8);
   textAlign(LEFT, BOTTOM);
-  text(
-    "Read noise: " + nf(READ_NOISE, 1, 1) + " e\u207b\u00b9",
-    px + pw - 90,
-    rnY - 2,
-  );
+  text("Read noise: " + nf(READ_NOISE, 1, 1) + " e⁻¹", px + pw - 90, rnY - 2);
 
   // Optimal sub marker
   if (optSub <= maxT) {
@@ -184,7 +180,7 @@ function draw() {
     noStroke();
     textSize(8);
     textAlign(LEFT, TOP);
-    text("\u25A0 " + l.label, px + 8, ly);
+    text("■ " + l.label, px + 8, ly);
     ly += 14;
   }
 
@@ -205,7 +201,7 @@ function draw() {
     ry,
   );
   ry += 16;
-  text("Pixel pitch: " + PIXEL_PITCH_UM + "\u00b5m", rx, ry);
+  text("Pixel pitch: " + PIXEL_PITCH_UM + "µm", rx, ry);
   ry += 16;
   text("QE: " + nf(QE * 100, 1, 0) + "%", rx, ry);
   ry += 16;
@@ -218,7 +214,7 @@ function draw() {
   ry += 18;
   fill(255);
   textSize(14);
-  text("Sky flux: " + nf(skyFlux, 1, 2) + " e\u207b\u00b9/px/s", rx, ry);
+  text("Sky flux: " + nf(skyFlux, 1, 2) + " e⁻¹/px/s", rx, ry);
   ry += 20;
   text("Optimal sub: " + nf(optSub, 1, 0) + "s", rx, ry);
   ry += 20;
@@ -226,18 +222,18 @@ function draw() {
   ry += 20;
 
   let actualRatio = sqrt(skyFlux * practicalSub) / READ_NOISE;
-  text("Swamp ratio: " + nf(actualRatio, 1, 1) + "\u00d7", rx, ry);
+  text("Swamp ratio: " + nf(actualRatio, 1, 1) + "×", rx, ry);
   ry += 24;
 
   fill(140);
   textSize(10);
   text("Rule: swamp read noise by", rx, ry);
   ry += 14;
-  text("10\u00d7 for optimal SNR.", rx, ry);
+  text("10× for optimal SNR.", rx, ry);
   ry += 14;
-  text("Alt-Az clamped to 10\u201320s.", rx, ry);
+  text("Alt-Az clamped to 10–20s.", rx, ry);
   ry += 14;
-  text("EQ mounts: 30\u2013300s.", rx, ry);
+  text("EQ mounts: 30–300s.", rx, ry);
   ry += 14;
 
   // Formula
@@ -248,18 +244,12 @@ function draw() {
   fill(160);
   textSize(10);
   textAlign(LEFT, TOP);
-  text(
-    "t\u2092\u2091\u2096 = 10 \u00d7 R\u00b2 / S\u209b\u2096\u2097",
-    rx + 10,
-    ry + 8,
-  );
+  text("tₒₑₖ = 10 × R² / Sₛₖₗ", rx + 10, ry + 8);
   fill(100);
   textSize(8);
-  text("R = read noise (" + READ_NOISE + " e\u207b\u00b9)", rx + 10, ry + 26);
+  text("R = read noise (" + READ_NOISE + " e⁻¹)", rx + 10, ry + 26);
   text(
-    "S\u209b\u2096\u2097 = sky flux (" +
-      nf(skyFlux, 1, 2) +
-      " e\u207b\u00b9/px/s)",
+    "Sₛₖₗ = sky flux (" + nf(skyFlux, 1, 2) + " e⁻¹/px/s)",
     rx + 10,
     ry + 40,
   );
@@ -278,9 +268,7 @@ function draw() {
   textSize(12);
   textAlign(CENTER, TOP);
   text(
-    actualRatio >= 10
-      ? "\u2713 Swamped (\u226510\u00d7)"
-      : "\u26A0 Below 10\u00d7 target",
+    actualRatio >= 10 ? "✓ Swamped (≥10×)" : "⚠ Below 10× target",
     rx + 115,
     ry + 10,
   );

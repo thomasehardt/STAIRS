@@ -223,7 +223,7 @@ function drawHistogram(x, y, w, h) {
   noStroke();
   textSize(9);
   textAlign(CENTER, TOP);
-  text("\u03b3", gx, y + 2);
+  text("γ", gx, y + 2);
 
   // Labels
   fill(120);

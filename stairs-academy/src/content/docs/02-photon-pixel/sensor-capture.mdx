@@ -3,7 +3,6 @@ title: Sensor Capture
 description: How a CMOS sensor turns photons into electrons and electrons into digital values.
 ---
 
-import ManimVideo from "../../../components/ManimVideo.astro";
 import Interactive from "../../../components/Interactive.astro";
 import DeepDive from "../../../components/DeepDive.astro";
 
@@ -17,21 +16,16 @@ The sensor is a grid of millions of tiny buckets (pixels). During an exposure, p
 
 <Interactive
   src="/stairs-docs/interactives/sensor_pixel.html"
-  title="Photon to Digital Value"
+  title="From Photon to Digital Count"
+  height={580}
   caption="Fire individual photons and watch them knock electrons loose. Click 'Readout' to see the ADC convert charge to a digital number."
-/>
-
-## See It
-
-<ManimVideo
-  src="/stairs-docs/videos/exposure.mp4"
-  caption="As exposure time increases, more photons accumulate on the sensor. Signal builds while thermal noise also appears."
 />
 
 <Interactive
   src="/stairs-docs/interactives/exposure.html"
   title="Long Exposure Simulation"
-  caption="Click 'Open Shutter' to watch photons and thermal noise accumulate on the sensor over time."
+  height={530}
+  caption="Click 'Open Shutter' to watch photons and thermal noise accumulate on the sensor over time. Notice how signal eventually overcomes the random noise."
 />
 
 ---
@@ -41,6 +35,26 @@ The sensor is a grid of millions of tiny buckets (pixels). During an exposure, p
 ### The Photoelectric Effect
 
 When a photon hits the silicon in a pixel, it transfers its energy to an electron, knocking it loose. This electron is trapped in a **potential well** — a tiny region of the silicon that holds charge. The longer the shutter is open, the more electrons accumulate.
+
+<DeepDive title="Deep Dive: The Photoelectric Effect">
+
+### Energy and Threshold
+
+The photoelectric effect was explained by Albert Einstein in 1905. The key discovery was that electron emission doesn't depend on how bright the light is, but on its **frequency** (energy).
+
+Each photon carries energy $E = hf$. If this energy is higher than the **work function** ($\Phi$) of the material, an electron is ejected. For silicon, the threshold is approximately 1.1 eV, which corresponds to a wavelength of 1100nm.
+
+<Interactive
+  src="/stairs-docs/interactives/photoelectric.html"
+  title="Photoelectric Effect Visualizer"
+  height={520}
+  caption="Adjust the wavelength to change photon energy. Notice that long wavelengths (low energy) fail to knock electrons loose, regardless of intensity."
+/>
+
+- **Wavelength (Energy)**: Shorter wavelengths (UV/Blue) have more energy and knock electrons loose more easily.
+- **Flux (Intensity)**: Increasing the flux adds more photons, but only high-energy photons will result in more photoelectrons.
+
+</DeepDive>
 
 ### Key Sensor Parameters
 

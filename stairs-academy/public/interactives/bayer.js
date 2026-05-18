@@ -274,21 +274,21 @@ function drawPipeline(y) {
 
   fill(255);
   noStroke();
-  textSize(13);
+  textSize(16);
   textAlign(LEFT);
-  text("Pipeline", 30, y - 12);
+  text("Pipeline", 30, y - 15);
 
   for (let p = 0; p < 3; p++) {
     let ox = 30 + p * (pW + 25);
     fill(200);
     noStroke();
-    textSize(11);
+    textSize(14);
     textAlign(CENTER);
-    text(labels[p], ox + pW / 2, y - 1);
+    text(labels[p], ox + pW / 2, y - 3);
     fill(120);
-    textSize(9);
+    textSize(12);
     if (p === 1)
-      text("completeness: " + round(alpha * 100) + "%", ox + pW / 2, y + 8);
+      text("completeness: " + round(alpha * 100) + "%", ox + pW / 2, y + 10);
     else if (p === 2) {
       let err = 0;
       for (let r = 0; r < N; r++)
@@ -300,7 +300,7 @@ function drawPipeline(y) {
       text(
         "Bayer error: " + (err / (N * N * 3)).toFixed(1),
         ox + pW / 2,
-        y + 8,
+        y + 10,
       );
     }
     let gridY = y + 14;
@@ -552,26 +552,26 @@ function draw() {
 
   fill(255);
   noStroke();
-  textSize(14);
+  textSize(18);
   textAlign(LEFT);
   text(
     mode === "individual"
-      ? "Accumulation \u2014 Individual Photons"
-      : "Accumulation \u2014 Parallel Exposure",
+      ? "Accumulation — Individual Photons"
+      : "Accumulation — Parallel Exposure",
     ox,
-    oy - 6,
+    oy - 8,
   );
   fill(120);
-  textSize(11);
+  textSize(13);
   text(
     mode === "individual"
       ? "One photon lands on a single pixel at a time."
-      : "All 64 pixels accumulate simultaneously at rates set by scene brightness.",
+      : "All 64 pixels accumulate simultaneously based on scene brightness.",
     ox,
-    oy + 10,
+    oy + 12,
   );
 
-  oy += 26;
+  oy += 32;
   drawAccumGrid(cell, ox, oy);
 
   if (mode === "individual") {
@@ -584,25 +584,25 @@ function draw() {
   let rx = ox + gW + 35;
   fill(255);
   noStroke();
-  textSize(16);
+  textSize(20);
   textAlign(LEFT);
   text("Statistics", rx, 250);
 
-  let iy = 275;
+  let iy = 285;
   fill(200);
-  textSize(13);
+  textSize(15);
   let showTotal =
     mode === "individual" ? min(totalPhotons, maxPhoton) : totalPhotons;
-  text("Total: " + showTotal, rx, iy);
-  iy += 24;
+  text("Total Photons: " + showTotal, rx, iy);
+  iy += 26;
 
   for (let f of ["R", "G", "B"]) {
     let cfc = getFilterColor(f);
     fill(cfc[0], cfc[1], cfc[2]);
     noStroke();
-    textSize(13);
+    textSize(15);
     text(f + ": " + colorCounts[f], rx + 4, iy);
-    iy += 20;
+    iy += 22;
   }
 
   if (mode === "parallel") {
@@ -610,7 +610,7 @@ function draw() {
     let remaining = max(exposureDuration - exposureTime, 0);
     let expComplete = !exposureActive && remaining <= 0;
     fill(expComplete ? color(100, 255, 100) : 180);
-    textSize(13);
+    textSize(15);
     text(
       expComplete
         ? "Exposure Complete"
@@ -618,9 +618,9 @@ function draw() {
       rx,
       iy,
     );
-    iy += 22;
+    iy += 24;
     fill(120);
-    textSize(11);
+    textSize(13);
     let curRate = map(
       parseInt(document.getElementById("speedSlider").value),
       1,
@@ -633,41 +633,41 @@ function draw() {
       rx,
       iy,
     );
-    iy += 20;
+    iy += 22;
   }
 
-  iy += 4;
+  iy += 6;
   fill(140);
-  textSize(10);
+  textSize(12);
   if (showADC) {
-    text("READOUT \u2014 exposure ended.", rx, iy);
-    iy += 15;
-    text("Each pixel's charge converted", rx, iy);
-    iy += 14;
-    text("to 12-bit ADC (0\u20134095).", rx, iy);
+    text("READOUT — exposure ended.", rx, iy);
     iy += 18;
+    text("Each pixel's charge converted", rx, iy);
+    iy += 16;
+    text("to 12-bit ADC (0–4095).", rx, iy);
+    iy += 22;
   } else if (mode === "parallel") {
     if (exposureActive) {
       text("Bright pixels accumulate faster.", rx, iy);
-      iy += 14;
+      iy += 16;
       text("Rate calibrated for given exp.", rx, iy);
-      iy += 14;
+      iy += 16;
     } else {
       text("Exposure ended. Press Readout", rx, iy);
-      iy += 14;
+      iy += 16;
       text("to see ADC values, or switch", rx, iy);
-      iy += 14;
+      iy += 16;
       text("mode / Reset to restart.", rx, iy);
-      iy += 14;
+      iy += 16;
     }
-    iy += 18;
+    iy += 22;
   } else {
     text("Manual: Fire / Auto / R/G/B/Rnd", rx, iy);
-    iy += 15;
-    text("Each photon lands on one pixel.", rx, iy);
-    iy += 14;
-    text("Counts = relative brightness.", rx, iy);
     iy += 18;
+    text("Each photon lands on one pixel.", rx, iy);
+    iy += 16;
+    text("Counts = relative brightness.", rx, iy);
+    iy += 22;
   }
 
   let idealRaw = getIdealRaw();
@@ -727,7 +727,7 @@ function drawDebayerView() {
   fill(140);
   textSize(11);
   text(
-    "4\u00d74 pixel cluster \u2014 Bilinear interpolation of missing color channels",
+    "4×4 pixel cluster — Bilinear interpolation of missing color channels",
     ox,
     oy - 2,
   );

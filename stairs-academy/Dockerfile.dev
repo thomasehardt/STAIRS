@@ -2,14 +2,16 @@ FROM node:22-slim
 
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@9 --activate
+RUN corepack enable && corepack prepare pnpm@11.1.2 --activate
 
 COPY package.json pnpm-lock.yaml ./
 
-RUN pnpm install
+# Install without scripts during build to get dependencies
+RUN pnpm install --ignore-scripts
 
 COPY . .
 
 EXPOSE 4321
 
-CMD ["pnpm", "run", "dev", "--", "--host", "0.0.0.0"]
+# Approve builds and run dev
+CMD ["/bin/bash", "-c", "pnpm approve-builds esbuild sharp && pnpm run dev -- --host 0.0.0.0"]

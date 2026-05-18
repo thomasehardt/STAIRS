@@ -13,12 +13,18 @@ importers:
       "@astrojs/starlight":
         specifier: ^0.39.2
         version: 0.39.2(astro@6.3.3(@types/node@24.12.4)(rollup@4.60.4))
+      "@types/p5":
+        specifier: ^1.7.7
+        version: 1.7.7
       astro:
         specifier: ^6.3.1
         version: 6.3.3(@types/node@24.12.4)(rollup@4.60.4)
       katex:
         specifier: ^0.16.11
         version: 0.16.46
+      p5:
+        specifier: ^1.11.13
+        version: 1.11.13
       rehype-katex:
         specifier: ^7.0.1
         version: 7.0.1
@@ -1128,6 +1134,12 @@ packages:
     resolution:
       {
         integrity: sha512-GUUEShf+PBCGW2KaXwcIt3Yk+e3pkKwWKb9GSyM9WQVE+ep2jzmHdGsHzu4wgcZy5fN9FBdVzjpBQsYlpfpgLA==,
+      }
+
+  "@types/p5@1.7.7":
+    resolution:
+      {
+        integrity: sha512-WFuP7jqc5CkkMtCK/NphgvMnJz1Qi9CMuK7t6xLu/tuXkRdGQA4q4AD0dUYcChC0Oibe8PE8gbKSFPNF0BqVNw==,
       }
 
   "@types/sax@1.2.7":
@@ -2474,6 +2486,12 @@ packages:
         integrity: sha512-AxTM2wDGORHGEkPCt8yqxOTMgpfbEHqF51f/5fJCmwFC3C/zNcGT63SymH2ttOAaiIws2zVg4+izQCjrakcwHg==,
       }
     engines: { node: ">=20" }
+
+  p5@1.11.13:
+    resolution:
+      {
+        integrity: sha512-gfGo4AkyuNMs6Ko7UNFM9K2edqFRGyLrFaYUB+XXF127JVdEPu0BIaC5uDDNJpsRMOD9hJMUpsOH4HkfuNhvhA==,
+      }
 
   package-manager-detector@1.6.0:
     resolution:
@@ -3835,6 +3853,8 @@ snapshots:
     dependencies:
       undici-types: 7.16.0
 
+  "@types/p5@1.7.7": {}
+
   "@types/sax@1.2.7":
     dependencies:
       "@types/node": 24.12.4
@@ -5038,6 +5058,8 @@ snapshots:
       p-timeout: 7.0.1
 
   p-timeout@7.0.1: {}
+
+  p5@1.11.13: {}
 
   package-manager-detector@1.6.0: {}
 

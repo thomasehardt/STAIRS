@@ -107,7 +107,7 @@ function draw() {
   textAlign(CENTER, BOTTOM);
   text("Hour of day", px + pw / 2, py + ph + 18);
   textAlign(LEFT, TOP);
-  text("Sun altitude (\u00b0)", px - 5, py + 5);
+  text("Sun altitude (°)", px - 5, py + 5);
 
   for (let h = 0; h < 24; h += 3) {
     stroke(30);
@@ -131,7 +131,7 @@ function draw() {
   noStroke();
   textSize(8);
   textAlign(LEFT, BOTTOM);
-  text("Astronomical twilight (-18\u00b0)", px + pw - 180, twiY - 2);
+  text("Astronomical twilight (-18°)", px + pw - 180, twiY - 2);
 
   // 0° line (horizon)
   stroke(60, 60, 80);
@@ -187,7 +187,7 @@ function draw() {
     noStroke();
     textSize(8);
     textAlign(CENTER, BOTTOM);
-    text("Astronomical night \u2190", (dsx + dex) / 2, py + 12);
+    text("Astronomical night ←", (dsx + dex) / 2, py + 12);
   }
 
   // Sun icon at peak position
@@ -214,11 +214,11 @@ function draw() {
 
   fill(140);
   textSize(11);
-  text("Latitude: " + LATITUDE + "\u00b0", rx, ry);
+  text("Latitude: " + LATITUDE + "°", rx, ry);
   ry += 16;
   text("Day: " + DAY_OF_YEAR, rx, ry);
   ry += 16;
-  text("Sun dec: " + nf(sunDeclination(DAY_OF_YEAR), 1, 1) + "\u00b0", rx, ry);
+  text("Sun dec: " + nf(sunDeclination(DAY_OF_YEAR), 1, 1) + "°", rx, ry);
   ry += 22;
 
   // Algorithm steps
@@ -229,7 +229,7 @@ function draw() {
 
   let steps = [
     { label: "1. Check current Sun altitude", done: true },
-    { label: "2. Below -18\u00b0? Use now as start.", done: darkStart >= 0 },
+    { label: "2. Below -18°? Use now as start.", done: darkStart >= 0 },
     {
       label: "3. If not, scan forward up to 14 days",
       done: scanResult !== null,
@@ -244,7 +244,7 @@ function draw() {
     fill(s.done ? color(100, 255, 100) : color(100, 100, 120));
     textSize(9);
     textAlign(LEFT, TOP);
-    text((s.done ? "\u2713 " : "\u25CB ") + s.label, rx, ry);
+    text((s.done ? "✓ " : "○ ") + s.label, rx, ry);
     ry += 16;
   }
 
@@ -281,7 +281,7 @@ function draw() {
       textSize(10);
       text("Likely polar summer where the", rx, ry);
       ry += 14;
-      text("Sun never drops below -18\u00b0.", rx, ry);
+      text("Sun never drops below -18°.", rx, ry);
     }
   }
 
@@ -315,7 +315,7 @@ function draw() {
     545,
   );
   text(
-    "The search checks solar midnight on each of the next 14 days. If the Sun is below -18\u00b0, it backtracks to find the exact twilight crossing.",
+    "The search checks solar midnight on each of the next 14 days. If the Sun is below -18°, it backtracks to find the exact twilight crossing.",
     30,
     560,
   );

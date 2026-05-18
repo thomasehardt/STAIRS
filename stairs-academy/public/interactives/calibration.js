@@ -94,7 +94,7 @@ function setup() {
     vg.rect(m, m, 500 - m * 2, 500 - m * 2);
   }
 
-  // Amp glow — layered ellipses from bottom-right
+  // Amp glow
   let ag = ampGlowBuffer;
   ag.noStroke();
   for (let i = 10; i >= 0; i--) {
@@ -110,10 +110,8 @@ function setup() {
     ag.ellipse(500, 500, 300 * h, 300 * h);
   }
 
-  // Read noise buffer
   preRenderNoise(noiseBuffer);
 
-  // Hot pixels
   for (let i = 0; i < 80; i++) {
     hotPixels.push({
       x: random(500),
@@ -123,7 +121,6 @@ function setup() {
     });
   }
 
-  // Noise dots (subsampled for speed)
   for (let i = 0; i < 4000; i++) {
     noiseDots.push({
       x: random(500),
@@ -172,14 +169,9 @@ function setup() {
       .querySelectorAll(".controls button")
       .forEach((b) => b.classList.remove("active"));
   });
-
-  document.getElementById("biasBtn").classList.remove("active");
-  document.getElementById("darkBtn").classList.remove("active");
-  document.getElementById("flatBtn").classList.remove("active");
 }
 
 function drawReadNoise() {
-  strokeWeight(1);
   noStroke();
   for (let s of noiseDots) {
     let a = constrain(abs(s.v) * 25, 0, 55);
@@ -208,17 +200,12 @@ function drawCalibPreview(x, y, s, label, type) {
   rect(x, y, s, s, 4);
   fill(200);
   noStroke();
-  textSize(9);
+  textSize(13);
   textAlign(LEFT, TOP);
   text(label, x + 4, y + 3);
 
-  let preview = null;
-  if (type === "bias") preview = noiseBuffer;
-  else if (type === "dark") preview = ampGlowBuffer;
-  else if (type === "flat") vignetteBuffer;
-
   if (type === "bias") {
-    image(noiseBuffer, x + 4, y + 16, s - 8, s - 8);
+    image(noiseBuffer, x + 4, y + 20, s - 8, s - 8);
   } else if (type === "dark") {
     let pg = createGraphics(s - 8, s - 8);
     pg.background(0);
@@ -228,7 +215,7 @@ function drawCalibPreview(x, y, s, label, type) {
       pg.fill(180 * (1 - h), 80 * (1 - h), 140 * (1 - h), pow(1 - h, 2) * 80);
       pg.ellipse(s - 8, s - 8, (s - 8) * h, (s - 8) * h);
     }
-    image(pg, x + 4, y + 16);
+    image(pg, x + 4, y + 20);
     pg.remove();
   } else if (type === "flat") {
     let pg = createGraphics(s - 8, s - 8);
@@ -245,7 +232,7 @@ function drawCalibPreview(x, y, s, label, type) {
       let m = (t * (s - 8)) / 2;
       pg.rect(m, m, s - 8 - m * 2, s - 8 - m * 2);
     }
-    image(pg, x + 4, y + 16);
+    image(pg, x + 4, y + 20);
     pg.remove();
   }
 }
@@ -254,7 +241,6 @@ function draw() {
   time++;
   background(17);
 
-  // Main image
   image(cleanBuffer, 20, 20);
   if (!showFlat) image(vignetteBuffer, 20, 20);
   if (!showDark) {
@@ -263,17 +249,15 @@ function draw() {
   }
   if (!showBias) drawReadNoise();
 
-  // Border around image
   noFill();
   stroke(60);
   strokeWeight(1);
   rect(20, 20, 500, 500);
 
-  // Labels on image
   let calOn = (showBias ? 1 : 0) + (showDark ? 1 : 0) + (showFlat ? 1 : 0);
   fill(calOn === 3 ? color(100, 255, 100) : color(255, 200, 100));
   noStroke();
-  textSize(16);
+  textSize(22);
   textAlign(LEFT, TOP);
   let label =
     calOn === 0
@@ -281,73 +265,68 @@ function draw() {
       : calOn === 3
         ? "Calibrated"
         : "Partially calibrated";
-  text(label, 28, 28);
+  text(label, 35, 35);
 
-  // Right panel
   let rx = 540,
     ry = 20;
   fill(255);
   noStroke();
-  textSize(18);
+  textSize(22);
   textAlign(LEFT);
   text("Calibration Frames", rx, ry);
-  ry += 30;
+  ry += 40;
 
   fill(140);
-  textSize(11);
+  textSize(14);
   text("Each frame captures a specific", rx, ry);
-  ry += 16;
+  ry += 18;
   text("artifact. Toggle to apply.", rx, ry);
-  ry += 28;
+  ry += 35;
 
-  // Status
   fill(200);
-  textSize(13);
+  textSize(15);
   text("Status", rx, ry);
   ry += 5;
-  let statusStr = showBias ? "Bias \u2713  " : "Bias \u2717  ";
-  statusStr += showDark ? "Dark \u2713  " : "Dark \u2717  ";
-  statusStr += showFlat ? "Flat \u2713" : "Flat \u2717";
+  let statusStr = showBias ? "Bias ✓  " : "Bias ✗  ";
+  statusStr += showDark ? "Dark ✓  " : "Dark ✗  ";
+  statusStr += showFlat ? "Flat ✓" : "Flat ✗";
   fill(calOn === 3 ? color(100, 255, 100) : 200);
-  textSize(15);
-  text(statusStr, rx, ry + 20);
-  ry += 45;
+  textSize(18);
+  text(statusStr, rx, ry + 22);
+  ry += 55;
 
-  // Calibration preview panels
-  drawCalibPreview(rx, ry, 55, "Master Bias", "bias");
-  ry += 60;
-  drawCalibPreview(rx, ry, 55, "Master Dark", "dark");
-  ry += 60;
-  drawCalibPreview(rx, ry, 55, "Master Flat", "flat");
-  ry += 72;
+  drawCalibPreview(rx, ry, 65, "Master Bias", "bias");
+  ry += 75;
+  drawCalibPreview(rx, ry, 65, "Master Dark", "dark");
+  ry += 75;
+  drawCalibPreview(rx, ry, 65, "Master Flat", "flat");
+  ry += 85;
 
-  // Descriptions
   fill(160);
-  textSize(11);
+  textSize(13);
   text("Bias: zero-length exposure,", rx, ry);
-  ry += 16;
+  ry += 18;
   text("captures read noise pattern.", rx, ry);
-  ry += 20;
+  ry += 24;
 
   text("Dark: lens-cap exposure at", rx, ry);
-  ry += 16;
+  ry += 18;
   text("same duration & temp, captures", rx, ry);
-  ry += 16;
+  ry += 18;
   text("amp glow + hot pixels.", rx, ry);
-  ry += 20;
+  ry += 24;
 
   text("Flat: evenly-lit panel, captures", rx, ry);
-  ry += 16;
+  ry += 18;
   text("vignetting + dust shadows.", rx, ry);
-  ry += 20;
+  ry += 24;
 
-  // Bottom info
-  ry += 8;
+  ry += 10;
   fill(100);
-  textSize(10);
+  textSize(12);
   text("Tip: apply Bias first, then", rx, ry);
-  ry += 15;
+  ry += 18;
   text("Dark, then Flat for best", rx, ry);
-  ry += 15;
+  ry += 18;
   text("results.", rx, ry);
 }

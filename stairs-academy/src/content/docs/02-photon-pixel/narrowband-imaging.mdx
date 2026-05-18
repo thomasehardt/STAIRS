@@ -1,0 +1,76 @@
+---
+title: Narrowband Imaging
+description: Using specialized filters to see the unseen emission of ionized gases.
+---
+
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+Most light pollution is "broadband" — it covers the whole rainbow. But many nebulae emit light at very specific wavelengths (colors) when their gases are excited by nearby stars. **Narrowband filters** act like a keyhole, blocking all light _except_ those specific emission lines, allowing you to see nebulae even from bright cities.
+
+---
+
+## Play With It
+
+<Interactive
+  src="/stairs-docs/interactives/narrowband.html"
+  title="Narrowband & the Hubble Palette"
+  height={720}
+  caption="Explore how narrowband filters isolate specific emission lines (Hα, OIII, SII) and how the Hubble Palette maps them to RGB. Notice how the 'star' light is suppressed while the nebula remains bright."
+/>
+
+---
+
+## The Details
+
+### Common Emission Lines
+
+1. **Hydrogen-Alpha (Hα)**: 656.3 nm (Deep Red). The most common emission in the universe. Most nebulae are primarily Hα.
+2. **Oxygen-III (OIII)**: 500.7 nm (Teal/Blue-Green). Emitted by doubly ionized oxygen. Common in planetary nebulae and supernova remnants.
+3. **Sulfur-II (SII)**: 671.6 nm (Deep Red). Traces shocks and high-energy regions.
+
+### Dual-Band Filters (HOO)
+
+Many smart telescopes use "Dual-Band" filters that pass both Hα and OIII simultaneously. Since Hα falls in the Red channel and OIII falls in the Green and Blue channels of your color sensor, you get a full-color image of the nebula in a single exposure.
+
+### The Hubble Palette (SHO)
+
+To see the structure of different gases, scientists often map these three lines to the standard Red, Green, and Blue channels:
+
+- **Sulfur-II** → Red
+- **Hα** → Green
+- **Oxygen-III** → Blue
+
+This creates the iconic "golden and blue" look made famous by the Hubble Space Telescope.
+
+---
+
+## In STAIRS
+
+Narrowband filters change the **Signal-to-Noise Ratio (SNR)** calculation significantly:
+
+- **Signal**: Slightly reduced (filter absorption).
+- **Noise**: Massively reduced (blocks 95%+ of light pollution).
+- **Result**: A huge net increase in contrast, allowing much higher "Absolute Quality Scores" from city locations.
+
+---
+
+<DeepDive title="Deep Dive: Narrowband Physics">
+
+### Bandpass & FWHM
+
+The "narrowness" of a filter is measured by its **FWHM (Full Width at Half Maximum)**.
+
+- **Broadband**: 100nm+
+- **Standard Narrowband**: 7nm - 12nm
+- **Ultra-Narrow**: 3nm - 5nm
+
+The narrower the filter, the better it rejects light pollution, but the more expensive it becomes and the more precisely it must be manufactured.
+
+### Filter Shift (f/ratio)
+
+As the light cone becomes steeper (faster f/ratio like f/2), the angle of incidence on the filter changes. This causes the bandpass to **shift** toward blue wavelengths. Fast telescopes require "pre-shifted" filters to ensure the Hα line still lands in the center of the transmission window.
+
+</DeepDive>

@@ -1,0 +1,53 @@
+---
+interface Props {
+  text?: string;
+  link?: string;
+}
+const {
+    text = "See the interactive light path simulation",
+    link = "/stairs-docs/01-telescopes/optical-designs/#see-it"
+} = Astro.props;
+---
+
+<div class="interactive-cta">
+  <a href={link}>
+    <span class="icon">✨</span>
+    <span class="text">{text}</span>
+    <span class="arrow">→</span>
+  </a>
+</div>
+
+<style>
+  .interactive-cta {
+    margin: 2rem 0;
+  }
+  .interactive-cta a {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.25rem 1.75rem;
+    background: var(--sl-color-gray-6);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.75rem;
+    text-decoration: none;
+    color: var(--sl-color-text-accent);
+    font-weight: 600;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--sl-shadow-sm);
+  }
+  .interactive-cta a:hover {
+    background: var(--sl-color-gray-5);
+    border-color: var(--sl-color-gray-4);
+    transform: translateY(-2px);
+    box-shadow: var(--sl-shadow-md);
+    color: white;
+  }
+  .icon { font-size: 1.5rem; }
+  .text { flex: 1; }
+  .arrow {
+    font-size: 1.25rem;
+    margin-left: auto;
+    transition: transform 0.2s;
+  }
+  .interactive-cta a:hover .arrow { transform: translateX(6px); }
+</style>

@@ -64,11 +64,11 @@ function draw() {
 
   fill(120);
   noStroke();
-  textSize(9);
+  textSize(14);
   textAlign(CENTER, BOTTOM);
-  text("Total integration time (hours)", px + plotW / 2, py + plotH + 18);
+  text("Total integration time (hours)", px + plotW / 2, py + plotH + 25);
   textAlign(LEFT, TOP);
-  text("SNR", px - 5, py + 5);
+  text("SNR", px - 5, py - 25);
 
   // Grid
   let maxHours = (maxFrames * SUB_TIME) / 3600;
@@ -79,9 +79,9 @@ function draw() {
     line(gx, py, gx, py + plotH);
     fill(60);
     noStroke();
-    textSize(7);
+    textSize(12);
     textAlign(CENTER, TOP);
-    text(h + "h", gx, py + plotH + 2);
+    text(h + "h", gx, py + plotH + 5);
   }
   for (let snr = 0; snr <= max(TARGET_SNR * 1.5, 50); snr += 10) {
     stroke(30);
@@ -94,11 +94,11 @@ function draw() {
     );
     fill(60);
     noStroke();
-    textSize(7);
+    textSize(12);
     textAlign(RIGHT, CENTER);
     text(
       snr,
-      px - 5,
+      px - 8,
       py + plotH - map(snr, 0, max(TARGET_SNR * 1.5, 50), 0, plotH - 20),
     );
   }
@@ -146,13 +146,13 @@ function draw() {
 
   fill(255, 200, 100);
   noStroke();
-  circle(cx, cy, 8);
+  circle(cx, cy, 10);
 
   fill(255, 200, 100);
   noStroke();
-  textSize(9);
+  textSize(16);
   textAlign(LEFT, BOTTOM);
-  text("SNR: " + nf(currentSNR, 1, 1), cx + 8, cy - 2);
+  text("SNR: " + nf(currentSNR, 1, 1), cx + 10, cy - 4);
 
   // Target SNR line
   let targetHours = ((TARGET_SNR / PER_SUB_SNR) ** 2 * SUB_TIME) / 3600;
@@ -173,9 +173,9 @@ function draw() {
   drawingContext.setLineDash([]);
   fill(255, 80, 80);
   noStroke();
-  textSize(8);
+  textSize(14);
   textAlign(LEFT, BOTTOM);
-  text("Target SNR: " + TARGET_SNR, px + plotW - 100, targetY - 2);
+  text("Target SNR: " + TARGET_SNR, px + plotW - 120, targetY - 2);
 
   let targetY2 =
     py +
@@ -193,8 +193,8 @@ function draw() {
   line(px, targetY2, px + plotW, targetY2);
   drawingContext.setLineDash([]);
   fill(255, 80, 80, 100);
-  textSize(7);
-  text("SNR: " + TARGET_SNR * 2, px + plotW - 100, targetY2 - 2);
+  textSize(12);
+  text("SNR: " + TARGET_SNR * 2, px + plotW - 120, targetY2 - 2);
 
   // Frames stacking visualization
   let stackX = 590,
@@ -211,18 +211,18 @@ function draw() {
 
   fill(200);
   noStroke();
-  textSize(12);
+  textSize(16);
   textAlign(LEFT, TOP);
-  text("Frame Stack", stackX + 8, stackY + 6);
+  text("Frame Stack", stackX + 12, stackY + 10);
   fill(100);
-  textSize(9);
-  text("N = " + accumulatedFrames + " subs", stackX + 8, stackY + 24);
+  textSize(14);
+  text("N = " + accumulatedFrames + " subs", stackX + 12, stackY + 32);
 
   // Draw stacked frames
   let maxVisible = min(accumulatedFrames, 50);
   for (let i = 0; i < maxVisible; i++) {
     let fx = stackX + 15 + (i % 10) * 21;
-    let fy = stackY + stackH - 30 - floor(i / 10) * 24;
+    let fy = stackY + stackH - 35 - floor(i / 10) * 24;
     let alpha = map(i, 0, maxVisible, 60, 200);
     fill(100, 180, 255, alpha);
     noStroke();
@@ -232,12 +232,12 @@ function draw() {
   if (accumulatedFrames > 50) {
     fill(100);
     noStroke();
-    textSize(8);
+    textSize(12);
     textAlign(LEFT, TOP);
     text(
       "... +" + (accumulatedFrames - 50) + " more",
       stackX + 15,
-      stackY + stackH - 30 - ceil(50 / 10) * 24 + 24,
+      stackY + stackH - 35 - ceil(50 / 10) * 24 + 24,
     );
   }
 
@@ -245,15 +245,12 @@ function draw() {
   fill(200);
   noStroke();
   textAlign(LEFT, TOP);
-  textSize(11);
-  text("Per-sub SNR: " + nf(PER_SUB_SNR, 1, 1), stackX + 8, stackY + 50);
-  text("Sub time: " + SUB_TIME + "s", stackX + 8, stackY + 66);
-  text(
-    "Total integration: " + nf(currentHours, 1, 2) + "h",
-    stackX + 8,
-    stackY + 82,
-  );
-  text("Current SNR: " + nf(currentSNR, 1, 1), stackX + 8, stackY + 98);
+  textSize(15);
+  let infoY = stackY + 65;
+  text("Per-sub SNR: " + nf(PER_SUB_SNR, 1, 1), stackX + 12, infoY);
+  text("Sub time: " + SUB_TIME + "s", stackX + 12, infoY + 20);
+  text("Total: " + nf(currentHours, 1, 2) + "h", stackX + 12, infoY + 40);
+  text("Current SNR: " + nf(currentSNR, 1, 1), stackX + 12, infoY + 60);
 
   let neededFrames = ceil((TARGET_SNR / PER_SUB_SNR) ** 2);
   let neededHours = (neededFrames * SUB_TIME) / 3600;
@@ -262,68 +259,63 @@ function draw() {
   // Progress toward target
   fill(30, 30, 40);
   noStroke();
-  rect(stackX + 8, stackY + 120, stackW - 16, 18, 3);
+  rect(stackX + 12, stackY + 155, stackW - 24, 22, 3);
   fill(pct >= 100 ? color(100, 255, 100) : color(100, 180, 255));
-  rect(stackX + 8, stackY + 120, (stackW - 16) * min(pct / 100, 1), 18, 3);
+  rect(stackX + 12, stackY + 155, (stackW - 24) * min(pct / 100, 1), 22, 3);
   fill(255);
   noStroke();
-  textSize(9);
+  textSize(13);
   textAlign(CENTER, TOP);
-  text(nf(pct, 1, 0) + "% of target SNR", stackX + stackW / 2, stackY + 122);
+  text(nf(pct, 1, 0) + "% of target SNR", stackX + stackW / 2, stackY + 158);
 
   // Needed info
   fill(140);
-  textSize(10);
+  textSize(14);
   textAlign(LEFT, TOP);
+  text("Needed for SNR " + TARGET_SNR + ":", stackX + 12, stackY + 185);
   text(
-    "Needed for SNR " +
-      TARGET_SNR +
-      ": " +
-      neededFrames +
-      " subs (" +
-      nf(neededHours, 1, 1) +
-      "h)",
-    stackX + 8,
-    stackY + 150,
+    neededFrames + " subs (" + nf(neededHours, 1, 1) + "h)",
+    stackX + 12,
+    stackY + 205,
   );
 
   if (pct >= 100) {
     fill(100, 255, 100);
-    textSize(14);
+    textSize(18);
     textAlign(CENTER, TOP);
-    text("\u2713 Target SNR reached!", stackX + stackW / 2, stackY + 180);
+    text("✓ Target SNR reached!", stackX + stackW / 2, stackY + 235);
   }
 
   // Formula at bottom
-  let fy = 490;
+  let fy = 485;
   fill(25, 25, 35);
   noStroke();
-  rect(20, fy, 820, 70, 5);
+  rect(20, fy, 820, 85, 5);
   fill(160);
-  textSize(11);
+  textSize(16);
   textAlign(LEFT, TOP);
   text(
-    "SNR(N) = SNR\u2098\u1d63\u2093 \u00d7 \u221aN    where SNR\u2098\u1d63\u2093 = " +
+    "SNR(N) = SNRₘᵣₓ × √N    where SNRₘᵣₓ = " +
       nf(PER_SUB_SNR, 1, 1) +
       " and N = number of subs",
     30,
-    fy + 8,
+    fy + 10,
   );
-  fill(100);
-  textSize(9);
+  fill(120);
+  textSize(13);
   text(
-    "Doubling the number of subs multiplies SNR by \u221a2 \u2248 1.41. To reach SNR = " +
+    "Doubling the number of subs multiplies SNR by √2 ≈ 1.41. To reach SNR = " +
       TARGET_SNR +
-      " you need (T / PER_SUB_SNR)\u00b2 = " +
+      " you need (T / PER_SUB_SNR)² = " +
       neededFrames +
       " subs = " +
       nf(neededHours, 1, 1) +
       " hours.",
     30,
-    fy + 30,
+    fy + 35,
   );
-  fill(150);
-  textSize(9);
+  fill(180);
+  textSize(13);
   if (currentSNR < TARGET_SNR) {
     text(
       "Current: " +
@@ -332,17 +324,17 @@ function draw() {
         nf(currentHours, 1, 2) +
         "h. Keep integrating!",
       30,
-      fy + 50,
+      fy + 60,
     );
   } else {
     text(
-      "\u2713 Reached " +
+      "✓ Reached " +
         nf(currentSNR, 1, 1) +
         " SNR with " +
         nf(accumulatedFrames, 0) +
         " subs.",
       30,
-      fy + 50,
+      fy + 60,
     );
   }
 
@@ -350,7 +342,7 @@ function draw() {
   let timeX = 60,
     timeY = 585,
     timeW = 500,
-    timeH = 6;
+    timeH = 8;
   fill(40);
   noStroke();
   rect(timeX, timeY, timeW, timeH, 3);
@@ -360,11 +352,11 @@ function draw() {
 
   fill(80);
   noStroke();
-  textSize(8);
+  textSize(12);
   textAlign(LEFT, TOP);
-  text("0h", timeX, timeY + 10);
+  text("0h", timeX, timeY + 12);
   textAlign(RIGHT, TOP);
-  text(nf(maxHours, 1, 0) + "h", timeX + timeW, timeY + 10);
+  text(nf(maxHours, 1, 0) + "h", timeX + timeW, timeY + 12);
   textAlign(CENTER, TOP);
-  text(nf(currentHours, 1, 1) + "h", timeX + timeW * progress, timeY + 10);
+  text(nf(currentHours, 1, 1) + "h", timeX + timeW * progress, timeY + 12);
 }

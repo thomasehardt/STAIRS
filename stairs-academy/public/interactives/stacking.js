@@ -133,10 +133,10 @@ function draw() {
 
   noStroke();
   fill(255);
-  textSize(22);
+  textSize(24);
   textAlign(CENTER);
-  text("Incoming Raw Frame", leftX + boxWidth / 2, yPos - 15);
-  text("Stacked Result", rightX + boxWidth / 2, yPos - 15);
+  text("Incoming Raw Frame", leftX + boxWidth / 2, yPos - 20);
+  text("Stacked Result", rightX + boxWidth / 2, yPos - 20);
 
   noFill();
   strokeWeight(2);
@@ -159,7 +159,7 @@ function draw() {
   if (framesStacked >= maxFrames) {
     fill(100, 255, 100);
     noStroke();
-    textSize(28);
+    textSize(32);
     textAlign(CENTER);
     text("Stacking Complete!", leftX + boxWidth / 2, yPos + boxHeight / 2);
   }
@@ -167,8 +167,8 @@ function draw() {
   fill(255);
   noStroke();
   textAlign(LEFT);
-  textSize(20);
-  text("Frames Stacked: " + framesStacked, rightX, yPos + boxHeight + 35);
+  textSize(22);
+  text("Frames Stacked: " + framesStacked, rightX, yPos + boxHeight + 40);
 
   let snrRatio = min(framesStacked / maxFrames, 1);
   let snrColor = lerpColor(color(255, 80, 80), color(80, 255, 80), snrRatio);
@@ -176,6 +176,6 @@ function draw() {
   text(
     "Relative SNR: " + Math.floor(snrRatio * 100) + "%",
     rightX,
-    yPos + boxHeight + 65,
+    yPos + boxHeight + 75,
   );
 }

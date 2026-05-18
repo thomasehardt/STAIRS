@@ -56,11 +56,19 @@ export default defineConfig({
               label: "Light as Photons",
               slug: "02-photon-pixel/light-as-photons",
             },
+            {
+              label: "The Atmosphere",
+              slug: "02-photon-pixel/the-atmosphere",
+            },
             { label: "The Optical Path", slug: "02-photon-pixel/optical-path" },
             { label: "Sensor Capture", slug: "02-photon-pixel/sensor-capture" },
             {
               label: "Color & the Bayer Filter",
               slug: "02-photon-pixel/bayer-filter",
+            },
+            {
+              label: "Narrowband Imaging",
+              slug: "02-photon-pixel/narrowband-imaging",
             },
             {
               label: "Deep Dive: QE, Read Noise & Gain",
@@ -98,6 +106,10 @@ export default defineConfig({
               slug: "04-stacking/calibration-frames",
             },
             {
+              label: "Processing Basics",
+              slug: "04-stacking/processing-basics",
+            },
+            {
               label: "Deep Dive: The SNR Equation",
               slug: "04-stacking/deep-dive-snr",
             },
@@ -109,6 +121,10 @@ export default defineConfig({
             {
               label: "The Scoring Pipeline",
               slug: "05-planning/scoring-pipeline",
+            },
+            {
+              label: "Choosing the Right Target",
+              slug: "05-planning/choosing-targets",
             },
             { label: "Object Suitability Score", slug: "05-planning/oss" },
             { label: "Sky Quality Score", slug: "05-planning/sqs" },

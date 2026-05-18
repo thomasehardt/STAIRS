@@ -146,9 +146,9 @@ function drawPreview(x, y, s, buf, label, active, borderCol) {
   rect(x, y, s, s, 4);
   fill(active ? borderCol : 150);
   noStroke();
-  textSize(9);
+  textSize(13);
   textAlign(CENTER, BOTTOM);
-  text(label, x + s / 2, y - 3);
+  text(label, x + s / 2, y - 5);
 }
 
 function draw() {
@@ -179,7 +179,7 @@ function draw() {
   // Labels on image
   let filterLabel =
     currentFilter === "ha"
-      ? "H\u03b1 (656 nm)"
+      ? "Hα (656 nm)"
       : currentFilter === "o3"
         ? "OIII (500 nm)"
         : currentFilter === "s2"
@@ -195,9 +195,9 @@ function draw() {
           : color(255, 200, 100);
   fill(labelCol);
   noStroke();
-  textSize(16);
+  textSize(22);
   textAlign(LEFT, TOP);
-  text(filterLabel, 28, 28);
+  text(filterLabel, 35, 35);
 
   // Channel strip
   let csX = 20,
@@ -205,7 +205,7 @@ function draw() {
     csS = 85,
     csGap = 10;
   let filters = [
-    { id: "ha", label: "H\u03b1", col: color(255, 80, 80) },
+    { id: "ha", label: "Hα", col: color(255, 80, 80) },
     { id: "o3", label: "OIII", col: color(80, 160, 255) },
     { id: "s2", label: "SII", col: color(255, 70, 70) },
     { id: "hubble", label: "SHO", col: color(255, 200, 80) },
@@ -236,17 +236,17 @@ function draw() {
     ry = 25;
   fill(255);
   noStroke();
-  textSize(18);
+  textSize(22);
   textAlign(LEFT);
   text("Narrowband Filters", rx, ry);
-  ry += 30;
+  ry += 40;
 
   fill(140);
-  textSize(11);
+  textSize(14);
   text("Each filter isolates a specific", rx, ry);
-  ry += 16;
+  ry += 18;
   text("emission line from ionized gas.", rx, ry);
-  ry += 24;
+  ry += 30;
 
   // Filter details
   let details = {
@@ -271,41 +271,41 @@ function draw() {
     hubble: {
       wave: "SHO composite",
       color: "False color",
-      traces: "SII\u2192R, H\u03b1\u2192G, OIII\u2192B",
+      traces: "SII→R, Hα→G, OIII→B",
       struct: "Hubble Palette",
     },
   };
   let d = details[currentFilter];
 
   fill(200);
-  textSize(13);
+  textSize(15);
   text("Wavelength", rx, ry);
   ry += 4;
   fill(255);
-  textSize(16);
-  text(d.wave, rx, ry + 16);
-  ry += 30;
+  textSize(18);
+  text(d.wave, rx, ry + 18);
+  ry += 35;
 
   fill(200);
-  textSize(13);
+  textSize(15);
   text("Emission", rx, ry);
   ry += 4;
   fill(255);
-  textSize(14);
-  text(d.traces, rx, ry + 14);
-  ry += 28;
+  textSize(16);
+  text(d.traces, rx, ry + 16);
+  ry += 32;
 
   fill(200);
-  textSize(13);
+  textSize(15);
   text("Morphology", rx, ry);
   ry += 4;
   fill(200);
-  textSize(13);
-  text(d.struct, rx, ry + 14);
-  ry += 28;
+  textSize(15);
+  text(d.struct, rx, ry + 16);
+  ry += 32;
 
   fill(200);
-  textSize(13);
+  textSize(15);
   text("Color", rx, ry);
   ry += 4;
   fill(
@@ -315,20 +315,20 @@ function draw() {
         ? color(255, 200, 100)
         : color(255, 120, 120),
   );
-  textSize(14);
-  text(d.color, rx, ry + 14);
-  ry += 35;
+  textSize(16);
+  text(d.color, rx, ry + 16);
+  ry += 40;
 
   // Hubble mapping diagram
   if (currentFilter === "hubble") {
     ry += 5;
     fill(200);
-    textSize(12);
+    textSize(14);
     text("Channel mapping", rx, ry);
-    ry += 18;
+    ry += 22;
     let mapY = ry;
     let mapW = 240,
-      mapH = 60;
+      mapH = 65;
     noStroke();
     fill(60, 20, 20, 200);
     rect(rx, mapY, mapW / 3, mapH);
@@ -346,30 +346,30 @@ function draw() {
     rect(rx + (2 * mapW) / 3, mapY, mapW / 3, mapH);
     fill(255);
     noStroke();
-    textSize(10);
+    textSize(13);
     textAlign(CENTER, CENTER);
-    text("SII\n\u2192\nR", rx + mapW / 6, mapY + mapH / 2);
+    text("SII\n→\nR", rx + mapW / 6, mapY + mapH / 2);
     fill(200);
-    text("H\u03b1\n\u2192\nG", rx + mapW / 2, mapY + mapH / 2);
-    text("OIII\n\u2192\nB", rx + (5 * mapW) / 6, mapY + mapH / 2);
-    ry += mapH + 20;
+    text("Hα\n→\nG", rx + mapW / 2, mapY + mapH / 2);
+    text("OIII\n→\nB", rx + (5 * mapW) / 6, mapY + mapH / 2);
+    ry += mapH + 25;
   } else {
     ry += 5;
     fill(100);
-    textSize(10);
+    textSize(13);
     text("Switch to Hubble Palette to", rx, ry);
-    ry += 15;
+    ry += 18;
     text("see the false-color composite.", rx, ry);
-    ry += 15;
+    ry += 18;
   }
 
   fill(120);
-  textSize(10);
+  textSize(12);
   text("Narrowband filters allow", rx, ry);
-  ry += 15;
+  ry += 16;
   text("imaging even under light", rx, ry);
-  ry += 15;
+  ry += 16;
   text("pollution by rejecting", rx, ry);
-  ry += 15;
+  ry += 16;
   text("broad-spectrum skyglow.", rx, ry);
 }

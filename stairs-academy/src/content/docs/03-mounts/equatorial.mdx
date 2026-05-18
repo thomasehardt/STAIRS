@@ -3,7 +3,6 @@ title: Equatorial Mounts
 description: How tilting the mount to match Earth's axis simplifies tracking to a single motor.
 ---
 
-import ManimVideo from "../../../components/ManimVideo.astro";
 import Interactive from "../../../components/Interactive.astro";
 import DeepDive from "../../../components/DeepDive.astro";
 
@@ -15,9 +14,10 @@ An equatorial mount tilts its main axis (Right Ascension, or RA) to point at the
 
 ## See It
 
-<ManimVideo
-  src="/stairs-docs/videos/mount-alignment.mp4"
-  caption="The equatorial mount's RA axis is parallel to Earth's axis. Only one motor needs to run to track."
+<Interactive
+  src="/stairs-docs/interactives/alignment.html"
+  title="Equatorial Alignment"
+  caption="Adjust your latitude and see how the EQ mount's RA axis aligns with the sky's rotation axis. Notice how it only needs one axis of motion to track perfectly."
 />
 
 ---
@@ -54,6 +54,7 @@ This is much simpler than the Alt-Az's varying dual-axis tracking. It also means
 <Interactive
   src="/stairs-docs/interactives/autoguiding.html"
   title="Autoguiding"
+  height={700}
   caption="See how a guide camera monitors a star and sends corrections to keep the mount on track."
 />
 

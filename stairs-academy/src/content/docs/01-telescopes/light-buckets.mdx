@@ -3,8 +3,8 @@ title: Telescopes Are Light Buckets
 description: The single most important idea in all of astronomy.
 ---
 
+import Interactive from "../../../components/Interactive.astro";
 import DeepDive from "../../../components/DeepDive.astro";
-import ManimVideo from "../../../components/ManimVideo.astro";
 
 ## The Big Idea
 
@@ -16,9 +16,11 @@ Everything else — magnification, resolution, tracking — exists to support th
 
 ## See It
 
-<ManimVideo
-  src="/stairs-docs/videos/telescope-light-path.mp4"
-  caption="Photons from a distant object travel through the telescope optics and converge on the sensor."
+<Interactive
+  src="/stairs-docs/interactives/photoncount.html"
+  title="The Photon Bucket Simulator"
+  height={620}
+  caption="Adjust the aperture and target magnitude to see how quickly photons accumulate. Notice how a small increase in aperture captures light much faster."
 />
 
 ---

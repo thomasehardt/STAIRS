@@ -194,15 +194,15 @@ function draw() {
     noStroke();
     textSize(11);
     textAlign(LEFT, TOP);
-    text("\u2190 RA corr  ", 24, 24);
+    text("← RA corr  ", 24, 24);
   }
   if (pulseDec > 0) {
     let a = constrain(pulseDec * 255, 0, 255);
     fill(100, 255, 100, a);
     noStroke();
     textSize(11);
-    if (corrDec > 0) text("Dec corr \u2191", 220, 24);
-    else text("Dec corr \u2193", 220, 24);
+    if (corrDec > 0) text("Dec corr ↑", 220, 24);
+    else text("Dec corr ↓", 220, 24);
   }
 
   fill(180);
@@ -223,32 +223,32 @@ function draw() {
   textAlign(LEFT);
   fill(255);
   noStroke();
-  textSize(18);
+  textSize(22);
   text("Autoguiding", rx, ry);
-  ry += 30;
+  ry += 40;
 
   let btn = document.getElementById("guideBtn");
   fill(guiding ? color(100, 255, 100) : 180);
-  textSize(20);
+  textSize(24);
   text(guiding ? "GUIDING ACTIVE" : "GUIDING OFF", rx, ry + 18);
-  ry += 40;
+  ry += 50;
 
   fill(180);
-  textSize(13);
+  textSize(15);
   text("Guide star position", rx, ry);
   ry += 4;
   fill(255);
-  textSize(15);
+  textSize(18);
   text(
     "(" + raError.toFixed(1) + ", " + decError.toFixed(1) + ") px",
     rx,
     ry + 18,
   );
-  ry += 35;
+  ry += 45;
 
   let rms = sqrt(raHist.reduce((s, v) => s + v * v, 0) / max(raHist.length, 1));
   fill(180);
-  textSize(13);
+  textSize(15);
   text("RMS error", rx, ry);
   ry += 4;
   let rmsCol =
@@ -258,73 +258,54 @@ function draw() {
         ? color(255, 200, 50)
         : color(255, 80, 80);
   fill(rmsCol);
-  textSize(22);
+  textSize(24);
   text(rms.toFixed(1) + " px", rx, ry + 20);
-  ry += 40;
+  ry += 50;
 
   fill(180);
-  textSize(13);
+  textSize(15);
   text("Corrections sent", rx, ry);
   ry += 4;
   fill(255);
-  textSize(22);
+  textSize(24);
   text(totalCorrections, rx, ry + 20);
-  ry += 40;
+  ry += 50;
 
   fill(180);
-  textSize(13);
+  textSize(15);
   text("Correction rate", rx, ry);
   ry += 4;
   fill(200);
-  textSize(15);
+  textSize(18);
   let rate = guideInterval === 0 ? 0 : round((60 / guideInterval) * 10) / 10;
   text(rate + "/sec", rx, ry + 18);
-  ry += 35;
-
-  fill(100);
-  textSize(10);
-  if (guiding) {
-    fill(100, 200, 255, constrain(pulseRA * 255, 0, 255));
-    text(
-      "Last RA corr: " + (corrRA > 0 ? "+" : "") + corrRA.toFixed(1),
-      rx,
-      ry,
-    );
-    ry += 16;
-    fill(100, 255, 100, constrain(pulseDec * 255, 0, 255));
-    text(
-      "Last Dec corr: " + (corrDec > 0 ? "+" : "") + corrDec.toFixed(1),
-      rx,
-      ry,
-    );
-    ry += 30;
-  }
+  ry += 45;
 
   fill(120);
-  textSize(10);
+  textSize(13);
   if (!guiding) {
     text("Without guiding, the star", rx, ry);
-    ry += 15;
-    text("drifts due to periodic error", rx, ry);
-    ry += 15;
-    text("(gear imperfections) and", rx, ry);
-    ry += 15;
-    text("atmospheric seeing jitter.", rx, ry);
     ry += 18;
+    text("drifts due to periodic error", rx, ry);
+    ry += 18;
+    text("(gear imperfections) and", rx, ry);
+    ry += 18;
+    text("atmospheric seeing jitter.", rx, ry);
+    ry += 22;
     fill(100);
-    textSize(9);
+    textSize(12);
     text("Seeing = " + seeing.toFixed(1) + '"', rx, ry);
   } else {
     text("Guide exposures every", rx, ry);
-    ry += 15;
+    ry += 18;
     text((guideInterval / 60).toFixed(2) + "s measure centroid", rx, ry);
-    ry += 15;
+    ry += 18;
     text("offset. Corrections are sent", rx, ry);
-    ry += 15;
+    ry += 18;
     text("to the mount to keep the", rx, ry);
-    ry += 15;
+    ry += 18;
     text("star centered. Residual", rx, ry);
-    ry += 15;
+    ry += 18;
     text("error is mostly seeing.", rx, ry);
   }
 }

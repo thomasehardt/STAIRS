@@ -79,9 +79,9 @@ function drawSkyView() {
     if (a > 0) {
       fill(60);
       noStroke();
-      textSize(8);
+      textSize(12);
       textAlign(LEFT, CENTER);
-      text(a + "°", ro + 4, 0);
+      text(a + "°", ro + 5, 0);
     }
   }
 
@@ -97,16 +97,16 @@ function drawSkyView() {
     let a = radians(i * 45);
     fill(80);
     noStroke();
-    textSize(10);
+    textSize(14);
     textAlign(CENTER, CENTER);
-    text(dirs[i], cos(a) * (r + 18), sin(a) * (r + 18));
+    text(dirs[i], cos(a) * (r + 22), sin(a) * (r + 22));
   }
 
   fill(120);
   noStroke();
-  textSize(8);
+  textSize(12);
   textAlign(CENTER, TOP);
-  text("ZENITH", 0, -r - 22);
+  text("ZENITH", 0, -r - 25);
 
   for (let s of skyStars) {
     let p = project(s.alt, s.az, 0, 0, r);
@@ -161,7 +161,7 @@ function drawSkyView() {
   textSize(9);
   textAlign(CENTER, BOTTOM);
   text(
-    "\u25BC",
+    "▼",
     -tazR * sin(radians(180 - trackedAz)),
     -tazR * cos(radians(180 - trackedAz)),
   );
@@ -243,13 +243,13 @@ function drawSensorView() {
   // Corner markings
   fill(60);
   noStroke();
-  textSize(8);
+  textSize(12);
   textAlign(LEFT, TOP);
-  text("N", -sz + 3, -sz + 3);
-  text("S", -sz + 3, sz - 12);
+  text("N", -sz + 5, -sz + 5);
+  text("S", -sz + 5, sz - 15);
   textAlign(RIGHT, TOP);
-  text("E", sz - 3, -sz + 3);
-  text("W", sz - 3, sz - 12);
+  text("E", sz - 5, -sz + 5);
+  text("W", sz - 5, sz - 15);
 
   // Rotation arc indicator
   let arcR = sz - 20;
@@ -267,10 +267,10 @@ function drawSensorView() {
     let aA = -radians(rotationAngle * 0.3);
     fill(255, 200, 80, 150);
     noStroke();
-    textSize(12);
+    textSize(16);
     textAlign(CENTER, CENTER);
     text(
-      sign > 0 ? "\u21BB" : "\u21BA",
+      sign > 0 ? "↻" : "↺",
       arrowR * 0.7 * cos(aA - PI / 2),
       arrowR * 0.7 * sin(aA - PI / 2),
     );
@@ -281,9 +281,9 @@ function drawSensorView() {
   // Rotation value below sensor
   fill(180);
   noStroke();
-  textSize(11);
+  textSize(14);
   textAlign(CENTER, TOP);
-  text("Field rotation: " + nf(rotationAngle, 1, 1) + "°", cx, cy + sz + 14);
+  text("Field rotation: " + nf(rotationAngle, 1, 1) + "°", cx, cy + sz + 18);
 }
 
 function draw() {
@@ -301,15 +301,15 @@ function draw() {
   // Title areas
   fill(200);
   noStroke();
-  textSize(13);
+  textSize(16);
   textAlign(LEFT, TOP);
   text("Sky View (polar projection)", 20, 3);
   textAlign(RIGHT, TOP);
   text("Sensor View (field rotation)", 880, 3);
   textAlign(LEFT, TOP);
   fill(80);
-  textSize(9);
-  text("30° min altitude ring", 270, 10);
+  textSize(12);
+  text("30° min altitude ring", 270, 8);
 
   // Sky view boundary
   noFill();
@@ -328,13 +328,13 @@ function draw() {
   drawSensorView();
 
   // Info panel at bottom
-  let iy = 535;
+  let iy = 530;
   fill(200);
   noStroke();
-  textSize(12);
+  textSize(16);
   textAlign(LEFT, TOP);
   text("Night progress: " + nf(nightTime * 100, 1, 0) + "%", 20, iy);
-  iy += 18;
+  iy += 22;
   text(
     "Altitude: " +
       nf(trackedAlt, 1, 1) +
@@ -344,7 +344,7 @@ function draw() {
     20,
     iy,
   );
-  iy += 18;
+  iy += 22;
   text(
     "Field rotation: " +
       nf(rotationAngle, 1, 1) +
@@ -355,77 +355,77 @@ function draw() {
     20,
     iy,
   );
-  iy += 18;
+  iy += 22;
   fill(100);
-  textSize(10);
+  textSize(13);
   text(
-    "\u2190 As the telescope tracks the target star, the sensor field rotates because the Alt-Az mount does not compensate for Earth\u2019s axial rotation.",
+    "← As the telescope tracks the target star, the sensor field rotates because the Alt-Az mount does not compensate for Earth’s axial rotation.",
     20,
     iy,
   );
-  iy += 14;
+  iy += 18;
   text(
     "The rotation is zero at the meridian and strongest near the horizon.",
     20,
     iy,
   );
-  iy += 24;
+  iy += 30;
 
   // Key value cards in right panel
   let rx = 560,
     ry = 460;
   fill(30, 30, 40);
   noStroke();
-  rect(rx, ry, 90, 48, 4);
+  rect(rx, ry, 95, 55, 4);
   fill(120);
-  textSize(9);
+  textSize(12);
   textAlign(CENTER, TOP);
-  text("ALTITUDE", rx + 45, ry + 4);
+  text("ALTITUDE", rx + 47.5, ry + 5);
   fill(255);
-  textSize(18);
+  textSize(22);
   textAlign(CENTER, TOP);
-  text(nf(trackedAlt, 1, 0) + "°", rx + 45, ry + 18);
+  text(nf(trackedAlt, 1, 0) + "°", rx + 47.5, ry + 22);
 
   fill(30, 30, 40);
   noStroke();
-  rect(rx + 100, ry, 90, 48, 4);
+  rect(rx + 105, ry, 95, 55, 4);
   fill(120);
-  textSize(9);
+  textSize(12);
   textAlign(CENTER, TOP);
-  text("ROTATION", rx + 145, ry + 4);
+  text("ROTATION", rx + 152.5, ry + 5);
   fill(255, 200, 80);
-  textSize(18);
+  textSize(22);
   textAlign(CENTER, TOP);
-  text(nf(rotationAngle, 1, 0) + "°", rx + 145, ry + 18);
+  text(nf(rotationAngle, 1, 0) + "°", rx + 152.5, ry + 22);
 
   fill(30, 30, 40);
   noStroke();
-  rect(rx + 200, ry, 90, 48, 4);
+  rect(rx + 210, ry, 95, 55, 4);
   fill(120);
-  textSize(9);
+  textSize(12);
   textAlign(CENTER, TOP);
-  text("NIGHT", rx + 245, ry + 4);
+  text("NIGHT", rx + 257.5, ry + 5);
   fill(255);
-  textSize(18);
+  textSize(22);
   textAlign(CENTER, TOP);
-  text(nf(nightTime * 100, 1, 0) + "%", rx + 245, ry + 18);
+  text(nf(nightTime * 100, 1, 0) + "%", rx + 257.5, ry + 22);
 
   // Time bar
   let barX = 20,
     barY = 610,
     barW = 600,
-    barH = 6;
+    barH = 8;
   fill(40);
   noStroke();
-  rect(barX, barY, barW, barH, 3);
+  rect(barX, barY, barW, barH, 4);
   fill(255, 200, 80);
-  rect(barX, barY, barW * nightTime, barH, 3);
+  rect(barX, barY, barW * nightTime, barH, 4);
 
   fill(80);
   noStroke();
-  textSize(9);
+  textSize(12);
   textAlign(LEFT, TOP);
-  text("Evening", barX, barY + 10);
+  text("Evening", barX, barY + 12);
   textAlign(CENTER, TOP);
   let meridianX = barX + barW * 0.5;
   fill(100, 200, 100, 120);
@@ -436,5 +436,5 @@ function draw() {
   noStroke();
   text("Meridian", meridianX, barY + 12);
   textAlign(RIGHT, TOP);
-  text("Morning", barX + barW, barY + 10);
+  text("Morning", barX + barW, barY + 12);
 }

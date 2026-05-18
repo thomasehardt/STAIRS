@@ -1,0 +1,75 @@
+---
+title: "Processing Basics: Stretching & Linear Data"
+description: Why raw astronomical images look black and how we fix it.
+---
+
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+When you open a raw astronomical image, it often looks completely black. This is because astronomical data is **linear** — most of the signal is bunched up in the darkest 1% of the range. To see the nebula, we must "stretch" the data, re-mapping those dark values to a visible range.
+
+---
+
+## Play With It
+
+<Interactive
+  src="/stairs-docs/interactives/histogram.html"
+  title="Histogram Stretching Simulator"
+  height={700}
+  caption="Drag the sliders to adjust the black point, midtones (gamma), and white point. Watch how the histogram shifts as you reveal the faint nebula hidden in the noise."
+/>
+
+---
+
+## The Details
+
+### Linear vs. Non-linear
+
+Our eyes and standard cameras are non-linear; they apply a curve to make images look natural. Astronomical sensors are **linear counters**: if a pixel receives twice as many photons, it records twice the value.
+
+- **Linear Data**: Preserves the physical relationship between light and measurement. Essential for science and stacking.
+- **Non-linear Data**: Stretched for display. This is what you see in a finished JPG.
+
+### The Histogram
+
+A histogram is a graph showing how many pixels have each brightness value. In a raw astronomical image:
+
+1. There is a huge spike near the left (the dark sky background).
+2. The nebula signal is a tiny "hump" just to the right of the background spike.
+3. The rest of the graph is empty.
+
+### The Stretching Process
+
+1. **Black Point**: We move the "zero" value up to the edge of the sky background spike. This removes the grey haze of light pollution.
+2. **Midtones (Gamma)**: We apply a curve that lifts the faint nebula signal without blowing out the bright stars.
+3. **White Point**: We set the maximum brightness level. Usually, we leave this alone to avoid "clipping" (losing detail in) the bright centers of stars.
+
+---
+
+## In STAIRS
+
+Understanding stretching is vital for evaluating **Surface Brightness**. STAIRS calculates scores based on the physical (linear) signal, but you judge the result based on the stretched image. A target with low surface brightness will require a much more aggressive stretch, which also makes the noise more visible.
+
+---
+
+<DeepDive title="Deep Dive: The Math of Stretching">
+
+### Power Law Stretch (Gamma)
+
+The most basic stretch is a power law:
+
+$$V_{\text{out}} = V_{\text{in}}^{\gamma}$$
+
+Where $\gamma < 1$ (typically 0.2 to 0.5) to brighten midtones.
+
+### ArcSinh Stretch
+
+A more advanced stretch used in professional software like PixInsight is the **Inverse Hyperbolic Sine (ArcSinh)** stretch. Its unique property is that it preserves color ratios while stretching intensity:
+
+$$f(x) = \frac{\text{asinh}(x \cdot \beta)}{\text{asinh}(\beta)}$$
+
+Where $\beta$ is a stretching factor. Unlike a standard gamma stretch, ArcSinh doesn't "wash out" colors as the image gets brighter.
+
+</DeepDive>

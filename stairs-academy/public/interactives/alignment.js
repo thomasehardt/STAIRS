@@ -348,5 +348,5 @@ function draw() {
   fill(255, 255, 0);
   textSize(20);
   noStroke();
-  text("Latitude: " + lat + "\u00B0", width / 2, height - 30);
+  text("Latitude: " + lat + "°", width / 2, height - 30);
 }

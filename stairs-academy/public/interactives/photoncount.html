@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Photon Bucket</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .val {
+        color: #88f;
+        font-weight: bold;
+        min-width: 40px;
+        display: inline-block;
+      }
+      #canvas-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Telescopes are Light Buckets</h1>
+    <p>The larger the aperture, the more photons you catch per second.</p>
+    <div class="controls">
+      <label>
+        Aperture (mm):
+        <input type="range" id="apSlider" min="5" max="250" value="50" />
+        <span id="apVal" class="val">50mm</span>
+      </label>
+      <label>
+        Target Magnitude:
+        <input type="range" id="magSlider" min="0" max="15" value="5" />
+        <span id="magVal" class="val">5.0</span>
+      </label>
+      <button id="resetBtn">↺ Clear Bucket</button>
+    </div>
+    <div id="canvas-container"></div>
+    <script src="photoncount.js"></script>
+  </body>
+</html>
