@@ -15,7 +15,10 @@ contains logic related to the viewer at a point in time (i.e., a location + time
 """
 
 logger = logging.getLogger(__name__)
+# Configure IERS to prevent 30-day age errors
+# This is critical for preventing API crashes due to IERS data issues
 iers.conf.auto_download = False
+iers.conf.auto_max_age = None
 
 
 def safe_round(val: Any, decimals: int = 1) -> float:

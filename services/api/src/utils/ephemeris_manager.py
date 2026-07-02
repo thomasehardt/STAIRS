@@ -9,10 +9,16 @@ import numpy as np
 import pandas as pd
 from astropy.coordinates import AltAz, SkyCoord, get_body
 from astropy.time import Time, TimeDelta
+from astropy.utils import iers
 from src.astro_logic.visibility import get_astronomical_night
 from src.db.duck_session import get_duck_db
 from src.planner.planner_models import ObservationLocation
 from src.utils.geo_cache import GeoCacheService
+
+# Configure IERS to prevent 30-day age errors
+# This is critical for preventing API crashes due to IERS data issues
+iers.conf.auto_max_age = None
+iers.conf.auto_download = False
 
 logger = logging.getLogger(__name__)
 CACHE_ROOT = Path(os.getenv("CACHE_DIR", "cache"))
@@ -255,6 +261,8 @@ class EphemerisManager:
                 logger.info("ephemeris cache is already warm")
         except Exception as e:
             logger.error(f"error during ephemeris cache warming: {e}", exc_info=True)
+            # If we fail to warm the cache, we still want the API to start
+            # This prevents the entire application from crashing due to IERS issues
 
     def get_cached_peak_altitude(
         self, latitude: float, longitude: float, night_start: Time

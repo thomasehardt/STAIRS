@@ -16,13 +16,13 @@ import {
   Clock,
   ArrowRight,
   AlertCircle,
-  Info,
   Moon,
   Sunrise,
   Sunset,
   X,
 } from "lucide-react";
 import { SkyQualityChart } from "@/components/SkyQualityChart";
+import { EducationalTooltip } from "@/components/EducationalTooltip";
 import { useSkyQuality } from "@/hooks/use-sky-quality";
 import type { components } from "@/types/api";
 
@@ -291,10 +291,10 @@ const DayOverview: React.FC<DayOverviewProps> = ({
 
 const ScoreInfoTooltip: React.FC = () => {
   return (
-    <div className="group relative">
-      <Info className="w-3.5 h-3.5 text-muted-foreground hover:text-primary cursor-help transition-colors" />
-      <div className="absolute bottom-full right-0 mb-2 w-64 p-3 bg-card border border-border rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
-        <div className="space-y-2 text-left">
+    <EducationalTooltip
+      title="Quality Scores"
+      content={
+        <div className="space-y-2">
           <div>
             <p className="text-[10px] font-black uppercase text-primary mb-0.5">
               Relative Quality
@@ -322,8 +322,8 @@ const ScoreInfoTooltip: React.FC = () => {
             </p>
           </div>
         </div>
-      </div>
-    </div>
+      }
+    />
   );
 };
 

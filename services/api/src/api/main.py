@@ -18,6 +18,9 @@ from src.api.routers import (
     weather,
 )
 from src.db.parquet_loader import load_data_to_parquet
+from src.utils import (
+    iers_config as _iers_config,  # noqa: F401  # configure IERS at startup
+)
 from src.utils.ephemeris_manager import EphemerisManager
 from src.utils.logging_config import setup_logging
 

@@ -3,6 +3,7 @@ import { Telescope, MapPin, Activity, Pin, PinOff, Clock } from "lucide-react";
 import { useTargetPosition } from "@/hooks/use-target-position";
 import { AltitudeChart } from "./AltitudeChart";
 import { Button } from "@/components/ui/button";
+import { EducationalTooltip } from "@/components/EducationalTooltip";
 import { useSettings } from "@/hooks/use-settings-context";
 import { useProfiles } from "@/hooks/use-config";
 import type { components } from "@/types/api";
@@ -261,6 +262,31 @@ export function TargetCard({
                   ABS
                 </span>
               </div>
+              <EducationalTooltip
+                title="Sky Quality Scores"
+                content={
+                  <>
+                    <div className="mb-2">
+                      <p className="font-bold text-primary uppercase text-[10px] mb-0.5">
+                        Relative (REL)
+                      </p>
+                      <p>
+                        How good tonight's conditions are for this location —
+                        weather, clouds, moon. 100 = perfect.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-bold text-primary uppercase text-[10px] mb-0.5">
+                        Absolute (ABS)
+                      </p>
+                      <p>
+                        Adjusts for light pollution (Bortle scale). A Bortle 8
+                        site will never reach 100.
+                      </p>
+                    </div>
+                  </>
+                }
+              />
             </div>
           )}
         </div>
