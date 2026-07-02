@@ -6,6 +6,9 @@ COPY package*.json ./
 
 RUN npm install --legacy-peer-deps
 
+# Fix permissions for the anonymous volume so non-root container users can write to node_modules (e.g. Vite temp files)
+RUN chown -R node:node /app/node_modules
+
 COPY . .
 
 EXPOSE 5173
