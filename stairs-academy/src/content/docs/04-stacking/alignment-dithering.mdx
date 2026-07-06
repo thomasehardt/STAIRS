@@ -3,7 +3,6 @@ title: Alignment & Dithering
 description: How software keeps stars pinned in place across hundreds of frames.
 ---
 
-import Interactive from "../../../components/Interactive.astro";
 import DeepDive from "../../../components/DeepDive.astro";
 
 ## The Big Idea
@@ -23,14 +22,7 @@ Even with good tracking, stars drift between frames. Alignment software detects 
 
 ### Plate Solving
 
-A more sophisticated version is **plate solving** — matching the star pattern against a catalog to determine exactly where the telescope is pointing. This gives absolute coordinates rather than just relative alignment.
-
-<Interactive
-  src="/stairs-docs/interactives/platesolve.html"
-  title="Plate Solving Simulation"
-  height={680}
-  caption="See how star patterns are matched against a catalog to determine position."
-/>
+A more sophisticated version is **plate solving** — matching the star pattern against a catalog to determine exactly where the telescope is pointing, giving absolute coordinates rather than just relative alignment. See **Plate Solving** for the full mechanics.
 
 ### Dithering
 

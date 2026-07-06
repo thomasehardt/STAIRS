@@ -32,6 +32,10 @@ A spectacular target is useless if it's cloudy, if the moon is washing out the s
 
 ## The Details
 
+### The Bortle Scale
+
+The **Bortle Scale** classifies sky darkness on a 1-to-9 scale, from Bortle 1 (a pristine site where the Milky Way casts visible shadows) to Bortle 9 (inner-city skies where only the Moon, planets, and the brightest stars are visible). It's based on naked-eye limiting magnitude and the visibility of specific features (zodiacal light, Milky Way structure, airglow) — not just a subjective brightness impression. Most suburban imagers sit between Bortle 4 and 8, where skyglow from streetlights and signage scatters off the atmosphere and raises background brightness uniformly across the field of view.
+
 ### SQS Components
 
 **Weather multiplier** (0–1):
@@ -46,7 +50,7 @@ Depends on the moon's phase, altitude, and angular separation from the target:
 
 - New moon: 1.0 (no penalty)
 - Full moon overhead: μ 0.1 (sky is heavily washed out)
-- Formula: $1 - (\text{illumination} \times 0.5 \times \text{moon altitude} / 90)$
+- Formula: $1 - (\text{illumination} \times 0.5 \times \text{moon altitude} / 90)$ — a dimmer or lower Moon simply scales the penalty down toward 1.0 (no penalty) between those two extremes
 
 **Target altitude trace** (0–1):
 The target's altitude changes throughout the night. SQS samples the target's altitude at multiple times and scores based on how much time it spends in the "sweet spot" (30–75°).

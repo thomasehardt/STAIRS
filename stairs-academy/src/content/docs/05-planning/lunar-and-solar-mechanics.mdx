@@ -1,0 +1,106 @@
+---
+title: Lunar and Solar Mechanics
+description: The Moon as a predictable, broad-spectrum light pollution source, and the non-negotiable filtration physics that make daytime solar imaging safe.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+The Sky Quality Score's Moon multiplier (see **Sky Quality Score**) already tells you _that_ a bright Moon hurts a session. This chapter is about _why_: the Moon is a predictable, broad-spectrum light source whose impact you can plan around exactly, and its daytime counterpart — the Sun — is a different category of problem altogether, one that's about equipment and eye safety rather than image quality.
+
+---
+
+## The Details
+
+### The Moon as a Light Pollution Source
+
+The Moon shines by reflected sunlight, cycling through its illuminated fraction predictably over the ~29.5-day **synodic month**. Unlike artificial light pollution, its brightness is not fixed - a full moon is roughly **ten times brighter** than a first-quarter (half-lit) moon, a much bigger jump than the simple geometry of "half the area lit" would suggest, caused by the **opposition surge**: lunar soil scatters light most efficiently straight back the way it came, which only happens when the Moon is nearly opposite the Sun in our sky (i.e., full).
+
+<div style="display: flex; justify-content: center; margin: 2rem 0;">
+  <svg
+    width="380"
+    height="110"
+    viewBox="0 0 380 110"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect width="380" height="110" fill="#111" rx="8" />
+    <circle cx="50" cy="55" r="28" fill="#222" stroke="#666" />
+    <text x="50" y="100" fill="#888" font-size="11" text-anchor="middle">
+      New
+    </text>
+    <circle cx="140" cy="55" r="28" fill="#222" stroke="#666" />
+    <path d="M140 27 A28 28 0 0 1 140 83 Z" fill="#ddd" />
+    <text x="140" y="100" fill="#888" font-size="11" text-anchor="middle">
+      First Quarter
+    </text>
+    <circle cx="230" cy="55" r="28" fill="#ddd" stroke="#666" />
+    <text x="230" y="100" fill="#ddd" font-size="11" text-anchor="middle">
+      Full (~10x brighter than quarter)
+    </text>
+    <circle cx="330" cy="55" r="28" fill="#222" stroke="#666" />
+    <path d="M330 27 A28 28 0 0 0 330 83 Z" fill="#ddd" />
+    <text x="330" y="100" fill="#888" font-size="11" text-anchor="middle">
+      Last Quarter
+    </text>
+  </svg>
+</div>
+
+The reflected light itself has a broad, continuous, sunlight-like spectrum, unlike the narrow emission lines covered in **Narrowband Imaging** - so it raises sky background across the whole visible spectrum, and dual-band filters only partially suppress it. The Moon's contribution also falls off with angular distance from it (via Rayleigh and Mie scattering off the atmosphere), so a target near the Moon suffers far more than one on the opposite side of the sky, even at an identical phase.
+
+Because Sun-Earth-Moon geometry is exactly predictable, lunar brightness and position are forecastable years in advance - unlike weather-dependent seeing and transparency, the Moon's impact on a given night can be planned around with complete certainty.
+
+### Solar Imaging: A Different Order of Magnitude Entirely
+
+The Sun's apparent brightness exceeds the full Moon's by roughly **400,000 times** (about 5.6 orders of magnitude, from the standard magnitude difference of ~14 between the two) — put another way, you would need to line up around 400,000 full moons side by side to match the Sun's output. It also emits strongly across ultraviolet and infrared wavelengths the naked eye can't detect but that cause real thermal and photochemical damage. Safe solar observation requires a purpose-built, full-aperture solar filter - typically metal-coated polymer film or coated glass - engineered to block on the order of 99.999% of incident light (specified as optical density 5, or **ND5**) across ultraviolet, visible, and infrared bands simultaneously, not just the visible light a human eye would register as "too bright."
+
+The filter must sit in front of the _entire_ optical aperture, intercepting sunlight before it's ever focused or concentrated by the optics. A filter placed behind the objective - such as at an eyepiece - would have already-concentrated sunlight passing through the full aperture's collecting power beforehand, which can crack the filter or, if it fails, deliver a concentrated beam onward undiminished. Dedicated **hydrogen-alpha solar telescopes** use a different technology entirely (a narrow-bandpass etalon transmitting a sliver of spectrum roughly 0.5 to 1 angstrom wide, centered on the 656.3nm Hα line) to reveal chromosphere features like prominences - a distinct, considerably more specialized class of equipment from a simple white-light front filter, and not standard on consumer smart telescopes.
+
+<Aside
+  type="danger"
+  title="Never image the Sun without a certified full-aperture solar filter"
+>
+  Pointing any telescope at the Sun without a purpose-built, full-aperture solar
+  filter can permanently destroy a camera sensor within seconds and poses an
+  immediate, severe eye-injury risk to anyone viewing through an unfiltered
+  eyepiece or finderscope on the same mount. Visible-light brightness is not a
+  reliable warning sign - the ultraviolet and infrared components that cause the
+  most damage are invisible to the eye. Verify any solar filter is rated for
+  direct solar viewing/imaging and is free of scratches, pinholes, or damage
+  before every use.
+</Aside>
+
+---
+
+## In STAIRS
+
+STAIRS's **Sky Quality Score** already encodes the lunar physics above into a single multiplier:
+
+$$\text{moon\_mult} = 1 - \left(\text{illumination} \times 0.5 \times \frac{\text{moon altitude}}{90}\right)$$
+
+The illumination term captures the phase-brightness relationship (though as a simpler linear approximation rather than the true opposition-surge curve), and the altitude term captures that a Moon near the horizon contributes far less skyglow than one overhead. STAIRS has no concept of solar targets at all - it's built entirely around night-time deep-sky planning, so solar imaging safety and technique fall completely outside anything the app checks for you.
+
+---
+
+<DeepDive title="Deep Dive: What ND5 Actually Means">
+
+**Optical density (OD)** and **neutral density (ND)** ratings describe filter attenuation on a logarithmic scale:
+
+$$T = 10^{-\text{OD}}$$
+
+where $T$ is the fraction of light transmitted. An ND5 (OD5) filter transmits:
+
+$$T = 10^{-5} = 0.00001 = 0.001\%$$
+
+meaning it blocks 99.999% of incident light. This is the minimum density considered safe for direct solar viewing and imaging - lower-rated "ND" filters sold for daytime terrestrial photography (commonly ND3 to ND4, blocking 99.9% to 99.99%) are not adequate for solar work and must never be substituted.
+
+</DeepDive>
+
+<Interactive
+  src="/stairs-docs/interactives/nightfinder.html"
+  title="Sun and Moon Geometry"
+  height={700}
+  caption="The Sun's altitude sets the boundary of usable darkness each night, and the same Sun-Earth-Moon geometry predicts the Moon's phase and brightness with complete certainty."
+/>

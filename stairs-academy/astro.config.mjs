@@ -29,6 +29,7 @@ export default defineConfig({
           items: [
             { label: "Welcome", slug: "start-here/welcome" },
             { label: "How to Use This Guide", slug: "start-here/how-to-use" },
+            { label: "Glossary", slug: "start-here/glossary" },
           ],
         },
         {
@@ -80,6 +81,10 @@ export default defineConfig({
           label: "3. Mounts & Tracking",
           items: [
             { label: "Why Mounts Matter", slug: "03-mounts/why-mounts-matter" },
+            {
+              label: "The Celestial Coordinate System",
+              slug: "03-mounts/celestial-coordinates",
+            },
             { label: "Alt-Az Mounts", slug: "03-mounts/alt-az" },
             { label: "Equatorial Mounts", slug: "03-mounts/equatorial" },
             { label: "Field Rotation", slug: "03-mounts/field-rotation" },
@@ -100,6 +105,10 @@ export default defineConfig({
             {
               label: "Alignment & Dithering",
               slug: "04-stacking/alignment-dithering",
+            },
+            {
+              label: "Plate Solving",
+              slug: "04-stacking/plate-solving",
             },
             {
               label: "Calibration Frames",
@@ -126,8 +135,16 @@ export default defineConfig({
               label: "Choosing the Right Target",
               slug: "05-planning/choosing-targets",
             },
+            {
+              label: "Stellar Evolution and the Cosmic Distance Scale",
+              slug: "05-planning/target-types-and-distances",
+            },
             { label: "Object Suitability Score", slug: "05-planning/oss" },
             { label: "Sky Quality Score", slug: "05-planning/sqs" },
+            {
+              label: "Lunar and Solar Mechanics",
+              slug: "05-planning/lunar-and-solar-mechanics",
+            },
             {
               label: "Building an Imaging Plan",
               slug: "05-planning/building-a-plan",

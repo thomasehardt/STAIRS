@@ -1,0 +1,103 @@
+---
+title: The Celestial Coordinate System (RA/Dec)
+description: The sky's own latitude and longitude grid — and why it's the only way to point at something not already in a catalog.
+---
+
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+Every star, galaxy, and nebula has an address on the sky, in the same way every building has an address on Earth. That address is a pair of numbers — **Right Ascension** and **Declination** — and it stays fixed no matter where on Earth you're observing from or what time you look. This is what makes it possible to hand a telescope a coordinate for something that isn't in its built-in catalog at all: a newly discovered comet, a supernova announced an hour ago.
+
+---
+
+## The Details
+
+### Earth's grid, projected onto the sky
+
+Imagine Earth's latitude and longitude lines extended outward until they paint themselves onto the inside of a giant sphere surrounding the planet — the **celestial sphere**. Every object in the sky sits at a fixed point on that sphere:
+
+- **Declination (Dec)** is the direct equivalent of latitude: degrees north or south of the celestial equator. 0° at the equator, +90° at the north celestial pole, -90° at the south.
+- **Right Ascension (RA)** is the equivalent of longitude: angular distance measured eastward around the celestial equator. Because Earth rotates once per day, RA is conventionally given in hours, minutes, and seconds (0h to 24h) rather than degrees — 1 hour of RA equals 15 degrees.
+
+<div style="display: flex; justify-content: center; margin: 2rem 0;">
+  <svg
+    width="360"
+    height="220"
+    viewBox="0 0 360 220"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect width="360" height="220" fill="#111" rx="8" />
+    {/* Dec lines */}
+    <line x1="20" y1="40" x2="340" y2="40" stroke="#444" stroke-width="1" />
+    <line x1="20" y1="80" x2="340" y2="80" stroke="#444" stroke-width="1" />
+    <line
+      x1="20"
+      y1="120"
+      x2="340"
+      y2="120"
+      stroke="#66ccff"
+      stroke-width="2"
+    />
+    <line x1="20" y1="160" x2="340" y2="160" stroke="#444" stroke-width="1" />
+    <text x="345" y="124" fill="#66ccff" font-size="10">
+      0&#176; (equator)
+    </text>
+    <text x="345" y="44" fill="#888" font-size="10">
+      +40&#176;
+    </text>
+    <text x="345" y="164" fill="#888" font-size="10">
+      -40&#176;
+    </text>
+    {/* RA lines */}
+    <line x1="60" y1="20" x2="60" y2="200" stroke="#444" stroke-width="1" />
+    <line x1="140" y1="20" x2="140" y2="200" stroke="#444" stroke-width="1" />
+    <line x1="220" y1="20" x2="220" y2="200" stroke="#444" stroke-width="1" />
+    <line x1="300" y1="20" x2="300" y2="200" stroke="#444" stroke-width="1" />
+    <text x="55" y="212" fill="#888" font-size="10">
+      0h
+    </text>
+    <text x="135" y="212" fill="#888" font-size="10">
+      6h
+    </text>
+    <text x="215" y="212" fill="#888" font-size="10">
+      12h
+    </text>
+    <text x="295" y="212" fill="#888" font-size="10">
+      18h
+    </text>
+    {/* Target marker: M42 Orion Nebula, RA 5h35m, Dec -5.4deg */}
+    <circle cx="112" cy="128" r="5" fill="#ff8844" />
+    <text x="122" y="132" fill="#ff8844" font-size="11" font-weight="bold">
+      M42: RA 5h35m, Dec -5.4&#176;
+    </text>
+  </svg>
+</div>
+
+### Why it's a fixed reference
+
+RA is measured from a reference point called the **vernal equinox**, where the Sun's apparent path crosses the celestial equator moving northward. Because the grid is anchored to the star field itself rather than to any one observer's horizon, a cataloged object's coordinates stay effectively constant for decades. The only meaningful drift is **precession** — the roughly 26,000-year wobble of Earth's rotational axis — which shifts coordinates by only about 50 arcseconds per year. That's slow enough that catalogs simply pin coordinates to a reference date, or **epoch** (commonly **J2000.0**), and treat them as fixed for any practical observing timescale.
+
+### Why it matters for the uncataloged
+
+A telescope's onboard object database only contains what was known when it was compiled. New comets, novae, and supernovae are discovered continuously and have no entry in any preloaded catalog. What they do have, within hours of discovery, is a precise RA/Dec position published by the discovering observatory or a clearinghouse like the IAU Minor Planet Center. Because RA/Dec describes a location on the sky rather than a named object, any telescope anywhere on Earth can slew directly to it without needing to know the object's name or history — the coordinate system is universal in a way no catalog can be.
+
+---
+
+## In STAIRS
+
+Every target STAIRS plans for is first resolved from the catalog to a J2000 RA/Dec pair, which then feeds `astropy`'s `SkyCoord` machinery for all downstream visibility, altitude, and scoring calculations. STAIRS currently only plans for catalog-resolved targets — it doesn't yet accept a manually entered RA/Dec for an uncataloged object — so a newly discovered comet or nova has to be pointed at directly through your telescope's own app rather than through a STAIRS-generated plan.
+
+---
+
+<DeepDive title="Deep Dive: Fast Movers and Ephemerides">
+
+### When a Single Coordinate Isn't Enough
+
+A star's RA/Dec is fixed for practical purposes, but comets and asteroids move measurably against the background stars over hours to days. For these, a single coordinate pair goes stale quickly — what's needed is an **ephemeris**: a table (or generator, such as JPL Horizons or the Minor Planet Center's tool) that outputs RA/Dec for a specific date and time rather than a static position.
+
+### Epoch Mismatches
+
+The most common source of a "successful slew, wrong target" result isn't a bad coordinate — it's mixing epochs. A J2000 coordinate and a current-date (epoch-of-date) coordinate for the same object can differ by an arcminute or more after enough years have passed. When cross-referencing a discovery alert, a planning tool, and a telescope's manual-entry field, confirm all three assume the same epoch before trusting the result.
+
+</DeepDive>

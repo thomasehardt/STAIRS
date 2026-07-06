@@ -45,6 +45,12 @@ To see the structure of different gases, scientists often map these three lines 
 
 This creates the iconic "golden and blue" look made famous by the Hubble Space Telescope.
 
+### True Color vs. False Color
+
+A single wavelength has no "hue" relative to another — there's nothing intrinsically red about Hα or blue about OIII other than the arbitrary channel each gets assigned. Mapping narrowband data to RGB is therefore **false color**: a data-visualization choice made to maximize contrast between different gases, not a reproduction of anything a human eye could perceive. A one-shot color capture through a broadband RGB path, by contrast, is **true color** — an approximation (never perfect) of what the target would look like to an idealized eye. Dual-band captures sit in between: Hα lands in the sensor's red channel and OIII in green/blue, so even a "single exposure, no post-processing" dual-band image is already a mild false-color rendition before any deliberate palette remapping.
+
+One practical wrinkle: Hα sits near the red edge of the visible band (656.3nm), and many consumer camera sensors ship with an internal infrared-cut filter that also attenuates a meaningful share of that signal. This is why some smart telescope vendors offer astro-modified sensors or external accessories specifically to recover red-channel sensitivity for narrowband targets.
+
 ---
 
 ## In STAIRS

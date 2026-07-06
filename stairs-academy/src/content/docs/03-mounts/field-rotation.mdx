@@ -42,7 +42,7 @@ Field rotation depends on three factors:
 
 - **Target declination**: worst at the celestial equator, zero at the poles
 - **Observer latitude**: worse at mid-latitudes, better near the equator
-- **Time since meridian**: worst after meridian crossing
+- **Position relative to the meridian**: worst at meridian transit itself (especially when that transit passes close to the zenith), and momentarily zero when the target is due east or due west
 
 The rotation rate can reach several arcseconds per minute — enough to blur stars in a 30-second exposure at 400× magnification.
 
@@ -74,7 +74,7 @@ $$\dot{\rho} = \frac{15 \cos(\phi) \cos(A)}{\cos(a)}$$
 
 Where $\dot{\rho}$ = rotation rate (°/s), $\phi$ = observer latitude, $A$ = target azimuth, $a$ = target altitude.
 
-At its worst (target near zenith at mid-latitudes), this can be several degrees per hour. At its best (target on the meridian), rotation is momentarily zero but changes sign — the frame stops rotating and starts rotating the other way.
+At its worst (target near zenith at mid-latitudes), this can be several degrees per hour — and since $\cos(A) = \pm 1$ at meridian transit ($A = 0°$ or $180°$), rotation is actually near its fastest at that moment, not its slowest. Rotation instead falls to zero when the target crosses due east or due west ($A = 90°$ or $270°$, the "prime vertical"), where $\cos(A) = 0$.
 
 For a 50mm telescope with 2.4″/px pixel scale, a rotation rate of 1°/hour means stars at the edge of the frame will trail by about 2 pixels in a 20-second exposure — noticeable but acceptable for live stacking.
 

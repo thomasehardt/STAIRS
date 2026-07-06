@@ -1,0 +1,78 @@
+---
+title: Stellar Evolution and the Cosmic Distance Scale
+description: What kind of dying or newborn star you're actually imaging, and why a galaxy and a nebula can differ in distance by a factor of ten thousand.
+---
+
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+The target categories from the previous chapter — star clusters, emission nebulae, galaxies — aren't just a convenient grouping. They're snapshots of stars at specific, physically distinct stages of life, sitting at wildly different distances from Earth. Knowing which is which explains why two targets with the same catalog magnitude can behave completely differently at the eyepiece.
+
+---
+
+## Play With It
+
+<Interactive
+  src="/stairs-docs/interactives/angularsize.html"
+  title="Angular Size vs. Distance"
+  height={520}
+  caption="Drag both sliders independently and watch the right-hand panel: wildly different true sizes and distances can still land on the exact same apparent size in the eyepiece."
+/>
+
+---
+
+## The Details
+
+### Three Life-Cycle Signatures
+
+- **Emission nebulae (HII regions)** are stellar nurseries. Young, hot O- and B-type stars flood the hydrogen cloud they formed from with enough ultraviolet radiation to strip electrons from the gas (ionization). As electrons recombine, they emit light at fixed wavelengths — dominantly hydrogen-alpha — producing the red glow of targets like the Orion Nebula. This is active star formation, not stellar death.
+- **Planetary nebulae** mark the end of life for a Sun-like star. As it exhausts its fuel, it sheds its outer envelope in a slow stellar wind, exposing the hot, compact core underneath — a **white dwarf** — which is hot enough to ionize the ejected shell (the Ring Nebula, the Helix Nebula). The name is a historical artifact; it has nothing to do with planets.
+- **Supernova remnants** result from a far more violent death: the core collapse of a massive star, or the thermonuclear detonation of a white dwarf that accreted too much mass. The explosion drives a shockwave into surrounding gas at thousands of kilometers per second, and much of a remnant's glow (the Veil Nebula, the Crab Nebula) comes from **shock ionization** rather than ongoing photoionization by a nearby star.
+
+### The Distance Scale Gap
+
+Nearly all of the nebular targets above are **galactic** — they lie within the Milky Way, typically hundreds to a few thousand light-years away. **Galaxies** are entire separate star systems, typically millions to hundreds of millions of light-years distant — a gap of four to five orders of magnitude. The light from a nearby nebula left its source around the time of early human history; the light from a typical target galaxy left before complex life existed on Earth.
+
+| Target                 | Type              | Approximate Distance | Light Left Source                      |
+| ---------------------- | ----------------- | -------------------- | -------------------------------------- |
+| Orion Nebula (M42)     | Emission nebula   | ~1,300 ly            | ~1,300 years ago                       |
+| Ring Nebula (M57)      | Planetary nebula  | ~2,500 ly            | ~2,500 years ago                       |
+| Veil Nebula            | Supernova remnant | ~2,400 ly            | ~2,400 years ago                       |
+| Andromeda Galaxy (M31) | Spiral galaxy     | ~2.5 million ly      | Long before _Homo sapiens_ existed     |
+| Whirlpool Galaxy (M51) | Spiral galaxy     | ~23 million ly       | Long before the first hominins existed |
+
+To put that gap in everyday terms: if the Orion Nebula were shrunk down to sit one mile away, the Andromeda Galaxy — on the very same scale — would still be roughly 1,900 miles away, about the distance from New York to Denver. Both fit in the same eyepiece; they are not remotely the same kind of "far."
+
+These distances are measured by entirely different methods depending on scale: nearby galactic distances rely on **parallax** or known stellar luminosities; galactic distances rely on **standard candles** (Cepheid variables, Type Ia supernovae) or, for the most distant galaxies, on **redshift** — the stretching of light's wavelength caused by the expansion of space.
+
+### Why Distance Changes What You See
+
+The same total light output, spread across a larger angular area or shrunk by greater distance, produces very different framing outcomes. A nearby emission nebula's true physical structure can subtend degrees of sky; a distant galaxy of similar total brightness can subtend only arcminutes, rendering it as a comparatively featureless smudge with a brighter core in a small-aperture telescope, even though both objects might carry a similar catalog magnitude.
+
+---
+
+## In STAIRS
+
+STAIRS's **Object Suitability Score (OSS)** scores every target against your telescope's field of view using each object's cataloged angular size directly — it doesn't need to know why that angular size is what it is. But you do: a large, close emission nebula and a small, distant galaxy can land at opposite ends of the same FOV Fit curve for reasons that have nothing to do with brightness — they're simply different physical objects at different distances, and this is why a "let OSS pick" strategy occasionally surfaces a small galaxy alongside a wide nebula mosaic with similar scores for very different underlying reasons.
+
+---
+
+<DeepDive title="Deep Dive: Angular Size, Distance, and Surface Brightness">
+
+### The Small-Angle Approximation
+
+For any object whose physical size $D$ is much smaller than its distance $d$, its angular size in radians is approximately:
+
+$$\theta \approx \frac{D}{d}$$
+
+Converting to arcminutes: $\theta_{\text{arcmin}} \approx 3438 \times \dfrac{D}{d}$ (with $D$ and $d$ in the same units).
+
+This is why doubling an object's distance halves its angular size for the same physical size — and why two objects of very different true size and distance can still present nearly identical angular sizes to a telescope.
+
+### Surface Brightness Is Distance-Independent (Almost)
+
+A galaxy's _total_ brightness falls off with the inverse square of distance, but so does the light spread over its angular area — the two effects nearly cancel, which is why **surface brightness** (brightness per unit angular area, used directly in OSS) is a far more reliable predictor of how a spread-out object will actually look than total magnitude alone. This is also why moving a telescope to a darker site helps a galaxy's contrast against the sky background, but does nothing to change the galaxy's own surface brightness — the object itself isn't getting any easier to see per pixel, only the competing sky glow is getting dimmer.
+
+</DeepDive>

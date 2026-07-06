@@ -1,0 +1,61 @@
+---
+title: Plate Solving
+description: The computer-vision algorithm that turns a short exposure of unlabeled stars into a precise, arcsecond-level pointing fix.
+---
+
+import Interactive from "../../../components/Interactive.astro";
+import DeepDive from "../../../components/DeepDive.astro";
+
+## The Big Idea
+
+**Plate solving** figures out exactly where a telescope is pointed by analyzing the stars in a single short exposure — no encoders, no prior calibration, no knowledge of the image's orientation or scale required. The name is a holdover from the photographic-plate era, but the technique itself is pure computer vision, and it's what lets a smart telescope correct its own aim after every slew.
+
+---
+
+## Play With It
+
+<Interactive
+  src="/stairs-docs/interactives/platesolve.html"
+  title="Plate Solving Simulation"
+  height={680}
+  caption="A short exposure's star pattern is matched against a catalog index by relative geometry alone, yielding a precise pointing fix without any prior knowledge of orientation or scale."
+/>
+
+---
+
+## The Details
+
+### From Pixels to a Sky Position
+
+The process runs in four stages:
+
+1. **Star detection** — the software finds bright, point-like sources in the frame and records their pixel coordinates.
+2. **Geometric hashing** — rather than trying to match individual stars (any star looks like any other star), the algorithm groups nearby stars into small clusters (commonly triangles or 4-star "quads") and computes the ratios of the distances and angles between them. These ratios don't change no matter how the image is rotated, scaled, or flipped, making them a reliable fingerprint for that patch of sky.
+3. **Catalog lookup** — those fingerprints are compared against a precomputed index built the same way from a star catalog. A match identifies which real, cataloged stars correspond to which points in the image.
+4. **Coordinate transform (WCS)** — once a handful of stars are confidently matched, the software fits a **World Coordinate System (WCS)**: a mapping from every pixel in the frame to a precise RA/Dec, typically accurate to sub-arcsecond precision.
+
+### Shape Survives What Brightness Doesn't
+
+A star's measured brightness depends on exposure time, transparency, focus, and gain — none of which are known in advance. The relative _geometry_ of a group of stars, however, is essentially fixed regardless of any of that. This is why the pattern-matching approach works reliably even on noisy, poorly focused, or partly clouded frames: it depends on shape, which survives conditions that brightness measurements don't.
+
+A **blind solve** searches the whole sky with no starting assumption and can take longer to converge. A **near-field solve** — what nearly all smart telescopes use — starts from the mount's approximate encoder position and only needs to search a small patch of the index, typically resolving in a second or two.
+
+---
+
+## In STAIRS
+
+Plate solving happens entirely on the telescope side, not in STAIRS — STAIRS is a planning tool, not a device controller, so it never issues or verifies a solve itself. What STAIRS assumes is that the telescope's own solving loop delivers the pointing accuracy its scoring and scheduling decisions are built on: a target's altitude trace, meridian penalty, and integration-time estimate are only meaningful if the telescope actually lands on the coordinates STAIRS resolved. A repeatedly failing solve (thin cloud, very sparse star fields, heavy light pollution) is a real-world condition STAIRS's plan can't detect — it will show up as a session that doesn't match its planned outcome, which is exactly the kind of gap the session logging feature (see **Using STAIRS**) is meant to capture after the fact.
+
+---
+
+<DeepDive title="Deep Dive: Why Solves Fail">
+
+### Star Count Requirements
+
+Geometric hashing needs a workable number of detected stars to build reliable matches — typically a handful of stars are enough for a near-field solve, more for a blind solve searching the whole sky. Solves degrade in sparse star fields (deep in the galactic anti-center) and can fail outright under heavy light pollution or very short test exposures where too few stars cross the detection threshold — a common cause of a "solve failed, retrying" message on a hazy or heavily light-polluted night.
+
+### Why Geometry, Not Brightness, Is Rotation-Invariant
+
+For a triangle formed by three stars, the ratio of any two side lengths and the angles between them are preserved under rotation, uniform scaling, and translation of the image. This is precisely why a solver doesn't need to know the camera's orientation or field of view in advance — the same three stars produce the same ratios whether the frame is right-side up, rotated 90°, or scaled differently by a different focal length.
+
+</DeepDive>
