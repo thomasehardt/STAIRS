@@ -1,5 +1,11 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
+
+# Vendored/generated third-party assets (Pyodide runtime + wheels, duckdb-wasm
+# bundle) - not ours to reformat, and risky to touch since some are minified
+# JS or binary-adjacent (.wasm, .whl).
+exclude: "^mobile-poc/www/(pyodide|duckdb|vendor)/"
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.2.0

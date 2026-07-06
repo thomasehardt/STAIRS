@@ -13,6 +13,10 @@
   "dependencies": {
     "@capacitor/android": "^8.4.1",
     "@capacitor/cli": "^8.4.1",
-    "@capacitor/core": "^8.4.1"
+    "@capacitor/core": "^8.4.1",
+    "@duckdb/duckdb-wasm": "^1.32.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1"
   }
 }
