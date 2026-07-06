@@ -51,7 +51,7 @@ Your camera sensor has imperfections: some pixels are more sensitive than others
 
 $$I_{\text{calibrated}} = \frac{I_{\text{raw}} - I_{\text{dark}}}{I_{\text{flat}} - I_{\text{bias}}}$$
 
-Where each term is a **master** frame (median or average of many individual calibration frames). _Note: Depending on the camera and exposure time, Flats sometimes require their own "Flat-Darks" to be subtracted instead of Biases._
+In plain terms: subtract out everything the sensor added on its own (thermal noise, electronic offset), then correct for uneven illumination across the frame — what's left is the real signal from the sky. Where each term is a **master** frame (median or average of many individual calibration frames). _Note: Depending on the camera and exposure time, Flats sometimes require their own "Flat-Darks" to be subtracted instead of Biases._
 
 ### Smart Telescopes and Calibration
 
