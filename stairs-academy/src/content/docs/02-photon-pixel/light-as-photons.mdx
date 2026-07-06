@@ -3,6 +3,7 @@ title: Light as Photons
 description: What is light, really? And why do we treat it as particles in astrophotography?
 ---
 
+import Interactive from "../../../components/Interactive.astro";
 import DeepDive from "../../../components/DeepDive.astro";
 
 ## The Big Idea
@@ -16,7 +17,7 @@ Light behaves as both a wave and a particle. In astrophotography, we care about 
 ### Photon Basics
 
 - A photon is a quantum of electromagnetic energy
-- Its energy depends on its wavelength (color): $E = hc / \lambda$
+- Its energy depends on its wavelength (color): $E = hc / \lambda$ — in plain terms, shorter wavelengths pack more energy per photon, which is why blue light can do things (like knock an electron loose) that an equal amount of red light can't
 - Blue photons carry more energy than red photons
 - The human eye can detect individual photons under ideal conditions
 - A camera sensor counts photons and records the tally
@@ -25,8 +26,8 @@ Light behaves as both a wave and a particle. In astrophotography, we care about 
 
 Most astrophotography targets are **extremely dim** — few photons per pixel per second. This means:
 
-- **Shot noise**: photon arrival is random (Poisson statistics). The uncertainty is $\sqrt{N}$ where $N$ is the number of photons detected.
-- **SNR**: signal-to-noise ratio = $N / \sqrt{N} = \sqrt{N}$. More photons = better image.
+- **Shot noise**: photon arrival is random (Poisson statistics) — like raindrops hitting a roof, you can predict the average rate but not the exact count in any given second. The uncertainty is $\sqrt{N}$ where $N$ is the number of photons detected.
+- **SNR**: signal-to-noise ratio = $N / \sqrt{N} = \sqrt{N}$. In practice this means collecting 4x the photons only doubles your image quality, not quadruples it — more photons always helps, but with diminishing returns.
 - **Low signal**: a faint nebula might deliver only 1–2 photons per pixel per second.
 
 ### Flux and Magnitude
@@ -42,7 +43,14 @@ The photon flux from a star of magnitude $m$ is:
 
 $$F = F_0 \cdot 10^{-0.4m}$$
 
-Where $F_0$ is the flux of a magnitude 0 star (about $10^{10}$ photons/m²/s in visible light).
+Where $F_0$ is the flux of a magnitude 0 star (about $10^{10}$ photons/m²/s in visible light). The formula just encodes the "5 magnitudes = 100x" rule above in a form you can plug any magnitude into.
+
+<Interactive
+  src="/stairs-docs/interactives/magnitude.html"
+  title="Magnitude: Linear vs. Log Scale"
+  height={560}
+  caption="The same set of objects plotted on a linear brightness scale (where faint ones vanish entirely) versus the magnitude scale (where every object stays visible and evenly spaced)."
+/>
 
 ---
 

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>FOV Fit Score</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      #canvas-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+      input[type="range"] {
+        width: 220px;
+      }
+      label {
+        font-weight: bold;
+        color: #ccc;
+      }
+      .val {
+        color: #88f;
+        font-weight: bold;
+        min-width: 40px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>FOV Fit Score</h1>
+    <p>
+      Resize the target and your sensor's field of view, and watch the score
+      curve and the frame fit together.
+    </p>
+    <div class="controls">
+      <label
+        >Target Size (arcmin):
+        <input
+          type="range"
+          id="sizeSlider"
+          min="1"
+          max="150"
+          step="1"
+          value="25"
+        />
+        <span class="val" id="sizeVal">25'</span></label
+      >
+      <label
+        >Sensor FOV (arcmin):
+        <input
+          type="range"
+          id="fovSlider"
+          min="20"
+          max="90"
+          step="1"
+          value="43"
+        />
+        <span class="val" id="fovVal">43'</span></label
+      >
+    </div>
+    <div id="canvas-container"></div>
+    <script src="fovfit.js"></script>
+  </body>
+</html>

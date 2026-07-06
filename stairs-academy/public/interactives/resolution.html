@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Resolution vs. Aperture</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background: #111;
+        color: white;
+        margin: 0;
+        padding: 20px;
+      }
+      .controls {
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        width: fit-content;
+        margin: 10px auto;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      #canvas-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+      }
+      input[type="range"] {
+        width: 200px;
+      }
+      label {
+        font-weight: bold;
+        color: #ccc;
+      }
+      .val {
+        color: #88f;
+        font-weight: bold;
+        min-width: 40px;
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Resolution vs. Aperture</h1>
+    <p>
+      Two stars, a fixed angular separation apart. Grow the aperture and watch
+      Dawes' Limit shrink until they split.
+    </p>
+    <div class="controls">
+      <label
+        >Aperture (mm):
+        <input
+          type="range"
+          id="apSlider"
+          min="20"
+          max="300"
+          step="5"
+          value="80"
+        />
+        <span class="val" id="apVal">80mm</span></label
+      >
+      <label
+        >Star Separation:
+        <input
+          type="range"
+          id="sepSlider"
+          min="0.3"
+          max="6.0"
+          step="0.1"
+          value="2.0"
+        />
+        <span class="val" id="sepVal">2.0"</span></label
+      >
+    </div>
+    <div id="canvas-container"></div>
+    <script src="resolution.js"></script>
+  </body>
+</html>
