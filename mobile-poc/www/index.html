@@ -6,239 +6,512 @@
       name="viewport"
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
-    <title>STAIRS Mobile Feasibility POC</title>
+    <title>STAIRS Mobile POC</title>
     <script src="pyodide/pyodide.js"></script>
     <style>
+      * {
+        box-sizing: border-box;
+      }
       body {
         font-family: -apple-system, system-ui, sans-serif;
         background: #0d0d0d;
         color: #eee;
         margin: 0;
-        padding: 1.25rem;
+        padding: 0;
+      }
+      header {
+        padding: 1rem 1.25rem 0.75rem;
+        border-bottom: 1px solid #2a2a2a;
+        position: sticky;
+        top: 0;
+        background: #0d0d0d;
+        z-index: 5;
       }
       h1 {
-        font-size: 1.3rem;
-        margin: 0 0 0.25rem;
+        font-size: 1.2rem;
+        margin: 0 0 0.5rem;
       }
-      p.sub {
+      .status-line {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
         color: #999;
-        margin: 0 0 1rem;
-        font-size: 0.9rem;
+      }
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #666;
+        flex-shrink: 0;
+      }
+      .status-dot.ready {
+        background: #4caf50;
+      }
+      .status-dot.error {
+        background: #e05555;
+      }
+      details.diagnostics {
+        margin-top: 0.5rem;
+      }
+      details.diagnostics summary {
+        font-size: 0.8rem;
+        color: #888;
+        cursor: pointer;
       }
       .step {
         background: #1a1a1a;
         border: 1px solid #2a2a2a;
-        border-radius: 8px;
-        padding: 0.8rem 1rem;
-        margin-bottom: 0.7rem;
+        border-left-width: 3px;
+        border-radius: 6px;
+        padding: 0.6rem 0.8rem;
+        margin: 0.5rem 0;
       }
       .step .label {
         font-weight: 600;
-        font-size: 0.95rem;
+        font-size: 0.85rem;
       }
       .step .detail {
         color: #aaa;
-        font-size: 0.85rem;
-        margin-top: 0.3rem;
+        font-size: 0.78rem;
+        margin-top: 0.25rem;
         white-space: pre-wrap;
         word-break: break-word;
       }
-      .pending {
-        border-left: 3px solid #666;
+      .step.pending {
+        border-left-color: #666;
       }
-      .ok {
-        border-left: 3px solid #4caf50;
+      .step.ok {
+        border-left-color: #4caf50;
       }
-      .fail {
-        border-left: 3px solid #e05555;
+      .step.fail {
+        border-left-color: #e05555;
       }
-      .icon {
-        margin-right: 0.4rem;
+      .location-bar {
+        padding: 0.6rem 1.25rem;
+        font-size: 0.9rem;
+        color: #ccc;
+        border-bottom: 1px solid #2a2a2a;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .location-bar select {
+        flex: 1;
+        background: #1a1a1a;
+        color: #eee;
+        border: 1px solid #333;
+        border-radius: 6px;
+        padding: 0.4rem 0.5rem;
+        font-size: 0.88rem;
+      }
+      .tab-bar {
+        display: flex;
+        border-bottom: 1px solid #2a2a2a;
+      }
+      .tab-btn {
+        flex: 1;
+        background: none;
+        border: none;
+        color: #888;
+        padding: 0.7rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-bottom: 2px solid transparent;
+      }
+      .tab-btn.active {
+        color: #ffc966;
+        border-bottom-color: #ffc966;
+      }
+      #calendar-list {
+        padding: 1rem 1.25rem 1.5rem;
+      }
+      .night-card {
+        background: #161616;
+        border: 1px solid #262626;
+        border-left-width: 4px;
+        border-radius: 8px;
+        padding: 0.7rem 0.9rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .night-card .date {
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+      .night-card .sub {
+        color: #888;
+        font-size: 0.78rem;
+        margin-top: 0.15rem;
+      }
+      .night-card .quality {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #ffc966;
+      }
+      .search-bar {
+        padding: 0.75rem 1.25rem;
+      }
+      .search-bar input {
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+        border-radius: 8px;
+        border: 1px solid #333;
+        background: #1a1a1a;
+        color: #eee;
+        font-size: 0.95rem;
+      }
+      #target-list {
+        padding: 0 1.25rem 1.5rem;
+      }
+      .target-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.7rem 0.9rem;
+        background: #161616;
+        border: 1px solid #262626;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+      }
+      .target-row:active {
+        background: #222;
+      }
+      .target-row .name {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .target-row .type {
+        color: #888;
+        font-size: 0.8rem;
+      }
+      .target-row .mag {
+        color: #ffc966;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+      #empty-state,
+      #loading-state {
+        color: #777;
+        padding: 1rem 1.25rem;
+        font-size: 0.9rem;
+      }
+
+      /* Detail panel (slide-up sheet) */
+      #detail-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        display: none;
+        z-index: 10;
+      }
+      #detail-overlay.open {
+        display: block;
+      }
+      #detail-sheet {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        max-height: 80vh;
+        overflow-y: auto;
+        background: #151515;
+        border-top: 1px solid #333;
+        border-radius: 16px 16px 0 0;
+        padding: 1.25rem;
+        transform: translateY(100%);
+        transition: transform 0.2s ease-out;
+      }
+      #detail-overlay.open #detail-sheet {
+        transform: translateY(0);
+      }
+      #detail-sheet h2 {
+        margin: 0 0 0.2rem;
+        font-size: 1.15rem;
+      }
+      #detail-sheet .detail-sub {
+        color: #888;
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+      }
+      .score-row {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .score-tile {
+        flex: 1;
+        background: #1e1e1e;
+        border-radius: 10px;
+        padding: 0.75rem;
+        text-align: center;
+      }
+      .score-tile .value {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #ffc966;
+      }
+      .score-tile .label {
+        color: #888;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+      .fact-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #262626;
+        font-size: 0.88rem;
+      }
+      .fact-row .k {
+        color: #999;
+      }
+      .close-btn {
+        display: block;
+        width: 100%;
+        margin-top: 1rem;
+        padding: 0.7rem;
+        background: #262626;
+        color: #eee;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+      }
+      .spinner-line {
+        color: #888;
+        font-size: 0.85rem;
       }
     </style>
   </head>
   <body>
-    <h1>STAIRS Mobile Feasibility POC</h1>
-    <p class="sub">
-      STAIRS's real visibility.py + scoring.py, running entirely on-device via
-      Pyodide (Python/WASM) and duckdb-wasm. Fully bundled in this app - no
-      server, no network access required at all.
-    </p>
-    <div id="steps"></div>
+    <header>
+      <h1>STAIRS</h1>
+      <div class="status-line">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">Starting engine…</span>
+      </div>
+      <details class="diagnostics">
+        <summary>Engine diagnostics</summary>
+        <div id="steps"></div>
+      </details>
+    </header>
+
+    <div class="location-bar">
+      📍
+      <select id="location-select" disabled></select>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-targets">Targets</button>
+      <button class="tab-btn" id="tab-calendar">Calendar</button>
+    </div>
+
+    <div id="targets-panel">
+      <div class="search-bar">
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Search targets (name or type)…"
+          disabled
+        />
+      </div>
+
+      <div id="loading-state">
+        Engine still starting - target list will appear here once ready…
+      </div>
+      <div id="target-list" style="display: none"></div>
+      <div id="empty-state" style="display: none">
+        No targets match your search.
+      </div>
+    </div>
+
+    <div id="calendar-panel" style="display: none">
+      <div id="calendar-list"></div>
+    </div>
+
+    <div id="detail-overlay">
+      <div id="detail-sheet"></div>
+    </div>
 
     <script type="module">
       import * as duckdb from "./duckdb/duckdb-browser.bundle.mjs";
 
+      const LOCATIONS = [
+        {
+          name: "Home (Nashville, TN)",
+          latitude: 36.16,
+          longitude: -86.78,
+          elevation_m: 180,
+          bortle_scale: 5,
+          timezone: "America/Chicago",
+        },
+        {
+          name: "Dark Site (Big Bend, TX)",
+          latitude: 29.25,
+          longitude: -103.25,
+          elevation_m: 1100,
+          bortle_scale: 2,
+          timezone: "America/Chicago",
+        },
+        {
+          name: "Downtown Rooftop",
+          latitude: 36.16,
+          longitude: -86.78,
+          elevation_m: 180,
+          bortle_scale: 8,
+          timezone: "America/Chicago",
+        },
+      ];
+      let selectedLocation = LOCATIONS[0];
+
       const stepsEl = document.getElementById("steps");
       const stepEls = {};
+      const statusDot = document.getElementById("status-dot");
+      const statusText = document.getElementById("status-text");
+      const locationSelect = document.getElementById("location-select");
+      const tabTargetsBtn = document.getElementById("tab-targets");
+      const tabCalendarBtn = document.getElementById("tab-calendar");
+      const targetsPanel = document.getElementById("targets-panel");
+      const calendarPanel = document.getElementById("calendar-panel");
+      const calendarListEl = document.getElementById("calendar-list");
+      const searchInput = document.getElementById("search-input");
+      const targetListEl = document.getElementById("target-list");
+      const loadingStateEl = document.getElementById("loading-state");
+      const emptyStateEl = document.getElementById("empty-state");
+      const detailOverlay = document.getElementById("detail-overlay");
+      const detailSheet = document.getElementById("detail-sheet");
+
+      for (const loc of LOCATIONS) {
+        const opt = document.createElement("option");
+        opt.value = loc.name;
+        opt.textContent = `${loc.name} (Bortle ${loc.bortle_scale})`;
+        locationSelect.appendChild(opt);
+      }
+
+      let pyodide, db, conn;
 
       function step(id, label) {
         const el = document.createElement("div");
         el.className = "step pending";
-        el.innerHTML = `<div class="label"><span class="icon">&#9203;</span>${label}</div><div class="detail"></div>`;
+        el.innerHTML = `<div class="label">&#9203; ${label}</div><div class="detail"></div>`;
         stepsEl.appendChild(el);
         stepEls[id] = el;
-        return el;
       }
-
       function stepOk(id, detail) {
         const el = stepEls[id];
         el.className = "step ok";
-        el.querySelector(".icon").innerHTML = "&#9989;";
+        el.querySelector(".label").innerHTML =
+          "&#9989; " +
+          el.querySelector(".label").textContent.replace(/^\W+\s*/, "");
         el.querySelector(".detail").textContent = detail;
       }
-
       function stepFail(id, detail) {
         const el = stepEls[id];
         el.className = "step fail";
-        el.querySelector(".icon").innerHTML = "&#10060;";
+        el.querySelector(".label").innerHTML =
+          "&#10060; " +
+          el.querySelector(".label").textContent.replace(/^\W+\s*/, "");
         el.querySelector(".detail").textContent = detail;
+        statusDot.className = "status-dot error";
+        statusText.textContent =
+          "Engine failed to start - see diagnostics below";
       }
 
-      (async () => {
+      function setStatus(text, ready) {
+        statusText.textContent = text;
+        if (ready) statusDot.className = "status-dot ready";
+      }
+
+      async function initEngine() {
         step("pyodide-load", "Load Pyodide (Python 3.14 runtime, WASM)");
-        const t0 = performance.now();
-        let pyodide;
         try {
           pyodide = await loadPyodide({ indexURL: "pyodide/" });
-          stepOk(
-            "pyodide-load",
-            `Loaded in ${Math.round(performance.now() - t0)}ms`,
-          );
+          stepOk("pyodide-load", "Loaded");
         } catch (e) {
           stepFail("pyodide-load", e.message);
-          return;
+          return false;
         }
 
         step(
           "astropy-install",
-          "Install astropy 7.2.0 (real STAIRS dependency)",
+          "Load astropy 7.2.0 + numpy + pandas + pydantic",
         );
         try {
-          const t1 = performance.now();
           await pyodide.loadPackage([
             "numpy",
             "pandas",
             "micropip",
             "six",
             "pytz",
+            "pydantic",
           ]);
           const micropip = pyodide.pyimport("micropip");
           await micropip.install(["astropy==7.2.0"]);
-          stepOk(
-            "astropy-install",
-            `Installed in ${Math.round(performance.now() - t1)}ms`,
-          );
+          stepOk("astropy-install", "Loaded");
         } catch (e) {
           stepFail("astropy-install", e.message);
-          return;
+          return false;
         }
 
         step(
           "astroplan-vendor",
-          "Load real astroplan 0.10.1 source (same version as STAIRS's venv)",
+          "Load real astroplan 0.10.1 + STAIRS's visibility/scoring/planner modules",
         );
         try {
-          const t2a = performance.now();
-          const manifestResp = await fetch("vendor/manifest.txt");
-          const manifestText = await manifestResp.text();
+          const manifestText = await (
+            await fetch("vendor/manifest.txt")
+          ).text();
           const files = manifestText.trim().split("\n").filter(Boolean);
-
           for (const rel of files) {
-            const resp = await fetch(`vendor/${rel}`);
-            const text = await resp.text();
+            const text = await (await fetch(`vendor/${rel}`)).text();
             const destPath = rel.includes("/")
               ? `/lib/python3.14/site-packages/${rel}`
               : `/home/${rel}`;
-            const destDir = destPath.substring(0, destPath.lastIndexOf("/"));
-            pyodide.FS.mkdirTree(destDir);
+            pyodide.FS.mkdirTree(
+              destPath.substring(0, destPath.lastIndexOf("/")),
+            );
             pyodide.FS.writeFile(destPath, text);
           }
-          stepOk(
-            "astroplan-vendor",
-            `Copied ${files.length} files in ${Math.round(
-              performance.now() - t2a,
-            )}ms`,
-          );
-        } catch (e) {
-          stepFail("astroplan-vendor", e.message);
-          return;
-        }
-
-        step(
-          "astropy-calc",
-          "Run STAIRS's real, unmodified visibility.py + scoring.py (full OSS/AQS pipeline)",
-        );
-        try {
-          const t2 = performance.now();
-          const calcResult = await pyodide.runPythonAsync(`
+          pyodide.runPython(`
 import sys
 sys.path.insert(0, "/home")
-
 from astropy.utils import iers
 iers.conf.auto_max_age = None
 iers.conf.auto_download = False
 
 import visibility as v
 import scoring as s
-from astroplan import Observer
-from astropy.coordinates import SkyCoord, EarthLocation
-from astropy.time import Time
-import astropy.units as u
+from telescope_profile import TelescopeProfile
+from planner_models import ObservationLocation
+from multi_night import MultiNightPlanner
 
-# NGC7293 (Helix Nebula) - brightest planetary nebula in the bundled catalog
-# Real OpenNGC values: MajAx=16.33', V-Mag=7.30
-target_coord = SkyCoord("22:29:38.57", "-20:50:14.4", unit=(u.hourangle, u.deg), frame='icrs')
-location = EarthLocation(lat=36.16*u.deg, lon=-86.78*u.deg, height=180*u.m)
-observer = Observer(location=location, name="Nashville")
-
-start_time = Time("2026-10-01T00:00:00")
-night_start, night_end = v.get_astronomical_night(observer, start_time, date_window_days=14)
-window = v.find_visible_window(observer, target_coord, (night_start, night_end), min_alt=30.0)
-peak_alt = float(v.get_peak_altitudes(observer, target_coord, (night_start, night_end))[0])
-moon_q = v.get_moon_quality(observer, night_start)
-
-class TelescopeProfile:
-    fov_min = 43.0  # Seestar S50's shorter FOV dimension, arcmin
-
-target_data = {"target_id": "NGC7293", "magnitude": 7.30, "size_maj": 16.33, "size_min": 16.33}
-
-oss_rel, aqs_abs = s.calculate_oss(
-    target_data, TelescopeProfile(), max_altitude=peak_alt, min_target_altitude=30.0, bortle_scale=5,
-)
-final_rel, final_abs = s.calculate_final_score(
-    target_data, TelescopeProfile(), max_altitude=peak_alt, min_target_altitude=30.0,
-    weather_data=None, bortle_scale=5, moon_multiplier=moon_q,
+_profile = TelescopeProfile(
+    name="Seestar-class", aperture_mm=50, focal_length_mm=250,
+    sensor_x=1920, sensor_y=1080, pixel_pitch_um=2.9,
 )
 
-import json
-json.dumps({
-    "night_start_utc": night_start.iso,
-    "night_end_utc": night_end.iso,
-    "visible_window_found": window is not None,
-    "peak_altitude_deg": round(peak_alt, 2),
-    "moon_quality": round(moon_q, 3),
-    "oss_relative": oss_rel,
-    "aqs_absolute (Bortle 5)": aqs_abs,
-    "final_relative": final_rel,
-    "final_absolute": final_abs,
-}, indent=2)
+def set_location(lat, lon, elev, bortle, tz):
+    global _location, _observer
+    _location = ObservationLocation(
+        name="current", latitude=lat, longitude=lon, elevation_m=elev,
+        bortle_scale=bortle, timezone=tz,
+    )
+    _observer = _location.get_observer()
+
+set_location(${selectedLocation.latitude}, ${selectedLocation.longitude}, ${selectedLocation.elevation_m}, ${selectedLocation.bortle_scale}, "${selectedLocation.timezone}")
 `);
-          stepOk(
-            "astropy-calc",
-            `Computed in ${Math.round(
-              performance.now() - t2,
-            )}ms (target: NGC7293, Nashville TN, Oct 1 2026):\n${calcResult}`,
-          );
+          stepOk("astroplan-vendor", `Loaded ${files.length} files`);
         } catch (e) {
-          stepFail("astropy-calc", e.message);
-          return;
+          stepFail("astroplan-vendor", e.message);
+          return false;
         }
 
-        step("duckdb-init", "Initialize duckdb-wasm");
-        let db, conn;
+        step("duckdb-init", "Initialize duckdb-wasm + load catalog");
         try {
-          const t3 = performance.now();
           const bundle = {
             mainModule: new URL("duckdb/duckdb-eh.wasm", window.location.href)
               .href,
@@ -256,60 +529,349 @@ json.dumps({
           const logger = new duckdb.ConsoleLogger(duckdb.LogLevel.WARNING);
           db = new duckdb.AsyncDuckDB(logger, worker);
           await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
-          stepOk(
-            "duckdb-init",
-            `Initialized in ${Math.round(performance.now() - t3)}ms`,
-          );
-        } catch (e) {
-          stepFail("duckdb-init", e.message);
-          return;
-        }
 
-        step(
-          "duckdb-catalog",
-          "Load bundled STAIRS catalog (OpenNGC, ~14k objects) and query it",
-        );
-        try {
-          const t4 = performance.now();
-          const csvResp = await fetch("NGC.csv");
-          const csvBuf = await csvResp.arrayBuffer();
+          const csvBuf = await (await fetch("NGC.csv")).arrayBuffer();
           await db.registerFileBuffer("NGC.csv", new Uint8Array(csvBuf));
-
           conn = await db.connect();
           await conn.query(`
             CREATE TABLE catalog AS
             SELECT * FROM read_csv('NGC.csv', delim=';', header=true, ignore_errors=true)
           `);
-          const loadMs = Math.round(performance.now() - t4);
-
-          const t5 = performance.now();
-          const queryResult = await conn.query(`
-            SELECT Name, Type, "V-Mag"
-            FROM catalog
-            WHERE Type = 'PN' AND "V-Mag" IS NOT NULL
-            ORDER BY CAST("V-Mag" AS DOUBLE) ASC
-            LIMIT 5
-          `);
-          const queryMs = Math.round(performance.now() - t5);
-
-          const rowCountResult = await conn.query(
-            `SELECT COUNT(*)::INT AS n FROM catalog`,
-          );
-          const rowCount = rowCountResult.toArray()[0].n;
-
-          const rows = queryResult.toArray().map((r) => {
-            const o = r.toJSON();
-            return `${o.Name} (${o.Type}) mag ${o["V-Mag"]}`;
-          });
-
-          stepOk(
-            "duckdb-catalog",
-            `Loaded ${rowCount} rows in ${loadMs}ms, queried in ${queryMs}ms.\nBrightest planetary nebulae:\n` +
-              rows.join("\n"),
-          );
+          const rowCount = (
+            await conn.query(`SELECT COUNT(*)::INT AS n FROM catalog`)
+          ).toArray()[0].n;
+          stepOk("duckdb-init", `Loaded ${rowCount} catalog rows`);
         } catch (e) {
-          stepFail("duckdb-catalog", e.message);
+          stepFail("duckdb-init", e.message);
+          return false;
         }
+
+        return true;
+      }
+
+      function escapeHtml(str) {
+        const div = document.createElement("div");
+        div.textContent = str ?? "";
+        return div.innerHTML;
+      }
+
+      function renderTargets(rows) {
+        loadingStateEl.style.display = "none";
+        if (rows.length === 0) {
+          targetListEl.style.display = "none";
+          emptyStateEl.style.display = "block";
+          return;
+        }
+        emptyStateEl.style.display = "none";
+        targetListEl.style.display = "block";
+        targetListEl.innerHTML = "";
+        for (const r of rows) {
+          const row = document.createElement("div");
+          row.className = "target-row";
+          row.innerHTML = `
+            <div>
+              <div class="name">${escapeHtml(r.Name)}</div>
+              <div class="type">${escapeHtml(r.Type)} &middot; ${escapeHtml(
+                r.Const,
+              )}</div>
+            </div>
+            <div class="mag">${r["V-Mag"] ?? "?"}</div>
+          `;
+          row.addEventListener("click", () => showDetail(r));
+          targetListEl.appendChild(row);
+        }
+      }
+
+      async function runDefaultQuery() {
+        const result = await conn.query(`
+          SELECT Name, Type, Const, RA, "Dec", "V-Mag", MajAx
+          FROM catalog
+          WHERE Type NOT IN ('*', '**', 'NonEx', 'Dup')
+            AND "V-Mag" IS NOT NULL AND RA IS NOT NULL AND "Dec" IS NOT NULL
+          ORDER BY CAST("V-Mag" AS DOUBLE) ASC
+          LIMIT 40
+        `);
+        renderTargets(result.toArray().map((r) => r.toJSON()));
+      }
+
+      async function runSearchQuery(term) {
+        const escaped = term.replace(/'/g, "''").toUpperCase();
+        const result = await conn.query(`
+          SELECT Name, Type, Const, RA, "Dec", "V-Mag", MajAx
+          FROM catalog
+          WHERE Type NOT IN ('*', '**', 'NonEx', 'Dup')
+            AND "V-Mag" IS NOT NULL AND RA IS NOT NULL AND "Dec" IS NOT NULL
+            AND (UPPER(Name) LIKE '%${escaped}%' OR UPPER(Type) LIKE '%${escaped}%')
+          ORDER BY CAST("V-Mag" AS DOUBLE) ASC
+          LIMIT 40
+        `);
+        renderTargets(result.toArray().map((r) => r.toJSON()));
+      }
+
+      let searchDebounce;
+      searchInput.addEventListener("input", (e) => {
+        clearTimeout(searchDebounce);
+        const term = e.target.value.trim();
+        searchDebounce = setTimeout(() => {
+          const query =
+            term.length === 0 ? runDefaultQuery() : runSearchQuery(term);
+          query.catch((err) => {
+            console.error("search query failed:", err);
+            renderTargets([]);
+          });
+        }, 200);
+      });
+
+      async function showDetail(target) {
+        detailOverlay.classList.add("open");
+        detailSheet.innerHTML = `
+          <h2>${escapeHtml(target.Name)}</h2>
+          <div class="detail-sub">${escapeHtml(target.Type)} in ${escapeHtml(
+            target.Const,
+          )} &middot; magnitude ${target["V-Mag"]}</div>
+          <div class="spinner-line">Computing real visibility + score for right now…</div>
+        `;
+
+        try {
+          const nowIso = new Date().toISOString().slice(0, 19);
+          const raStr = target.RA;
+          const decStr = target.Dec;
+          const mag = parseFloat(target["V-Mag"]) || 15.0;
+          const majAx = parseFloat(target.MajAx) || 1.0;
+
+          pyodide.globals.set("_ra", raStr);
+          pyodide.globals.set("_dec", decStr);
+          pyodide.globals.set("_mag", mag);
+          pyodide.globals.set("_size", majAx);
+          pyodide.globals.set("_now_iso", nowIso);
+          pyodide.globals.set("_name", target.Name);
+
+          const result = await pyodide.runPythonAsync(`
+from astropy.coordinates import SkyCoord
+from astropy.time import Time
+import astropy.units as u
+import json
+
+def safe_iso(t):
+    # Some astroplan edge cases (e.g. a target that never crosses the
+    # horizon at this latitude/declination) return a masked Time rather
+    # than raising or returning None - guard the JSON serialization.
+    try:
+        if bool(getattr(t, "masked", False)):
+            return None
+        return str(t.iso)
+    except Exception:
+        return None
+
+target_coord = SkyCoord(_ra, _dec, unit=(u.hourangle, u.deg), frame='icrs')
+now = Time(_now_iso)
+
+night = v.get_astronomical_night(_observer, now, date_window_days=14)
+out = {"night_found": night is not None}
+
+if night:
+    night_start, night_end = night
+    out["night_start_utc"] = safe_iso(night_start)
+    out["night_end_utc"] = safe_iso(night_end)
+
+    window = v.find_visible_window(_observer, target_coord, (night_start, night_end), min_alt=30.0)
+    out["visible_tonight"] = window is not None
+    if window:
+        out["rise_utc"] = safe_iso(window[0])
+        out["set_utc"] = safe_iso(window[1])
+        if out["rise_utc"] is None or out["set_utc"] is None:
+            out["visible_tonight"] = False
+
+    peak_alt = float(v.get_peak_altitudes(_observer, target_coord, (night_start, night_end))[0])
+    if peak_alt != peak_alt:  # NaN check - e.g. a target that never crosses the horizon here
+        peak_alt = -90.0
+    out["peak_altitude_deg"] = round(peak_alt, 1)
+
+    moon_q = v.get_moon_quality(_observer, night_start)
+    if moon_q != moon_q:
+        moon_q = 1.0
+    out["moon_quality"] = round(moon_q, 2)
+
+    target_data = {"target_id": _name, "magnitude": _mag, "size_maj": _size, "size_min": _size}
+    oss_rel, aqs_abs = s.calculate_oss(
+        target_data, _profile, max_altitude=peak_alt, min_target_altitude=30.0, bortle_scale=_location.bortle_scale,
+    )
+    final_rel, final_abs = s.calculate_final_score(
+        target_data, _profile, max_altitude=peak_alt, min_target_altitude=30.0,
+        weather_data=None, bortle_scale=_location.bortle_scale, moon_multiplier=moon_q,
+    )
+    out["oss"] = oss_rel
+    out["aqs"] = aqs_abs
+    out["final_score"] = final_abs
+
+json.dumps(out)
+`);
+
+          renderDetailResult(target, JSON.parse(result));
+        } catch (e) {
+          detailSheet.innerHTML += `<div class="step fail"><div class="detail">${escapeHtml(
+            e.message,
+          )}</div></div>`;
+        }
+      }
+
+      function utcToLocalTime(iso) {
+        if (!iso) return "-";
+        const d = new Date(iso.replace(" ", "T") + "Z");
+        return d.toLocaleString(undefined, {
+          hour: "2-digit",
+          minute: "2-digit",
+          month: "short",
+          day: "numeric",
+        });
+      }
+
+      function renderDetailResult(target, r) {
+        if (!r.night_found) {
+          detailSheet.innerHTML += `<div class="fact-row"><span class="k">Tonight</span><span>No astronomical darkness found in the next 14 days at this location</span></div>`;
+        } else if (!r.visible_tonight) {
+          detailSheet.innerHTML = detailSheet.innerHTML.replace(
+            /<div class="spinner-line">.*?<\/div>/,
+            "",
+          );
+          detailSheet.innerHTML += `
+            <div class="fact-row"><span class="k">Astronomical night</span><span>${utcToLocalTime(
+              r.night_start_utc,
+            )} &ndash; ${utcToLocalTime(r.night_end_utc)}</span></div>
+            <div class="fact-row"><span class="k">Peak altitude tonight</span><span>${
+              r.peak_altitude_deg
+            }&deg;</span></div>
+            <div class="fact-row"><span class="k">Above 30&deg;?</span><span>Not tonight from this location</span></div>
+          `;
+        } else {
+          detailSheet.innerHTML = detailSheet.innerHTML.replace(
+            /<div class="spinner-line">.*?<\/div>/,
+            "",
+          );
+          detailSheet.innerHTML += `
+            <div class="score-row">
+              <div class="score-tile"><div class="value">${
+                r.oss
+              }</div><div class="label">OSS</div></div>
+              <div class="score-tile"><div class="value">${
+                r.aqs
+              }</div><div class="label">AQS</div></div>
+              <div class="score-tile"><div class="value">${
+                r.final_score
+              }</div><div class="label">Final</div></div>
+            </div>
+            <div class="fact-row"><span class="k">Visible window (rise&ndash;set)</span><span>${utcToLocalTime(
+              r.rise_utc,
+            )} &ndash; ${utcToLocalTime(r.set_utc)}</span></div>
+            <div class="fact-row"><span class="k">Peak altitude tonight</span><span>${
+              r.peak_altitude_deg
+            }&deg;</span></div>
+            <div class="fact-row"><span class="k">Moon quality</span><span>${
+              r.moon_quality
+            } (1.0 = no interference)</span></div>
+          `;
+        }
+        const closeBtn = document.createElement("button");
+        closeBtn.className = "close-btn";
+        closeBtn.textContent = "Close";
+        closeBtn.addEventListener("click", () =>
+          detailOverlay.classList.remove("open"),
+        );
+        detailSheet.appendChild(closeBtn);
+      }
+
+      detailOverlay.addEventListener("click", (e) => {
+        if (e.target === detailOverlay) detailOverlay.classList.remove("open");
+      });
+
+      function qualityColor(absQuality) {
+        if (absQuality >= 50) return "#4caf50";
+        if (absQuality >= 20) return "#ffc966";
+        return "#e05555";
+      }
+
+      async function runCalendar() {
+        calendarListEl.innerHTML = `<div class="spinner-line">Computing 14-night forecast for ${escapeHtml(
+          selectedLocation.name,
+        )}…</div>`;
+        try {
+          const result = await pyodide.runPythonAsync(`
+from astropy.time import Time
+import json
+
+planner = MultiNightPlanner(_location)
+forecast = planner.generate_forecast(days=14, start_time=Time.now())
+json.dumps([
+    {
+        "date": d.date, "dark_hrs": d.total_dark_hours, "eff_hrs": d.effective_hours,
+        "rel_quality": d.relative_quality, "abs_quality": d.absolute_quality, "note": d.note,
+    }
+    for d in forecast
+])
+`);
+          const nights = JSON.parse(result);
+          calendarListEl.innerHTML = "";
+          for (const n of nights) {
+            const card = document.createElement("div");
+            card.className = "night-card";
+            card.style.borderLeftColor = qualityColor(n.abs_quality);
+            const dateObj = new Date(n.date + "T12:00:00");
+            const dateStr = dateObj.toLocaleDateString(undefined, {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+            });
+            card.innerHTML = `
+              <div>
+                <div class="date">${dateStr}</div>
+                <div class="sub">${n.dark_hrs}h dark &middot; ${
+                  n.eff_hrs
+                }h effective${
+                  n.note ? " &middot; " + escapeHtml(n.note) : ""
+                }</div>
+              </div>
+              <div class="quality">${n.abs_quality}</div>
+            `;
+            calendarListEl.appendChild(card);
+          }
+        } catch (e) {
+          calendarListEl.innerHTML = `<div class="step fail"><div class="detail">${escapeHtml(
+            e.message,
+          )}</div></div>`;
+        }
+      }
+
+      tabTargetsBtn.addEventListener("click", () => {
+        tabTargetsBtn.classList.add("active");
+        tabCalendarBtn.classList.remove("active");
+        targetsPanel.style.display = "block";
+        calendarPanel.style.display = "none";
+      });
+      tabCalendarBtn.addEventListener("click", () => {
+        tabCalendarBtn.classList.add("active");
+        tabTargetsBtn.classList.remove("active");
+        targetsPanel.style.display = "none";
+        calendarPanel.style.display = "block";
+        runCalendar();
+      });
+
+      locationSelect.addEventListener("change", async (e) => {
+        const loc = LOCATIONS.find((l) => l.name === e.target.value);
+        if (!loc) return;
+        selectedLocation = loc;
+        pyodide.runPython(
+          `set_location(${loc.latitude}, ${loc.longitude}, ${loc.elevation_m}, ${loc.bortle_scale}, "${loc.timezone}")`,
+        );
+        if (calendarPanel.style.display !== "none") runCalendar();
+      });
+
+      (async () => {
+        const ok = await initEngine();
+        if (!ok) return;
+        setStatus("Ready", true);
+        searchInput.disabled = false;
+        locationSelect.disabled = false;
+        await runDefaultQuery();
       })();
     </script>
   </body>

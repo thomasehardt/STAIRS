@@ -10,3 +10,8 @@ astroplan/utils.py
 astroplan/version.py
 visibility.py
 scoring.py
+optics.py
+telescope_profile.py
+planner_models.py
+forecast_day.py
+multi_night.py
