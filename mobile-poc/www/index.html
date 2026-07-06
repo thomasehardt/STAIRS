@@ -20,7 +20,7 @@
         padding: 0;
       }
       header {
-        padding: 1rem 1.25rem 0.75rem;
+        padding: calc(1rem + env(safe-area-inset-top)) 1.25rem 0.75rem;
         border-bottom: 1px solid #2a2a2a;
         position: sticky;
         top: 0;
@@ -122,6 +122,53 @@
       .tab-btn.active {
         color: #ffc966;
         border-bottom-color: #ffc966;
+      }
+      /* Status palette - validated (skill dataviz/references/palette.md),
+         reserved for status meaning only, never reused as brand accent. */
+      :root {
+        --status-good: #0ca30c;
+        --status-warning: #fab219;
+        --status-serious: #ec835a;
+        --status-critical: #d03b3b;
+        --chart-muted: #898781;
+        --chart-baseline: #383835;
+      }
+      .metric-toggle {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.85rem 1.25rem 0;
+      }
+      .metric-btn {
+        flex: 1;
+        background: #161616;
+        border: 1px solid #262626;
+        color: #999;
+        padding: 0.5rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+      .metric-btn.active {
+        background: #262626;
+        color: #ffc966;
+        border-color: #3a3a3a;
+      }
+      #calendar-chart {
+        padding: 1rem 1.25rem 0.25rem;
+      }
+      #calendar-chart svg {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      .chart-bar-label {
+        font-size: 9px;
+        fill: var(--chart-muted);
+      }
+      .chart-value-label {
+        font-size: 9.5px;
+        font-weight: 600;
+        fill: #ccc;
       }
       #calendar-list {
         padding: 1rem 1.25rem 1.5rem;
@@ -323,7 +370,7 @@
         background: #151515;
         border-top: 1px solid #333;
         border-radius: 16px 16px 0 0;
-        padding: 1.25rem;
+        padding: 1.25rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom));
         transform: translateY(100%);
         transition: transform 0.2s ease-out;
       }
@@ -433,6 +480,15 @@
     </div>
 
     <div id="calendar-panel" style="display: none">
+      <div class="metric-toggle">
+        <button class="metric-btn active" id="metric-abs" data-metric="abs">
+          Absolute
+        </button>
+        <button class="metric-btn" id="metric-rel" data-metric="rel">
+          Relative
+        </button>
+      </div>
+      <div id="calendar-chart"></div>
       <div id="calendar-list"></div>
     </div>
 
@@ -571,6 +627,11 @@
       const calendarPanel = document.getElementById("calendar-panel");
       const settingsPanel = document.getElementById("settings-panel");
       const calendarListEl = document.getElementById("calendar-list");
+      const calendarChartEl = document.getElementById("calendar-chart");
+      const metricAbsBtn = document.getElementById("metric-abs");
+      const metricRelBtn = document.getElementById("metric-rel");
+      let calendarNights = null;
+      let calendarMetric = "abs";
       const locationsListEl = document.getElementById("locations-list");
       const profileSummaryEl = document.getElementById("profile-summary");
       const searchInput = document.getElementById("search-input");
@@ -987,13 +1048,134 @@ json.dumps(out)
         if (e.target === detailOverlay) detailOverlay.classList.remove("open");
       });
 
-      function qualityColor(absQuality) {
-        if (absQuality >= 50) return "#4caf50";
-        if (absQuality >= 20) return "#ffc966";
-        return "#e05555";
+      // Status color is a job of "how good is this night", not brand identity -
+      // uses the dataviz skill's validated, reserved status palette rather than
+      // the app's #ffc966 accent (which stays purely a UI/brand color elsewhere).
+      function qualityColor(value) {
+        if (value >= 60) return "var(--status-good)";
+        if (value >= 35) return "var(--status-warning)";
+        if (value >= 15) return "var(--status-serious)";
+        return "var(--status-critical)";
       }
 
+      function metricValue(n, metric) {
+        return metric === "abs" ? n.abs_quality : n.rel_quality;
+      }
+
+      // Compact axis label: just the day number, except the first bar and any
+      // bar where the month rolls over, which get "Mon D" instead - avoids the
+      // 14-way "Mon 6Tue 7Wed 8…" label collision a full weekday+date would
+      // cause at mobile bar widths (~24px).
+      function shortDate(dateStr, prevDateStr) {
+        const d = new Date(dateStr + "T12:00:00");
+        const isMonthStart =
+          !prevDateStr ||
+          new Date(prevDateStr + "T12:00:00").getMonth() !== d.getMonth();
+        return isMonthStart
+          ? d.toLocaleDateString(undefined, { month: "short", day: "numeric" })
+          : String(d.getDate());
+      }
+
+      function renderCalendarChart(nights, metric) {
+        const w = 340;
+        const chartH = 120;
+        const labelH = 30;
+        const h = chartH + labelH;
+        const n = nights.length;
+        const gap = 2;
+        const barW = Math.min(24, (w - gap * (n - 1)) / n);
+        const usedW = barW * n + gap * (n - 1);
+        const xOffset = (w - usedW) / 2;
+
+        let bars = "";
+        for (let i = 0; i < n; i++) {
+          const value = Math.max(
+            0,
+            Math.min(100, metricValue(nights[i], metric)),
+          );
+          const barH = (value / 100) * chartH;
+          const x = xOffset + i * (barW + gap);
+          const y = chartH - barH;
+          const color = qualityColor(value);
+          const r = Math.min(4, barH); // don't let a tiny bar's corner exceed its own height
+          bars += `
+            <path d="M${x},${chartH} L${x},${y + r} Q${x},${y} ${x + r},${y}
+                     L${x + barW - r},${y} Q${x + barW},${y} ${x + barW},${
+                       y + r
+                     }
+                     L${x + barW},${chartH} Z" fill="${color}" />
+            <text class="chart-value-label" x="${x + barW / 2}" y="${Math.max(
+              9,
+              y - 3,
+            )}" text-anchor="middle">${Math.round(value)}</text>
+            <text class="chart-bar-label" x="${x + barW / 2}" y="${
+              chartH + 14
+            }" text-anchor="middle">${escapeHtml(
+              shortDate(nights[i].date, nights[i - 1]?.date),
+            )}</text>
+          `;
+        }
+
+        calendarChartEl.innerHTML = `
+          <svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+            <line x1="${xOffset}" y1="${chartH}" x2="${
+              xOffset + usedW
+            }" y2="${chartH}"
+                  stroke="var(--chart-baseline)" stroke-width="1" />
+            ${bars}
+          </svg>
+        `;
+      }
+
+      function renderCalendarList(nights, metric) {
+        calendarListEl.innerHTML = "";
+        for (const n of nights) {
+          const value = metricValue(n, metric);
+          const card = document.createElement("div");
+          card.className = "night-card";
+          card.style.borderLeftColor = qualityColor(value);
+          const dateObj = new Date(n.date + "T12:00:00");
+          const dateStr = dateObj.toLocaleDateString(undefined, {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+          });
+          card.innerHTML = `
+            <div>
+              <div class="date">${dateStr}</div>
+              <div class="sub">${n.dark_hrs}h dark &middot; ${
+                n.eff_hrs
+              }h effective${
+                n.note ? " &middot; " + escapeHtml(n.note) : ""
+              }</div>
+            </div>
+            <div class="quality">${value}</div>
+          `;
+          calendarListEl.appendChild(card);
+        }
+      }
+
+      function renderCalendar() {
+        if (!calendarNights) return;
+        renderCalendarChart(calendarNights, calendarMetric);
+        renderCalendarList(calendarNights, calendarMetric);
+      }
+
+      metricAbsBtn.addEventListener("click", () => {
+        calendarMetric = "abs";
+        metricAbsBtn.classList.add("active");
+        metricRelBtn.classList.remove("active");
+        renderCalendar();
+      });
+      metricRelBtn.addEventListener("click", () => {
+        calendarMetric = "rel";
+        metricRelBtn.classList.add("active");
+        metricAbsBtn.classList.remove("active");
+        renderCalendar();
+      });
+
       async function runCalendar() {
+        calendarChartEl.innerHTML = "";
         calendarListEl.innerHTML = `<div class="spinner-line">Computing 14-night forecast for ${escapeHtml(
           selectedLocation.name,
         )}…</div>`;
@@ -1012,31 +1194,8 @@ json.dumps([
     for d in forecast
 ])
 `);
-          const nights = JSON.parse(result);
-          calendarListEl.innerHTML = "";
-          for (const n of nights) {
-            const card = document.createElement("div");
-            card.className = "night-card";
-            card.style.borderLeftColor = qualityColor(n.abs_quality);
-            const dateObj = new Date(n.date + "T12:00:00");
-            const dateStr = dateObj.toLocaleDateString(undefined, {
-              weekday: "short",
-              month: "short",
-              day: "numeric",
-            });
-            card.innerHTML = `
-              <div>
-                <div class="date">${dateStr}</div>
-                <div class="sub">${n.dark_hrs}h dark &middot; ${
-                  n.eff_hrs
-                }h effective${
-                  n.note ? " &middot; " + escapeHtml(n.note) : ""
-                }</div>
-              </div>
-              <div class="quality">${n.abs_quality}</div>
-            `;
-            calendarListEl.appendChild(card);
-          }
+          calendarNights = JSON.parse(result);
+          renderCalendar();
         } catch (e) {
           calendarListEl.innerHTML = `<div class="step fail"><div class="detail">${escapeHtml(
             e.message,
