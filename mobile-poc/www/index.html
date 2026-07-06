@@ -151,6 +151,108 @@
         font-weight: 700;
         color: #ffc966;
       }
+      .settings-section {
+        padding: 1rem 1.25rem;
+      }
+      .settings-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.6rem;
+      }
+      .settings-header h3 {
+        margin: 0;
+        font-size: 1rem;
+        color: #ccc;
+      }
+      .add-btn {
+        background: #262626;
+        color: #ffc966;
+        border: none;
+        border-radius: 6px;
+        padding: 0.4rem 0.7rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+      }
+      .location-card,
+      .profile-card {
+        background: #161616;
+        border: 1px solid #262626;
+        border-radius: 8px;
+        padding: 0.7rem 0.9rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+      }
+      .location-card .name,
+      .profile-card .name {
+        font-weight: 600;
+        font-size: 0.92rem;
+      }
+      .location-card .sub,
+      .profile-card .sub {
+        color: #888;
+        font-size: 0.78rem;
+        margin-top: 0.15rem;
+      }
+      .location-card .badge {
+        color: #ffc966;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+      .form-field {
+        margin-bottom: 0.9rem;
+      }
+      .form-field label {
+        display: block;
+        color: #999;
+        font-size: 0.8rem;
+        margin-bottom: 0.3rem;
+      }
+      .form-field input,
+      .form-field select {
+        width: 100%;
+        padding: 0.55rem 0.7rem;
+        border-radius: 8px;
+        border: 1px solid #333;
+        background: #1e1e1e;
+        color: #eee;
+        font-size: 0.92rem;
+      }
+      .form-row {
+        display: flex;
+        gap: 0.6rem;
+      }
+      .form-row .form-field {
+        flex: 1;
+      }
+      .btn-row {
+        display: flex;
+        gap: 0.6rem;
+        margin-top: 0.5rem;
+      }
+      .btn-row button {
+        flex: 1;
+        padding: 0.7rem;
+        border-radius: 8px;
+        border: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+      .btn-primary {
+        background: #ffc966;
+        color: #111;
+      }
+      .btn-danger {
+        background: #3a1f1f;
+        color: #e05555;
+      }
+      .btn-secondary {
+        background: #262626;
+        color: #eee;
+      }
       .search-bar {
         padding: 0.75rem 1.25rem;
       }
@@ -308,6 +410,7 @@
     <div class="tab-bar">
       <button class="tab-btn active" id="tab-targets">Targets</button>
       <button class="tab-btn" id="tab-calendar">Calendar</button>
+      <button class="tab-btn" id="tab-settings">Settings</button>
     </div>
 
     <div id="targets-panel">
@@ -333,6 +436,22 @@
       <div id="calendar-list"></div>
     </div>
 
+    <div id="settings-panel" style="display: none">
+      <div class="settings-section">
+        <div class="settings-header">
+          <h3>Locations</h3>
+          <button class="add-btn" id="add-location-btn">+ Add</button>
+        </div>
+        <div id="locations-list"></div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-header">
+          <h3>Telescope</h3>
+        </div>
+        <div id="profile-summary" class="profile-card"></div>
+      </div>
+    </div>
+
     <div id="detail-overlay">
       <div id="detail-sheet"></div>
     </div>
@@ -340,7 +459,7 @@
     <script type="module">
       import * as duckdb from "./duckdb/duckdb-browser.bundle.mjs";
 
-      const LOCATIONS = [
+      const DEFAULT_LOCATIONS = [
         {
           name: "Home (Nashville, TN)",
           latitude: 36.16,
@@ -366,7 +485,79 @@
           timezone: "America/Chicago",
         },
       ];
-      let selectedLocation = LOCATIONS[0];
+      const DEFAULT_PROFILE = {
+        name: "Seestar-class",
+        aperture_mm: 50,
+        focal_length_mm: 250,
+        sensor_x: 1920,
+        sensor_y: 1080,
+        pixel_pitch_um: 2.9,
+      };
+      const COMMON_TIMEZONES = [
+        "America/New_York",
+        "America/Chicago",
+        "America/Denver",
+        "America/Los_Angeles",
+        "America/Anchorage",
+        "America/Phoenix",
+        "Pacific/Honolulu",
+        "America/Sao_Paulo",
+        "America/Mexico_City",
+        "America/Toronto",
+        "America/Vancouver",
+        "Europe/London",
+        "Europe/Paris",
+        "Europe/Berlin",
+        "Europe/Madrid",
+        "Europe/Rome",
+        "Europe/Moscow",
+        "Europe/Athens",
+        "Africa/Cairo",
+        "Africa/Johannesburg",
+        "Asia/Dubai",
+        "Asia/Kolkata",
+        "Asia/Shanghai",
+        "Asia/Tokyo",
+        "Asia/Seoul",
+        "Asia/Singapore",
+        "Australia/Sydney",
+        "Australia/Perth",
+        "Pacific/Auckland",
+        "UTC",
+      ];
+
+      function loadLocations() {
+        try {
+          const raw = localStorage.getItem("stairs_locations");
+          const parsed = raw ? JSON.parse(raw) : null;
+          return Array.isArray(parsed) && parsed.length > 0
+            ? parsed
+            : DEFAULT_LOCATIONS;
+        } catch {
+          return DEFAULT_LOCATIONS;
+        }
+      }
+      function saveLocations(locs) {
+        localStorage.setItem("stairs_locations", JSON.stringify(locs));
+      }
+      function loadProfile() {
+        try {
+          const raw = localStorage.getItem("stairs_profile");
+          return raw ? JSON.parse(raw) : DEFAULT_PROFILE;
+        } catch {
+          return DEFAULT_PROFILE;
+        }
+      }
+      function saveProfile(p) {
+        localStorage.setItem("stairs_profile", JSON.stringify(p));
+      }
+
+      let locations = loadLocations();
+      let telescopeProfile = loadProfile();
+      let selectedLocation =
+        locations.find(
+          (l) => l.name === localStorage.getItem("stairs_selected_location"),
+        ) || locations[0];
 
       const stepsEl = document.getElementById("steps");
       const stepEls = {};
@@ -375,9 +566,13 @@
       const locationSelect = document.getElementById("location-select");
       const tabTargetsBtn = document.getElementById("tab-targets");
       const tabCalendarBtn = document.getElementById("tab-calendar");
+      const tabSettingsBtn = document.getElementById("tab-settings");
       const targetsPanel = document.getElementById("targets-panel");
       const calendarPanel = document.getElementById("calendar-panel");
+      const settingsPanel = document.getElementById("settings-panel");
       const calendarListEl = document.getElementById("calendar-list");
+      const locationsListEl = document.getElementById("locations-list");
+      const profileSummaryEl = document.getElementById("profile-summary");
       const searchInput = document.getElementById("search-input");
       const targetListEl = document.getElementById("target-list");
       const loadingStateEl = document.getElementById("loading-state");
@@ -385,12 +580,17 @@
       const detailOverlay = document.getElementById("detail-overlay");
       const detailSheet = document.getElementById("detail-sheet");
 
-      for (const loc of LOCATIONS) {
-        const opt = document.createElement("option");
-        opt.value = loc.name;
-        opt.textContent = `${loc.name} (Bortle ${loc.bortle_scale})`;
-        locationSelect.appendChild(opt);
+      function refreshLocationSelect() {
+        locationSelect.innerHTML = "";
+        for (const loc of locations) {
+          const opt = document.createElement("option");
+          opt.value = loc.name;
+          opt.textContent = `${loc.name} (Bortle ${loc.bortle_scale})`;
+          locationSelect.appendChild(opt);
+        }
+        locationSelect.value = selectedLocation.name;
       }
+      refreshLocationSelect();
 
       let pyodide, db, conn;
 
@@ -489,11 +689,6 @@ from telescope_profile import TelescopeProfile
 from planner_models import ObservationLocation
 from multi_night import MultiNightPlanner
 
-_profile = TelescopeProfile(
-    name="Seestar-class", aperture_mm=50, focal_length_mm=250,
-    sensor_x=1920, sensor_y=1080, pixel_pitch_um=2.9,
-)
-
 def set_location(lat, lon, elev, bortle, tz):
     global _location, _observer
     _location = ObservationLocation(
@@ -502,7 +697,15 @@ def set_location(lat, lon, elev, bortle, tz):
     )
     _observer = _location.get_observer()
 
+def set_profile(name, aperture_mm, focal_length_mm, sensor_x, sensor_y, pixel_pitch_um):
+    global _profile
+    _profile = TelescopeProfile(
+        name=name, aperture_mm=aperture_mm, focal_length_mm=focal_length_mm,
+        sensor_x=sensor_x, sensor_y=sensor_y, pixel_pitch_um=pixel_pitch_um,
+    )
+
 set_location(${selectedLocation.latitude}, ${selectedLocation.longitude}, ${selectedLocation.elevation_m}, ${selectedLocation.bortle_scale}, "${selectedLocation.timezone}")
+set_profile("${telescopeProfile.name}", ${telescopeProfile.aperture_mm}, ${telescopeProfile.focal_length_mm}, ${telescopeProfile.sensor_x}, ${telescopeProfile.sensor_y}, ${telescopeProfile.pixel_pitch_um})
 `);
           stepOk("astroplan-vendor", `Loaded ${files.length} files`);
         } catch (e) {
@@ -841,29 +1044,310 @@ json.dumps([
         }
       }
 
-      tabTargetsBtn.addEventListener("click", () => {
-        tabTargetsBtn.classList.add("active");
-        tabCalendarBtn.classList.remove("active");
-        targetsPanel.style.display = "block";
-        calendarPanel.style.display = "none";
-      });
-      tabCalendarBtn.addEventListener("click", () => {
-        tabCalendarBtn.classList.add("active");
-        tabTargetsBtn.classList.remove("active");
-        targetsPanel.style.display = "none";
-        calendarPanel.style.display = "block";
-        runCalendar();
-      });
+      function showTab(tab) {
+        tabTargetsBtn.classList.toggle("active", tab === "targets");
+        tabCalendarBtn.classList.toggle("active", tab === "calendar");
+        tabSettingsBtn.classList.toggle("active", tab === "settings");
+        targetsPanel.style.display = tab === "targets" ? "block" : "none";
+        calendarPanel.style.display = tab === "calendar" ? "block" : "none";
+        settingsPanel.style.display = tab === "settings" ? "block" : "none";
+        if (tab === "calendar") runCalendar();
+        if (tab === "settings") {
+          renderLocationsList();
+          renderProfileSummary();
+        }
+      }
+      tabTargetsBtn.addEventListener("click", () => showTab("targets"));
+      tabCalendarBtn.addEventListener("click", () => showTab("calendar"));
+      tabSettingsBtn.addEventListener("click", () => showTab("settings"));
 
-      locationSelect.addEventListener("change", async (e) => {
-        const loc = LOCATIONS.find((l) => l.name === e.target.value);
-        if (!loc) return;
+      function applyLocationChange(loc) {
         selectedLocation = loc;
+        localStorage.setItem("stairs_selected_location", loc.name);
         pyodide.runPython(
           `set_location(${loc.latitude}, ${loc.longitude}, ${loc.elevation_m}, ${loc.bortle_scale}, "${loc.timezone}")`,
         );
         if (calendarPanel.style.display !== "none") runCalendar();
+      }
+
+      locationSelect.addEventListener("change", (e) => {
+        const loc = locations.find((l) => l.name === e.target.value);
+        if (loc) applyLocationChange(loc);
       });
+
+      // ---------- Settings: Locations ----------
+
+      function renderLocationsList() {
+        locationsListEl.innerHTML = "";
+        for (const loc of locations) {
+          const card = document.createElement("div");
+          card.className = "location-card";
+          card.innerHTML = `
+            <div>
+              <div class="name">${escapeHtml(loc.name)}</div>
+              <div class="sub">${loc.latitude.toFixed(
+                2,
+              )}, ${loc.longitude.toFixed(2)} &middot; ${escapeHtml(
+                loc.timezone,
+              )}</div>
+            </div>
+            <div class="badge">Bortle ${loc.bortle_scale}</div>
+          `;
+          card.addEventListener("click", () => showLocationForm(loc));
+          locationsListEl.appendChild(card);
+        }
+      }
+
+      function timezoneOptionsHtml(selected) {
+        return COMMON_TIMEZONES.map(
+          (tz) =>
+            `<option value="${tz}" ${
+              tz === selected ? "selected" : ""
+            }>${tz}</option>`,
+        ).join("");
+      }
+
+      function showLocationForm(existing) {
+        detailOverlay.classList.add("open");
+        const isNew = !existing;
+        const loc = existing || {
+          name: "",
+          latitude: 0,
+          longitude: 0,
+          elevation_m: 0,
+          bortle_scale: 5,
+          timezone: "UTC",
+        };
+
+        detailSheet.innerHTML = `
+          <h2>${isNew ? "Add Location" : "Edit Location"}</h2>
+          <div class="form-field">
+            <label>Name</label>
+            <input type="text" id="f-name" value="${escapeHtml(
+              loc.name,
+            )}" placeholder="e.g. Grandma's Backyard" />
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Latitude</label>
+              <input type="number" id="f-lat" value="${
+                loc.latitude
+              }" step="0.0001" min="-90" max="90" />
+            </div>
+            <div class="form-field">
+              <label>Longitude</label>
+              <input type="number" id="f-lon" value="${
+                loc.longitude
+              }" step="0.0001" min="-180" max="180" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Elevation (m)</label>
+              <input type="number" id="f-elev" value="${
+                loc.elevation_m
+              }" step="1" min="0" />
+            </div>
+            <div class="form-field">
+              <label>Bortle Scale</label>
+              <select id="f-bortle">
+                ${[1, 2, 3, 4, 5, 6, 7, 8, 9]
+                  .map(
+                    (b) =>
+                      `<option value="${b}" ${
+                        b === loc.bortle_scale ? "selected" : ""
+                      }>${b}</option>`,
+                  )
+                  .join("")}
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Timezone</label>
+            <select id="f-tz">${timezoneOptionsHtml(loc.timezone)}</select>
+          </div>
+          <div class="btn-row">
+            <button class="btn-secondary" id="f-cancel">Cancel</button>
+            <button class="btn-primary" id="f-save">Save</button>
+          </div>
+          ${
+            !isNew && locations.length > 1
+              ? `<div class="btn-row"><button class="btn-danger" id="f-delete">Delete Location</button></div>`
+              : ""
+          }
+        `;
+
+        document
+          .getElementById("f-cancel")
+          .addEventListener("click", () =>
+            detailOverlay.classList.remove("open"),
+          );
+
+        document.getElementById("f-save").addEventListener("click", () => {
+          const name = document.getElementById("f-name").value.trim();
+          if (!name) return;
+          const updated = {
+            name,
+            latitude: parseFloat(document.getElementById("f-lat").value),
+            longitude: parseFloat(document.getElementById("f-lon").value),
+            elevation_m:
+              parseFloat(document.getElementById("f-elev").value) || 0,
+            bortle_scale: parseInt(
+              document.getElementById("f-bortle").value,
+              10,
+            ),
+            timezone: document.getElementById("f-tz").value,
+          };
+          if (
+            isNaN(updated.latitude) ||
+            updated.latitude < -90 ||
+            updated.latitude > 90
+          )
+            return;
+          if (
+            isNaN(updated.longitude) ||
+            updated.longitude < -180 ||
+            updated.longitude > 180
+          )
+            return;
+
+          if (isNew) {
+            locations = [...locations, updated];
+          } else {
+            locations = locations.map((l) => (l === existing ? updated : l));
+            if (
+              selectedLocation === existing ||
+              selectedLocation.name === existing.name
+            ) {
+              selectedLocation = updated;
+            }
+          }
+          saveLocations(locations);
+          refreshLocationSelect();
+          renderLocationsList();
+          if (selectedLocation.name === updated.name)
+            applyLocationChange(updated);
+          detailOverlay.classList.remove("open");
+        });
+
+        const deleteBtn = document.getElementById("f-delete");
+        if (deleteBtn) {
+          deleteBtn.addEventListener("click", () => {
+            locations = locations.filter((l) => l !== existing);
+            saveLocations(locations);
+            if (
+              selectedLocation === existing ||
+              selectedLocation.name === existing.name
+            ) {
+              applyLocationChange(locations[0]);
+            }
+            refreshLocationSelect();
+            renderLocationsList();
+            detailOverlay.classList.remove("open");
+          });
+        }
+      }
+
+      document
+        .getElementById("add-location-btn")
+        .addEventListener("click", () => showLocationForm(null));
+
+      // ---------- Settings: Telescope Profile ----------
+
+      function renderProfileSummary() {
+        const p = telescopeProfile;
+        profileSummaryEl.innerHTML = `
+          <div>
+            <div class="name">${escapeHtml(p.name)}</div>
+            <div class="sub">${p.aperture_mm}mm aperture &middot; f/${(
+              p.focal_length_mm / p.aperture_mm
+            ).toFixed(1)} &middot; ${p.sensor_x}&times;${p.sensor_y}px</div>
+          </div>
+          <div class="badge">Edit</div>
+        `;
+        profileSummaryEl.addEventListener("click", showProfileForm, {
+          once: true,
+        });
+      }
+
+      function showProfileForm() {
+        detailOverlay.classList.add("open");
+        const p = telescopeProfile;
+        detailSheet.innerHTML = `
+          <h2>Telescope Profile</h2>
+          <div class="form-field">
+            <label>Name</label>
+            <input type="text" id="p-name" value="${escapeHtml(p.name)}" />
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Aperture (mm)</label>
+              <input type="number" id="p-aperture" value="${
+                p.aperture_mm
+              }" min="1" />
+            </div>
+            <div class="form-field">
+              <label>Focal Length (mm)</label>
+              <input type="number" id="p-focal" value="${
+                p.focal_length_mm
+              }" min="1" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Sensor Width (px)</label>
+              <input type="number" id="p-sx" value="${p.sensor_x}" min="1" />
+            </div>
+            <div class="form-field">
+              <label>Sensor Height (px)</label>
+              <input type="number" id="p-sy" value="${p.sensor_y}" min="1" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Pixel Pitch (&micro;m)</label>
+            <input type="number" id="p-pitch" value="${
+              p.pixel_pitch_um
+            }" step="0.1" min="0.1" />
+          </div>
+          <div class="btn-row">
+            <button class="btn-secondary" id="p-cancel">Cancel</button>
+            <button class="btn-primary" id="p-save">Save</button>
+          </div>
+        `;
+        document
+          .getElementById("p-cancel")
+          .addEventListener("click", () =>
+            detailOverlay.classList.remove("open"),
+          );
+        document.getElementById("p-save").addEventListener("click", () => {
+          const updated = {
+            name: document.getElementById("p-name").value.trim() || "Custom",
+            aperture_mm: parseInt(
+              document.getElementById("p-aperture").value,
+              10,
+            ),
+            focal_length_mm: parseInt(
+              document.getElementById("p-focal").value,
+              10,
+            ),
+            sensor_x: parseInt(document.getElementById("p-sx").value, 10),
+            sensor_y: parseInt(document.getElementById("p-sy").value, 10),
+            pixel_pitch_um: parseFloat(
+              document.getElementById("p-pitch").value,
+            ),
+          };
+          for (const v of Object.values(updated)) {
+            if (typeof v === "number" && (isNaN(v) || v <= 0)) return;
+          }
+          telescopeProfile = updated;
+          saveProfile(updated);
+          pyodide.runPython(
+            `set_profile("${updated.name}", ${updated.aperture_mm}, ${updated.focal_length_mm}, ${updated.sensor_x}, ${updated.sensor_y}, ${updated.pixel_pitch_um})`,
+          );
+          renderProfileSummary();
+          detailOverlay.classList.remove("open");
+        });
+      }
 
       (async () => {
         const ok = await initEngine();
