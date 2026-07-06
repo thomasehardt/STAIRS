@@ -116,7 +116,13 @@
         );
         try {
           const t1 = performance.now();
-          await pyodide.loadPackage(["numpy", "micropip", "six", "pytz"]);
+          await pyodide.loadPackage([
+            "numpy",
+            "pandas",
+            "micropip",
+            "six",
+            "pytz",
+          ]);
           const micropip = pyodide.pyimport("micropip");
           await micropip.install(["astropy==7.2.0"]);
           stepOk(
@@ -141,10 +147,9 @@
           for (const rel of files) {
             const resp = await fetch(`vendor/${rel}`);
             const text = await resp.text();
-            const destPath =
-              rel === "visibility.py"
-                ? `/home/${rel}`
-                : `/lib/python3.14/site-packages/${rel}`;
+            const destPath = rel.includes("/")
+              ? `/lib/python3.14/site-packages/${rel}`
+              : `/home/${rel}`;
             const destDir = destPath.substring(0, destPath.lastIndexOf("/"));
             pyodide.FS.mkdirTree(destDir);
             pyodide.FS.writeFile(destPath, text);
@@ -162,7 +167,7 @@
 
         step(
           "astropy-calc",
-          "Run STAIRS's real, unmodified visibility.py (night window + visibility + moon quality)",
+          "Run STAIRS's real, unmodified visibility.py + scoring.py (full OSS/AQS pipeline)",
         );
         try {
           const t2 = performance.now();
@@ -175,41 +180,55 @@ iers.conf.auto_max_age = None
 iers.conf.auto_download = False
 
 import visibility as v
+import scoring as s
 from astroplan import Observer
 from astropy.coordinates import SkyCoord, EarthLocation
 from astropy.time import Time
 import astropy.units as u
 
 # NGC7293 (Helix Nebula) - brightest planetary nebula in the bundled catalog
-target = SkyCoord("22:29:38.55", "-20:50:13.6", unit=(u.hourangle, u.deg), frame='icrs')
+# Real OpenNGC values: MajAx=16.33', V-Mag=7.30
+target_coord = SkyCoord("22:29:38.57", "-20:50:14.4", unit=(u.hourangle, u.deg), frame='icrs')
 location = EarthLocation(lat=36.16*u.deg, lon=-86.78*u.deg, height=180*u.m)
 observer = Observer(location=location, name="Nashville")
 
-start_time = Time("2026-04-15T00:00:00")
-night = v.get_astronomical_night(observer, start_time, date_window_days=14)
+start_time = Time("2026-10-01T00:00:00")
+night_start, night_end = v.get_astronomical_night(observer, start_time, date_window_days=14)
+window = v.find_visible_window(observer, target_coord, (night_start, night_end), min_alt=30.0)
+peak_alt = float(v.get_peak_altitudes(observer, target_coord, (night_start, night_end))[0])
+moon_q = v.get_moon_quality(observer, night_start)
 
-result = {"night_found": night is not None}
-if night:
-    night_start, night_end = night
-    result["night_start_utc"] = night_start.iso
-    result["night_end_utc"] = night_end.iso
+class TelescopeProfile:
+    fov_min = 43.0  # Seestar S50's shorter FOV dimension, arcmin
 
-    window = v.find_visible_window(observer, target, (night_start, night_end), min_alt=30.0)
-    result["visible_window_found"] = window is not None
-    if window:
-        result["rise_utc"] = window[0].iso
-        result["set_utc"] = window[1].iso
+target_data = {"target_id": "NGC7293", "magnitude": 7.30, "size_maj": 16.33, "size_min": 16.33}
 
-    result["moon_quality"] = round(v.get_moon_quality(observer, night_start), 3)
+oss_rel, aqs_abs = s.calculate_oss(
+    target_data, TelescopeProfile(), max_altitude=peak_alt, min_target_altitude=30.0, bortle_scale=5,
+)
+final_rel, final_abs = s.calculate_final_score(
+    target_data, TelescopeProfile(), max_altitude=peak_alt, min_target_altitude=30.0,
+    weather_data=None, bortle_scale=5, moon_multiplier=moon_q,
+)
 
 import json
-json.dumps(result, indent=2)
+json.dumps({
+    "night_start_utc": night_start.iso,
+    "night_end_utc": night_end.iso,
+    "visible_window_found": window is not None,
+    "peak_altitude_deg": round(peak_alt, 2),
+    "moon_quality": round(moon_q, 3),
+    "oss_relative": oss_rel,
+    "aqs_absolute (Bortle 5)": aqs_abs,
+    "final_relative": final_rel,
+    "final_absolute": final_abs,
+}, indent=2)
 `);
           stepOk(
             "astropy-calc",
             `Computed in ${Math.round(
               performance.now() - t2,
-            )}ms (target: NGC7293, Nashville TN):\n${calcResult}`,
+            )}ms (target: NGC7293, Nashville TN, Oct 1 2026):\n${calcResult}`,
           );
         } catch (e) {
           stepFail("astropy-calc", e.message);

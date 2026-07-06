@@ -9,3 +9,4 @@ astroplan/target.py
 astroplan/utils.py
 astroplan/version.py
 visibility.py
+scoring.py
