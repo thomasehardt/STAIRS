@@ -386,6 +386,15 @@
         font-size: 0.85rem;
         margin-bottom: 1rem;
       }
+      .type-desc {
+        color: #bbb;
+        font-size: 0.88rem;
+        line-height: 1.4;
+        background: #1a1a1a;
+        border-radius: 8px;
+        padding: 0.7rem 0.85rem;
+        margin-bottom: 1rem;
+      }
       .score-row {
         display: flex;
         gap: 0.75rem;
@@ -744,6 +753,9 @@ from astropy.utils import iers
 iers.conf.auto_max_age = None
 iers.conf.auto_download = False
 
+import astropy.units as u
+from astropy.time import Time
+
 import visibility as v
 import scoring as s
 from telescope_profile import TelescopeProfile
@@ -764,6 +776,58 @@ def set_profile(name, aperture_mm, focal_length_mm, sensor_x, sensor_y, pixel_pi
         name=name, aperture_mm=aperture_mm, focal_length_mm=focal_length_mm,
         sensor_x=sensor_x, sensor_y=sensor_y, pixel_pitch_um=pixel_pitch_um,
     )
+
+def score_candidates(candidates_json, min_alt=30.0):
+    """
+    Batch version of the per-target detail calculation: scores every
+    candidate against tonight's real astronomical night window at the
+    current location, using the same real visibility.py/scoring.py used
+    for a single target - just vectorized across a few thousand rows via
+    calculate_oss_vectorized (identical to what scheduler.py does
+    server-side to build candidate pools).
+    """
+    import json
+    import numpy as np
+    import pandas as pd
+    from astropy.coordinates import SkyCoord
+
+    rows = json.loads(candidates_json)
+    if not rows:
+        return json.dumps([])
+
+    df = pd.DataFrame(rows)
+    df["magnitude"] = pd.to_numeric(df["V-Mag"], errors="coerce")
+    df = df.dropna(subset=["magnitude"])
+    if df.empty:
+        return json.dumps([])
+
+    night = v.get_astronomical_night(_observer, Time.now(), date_window_days=14)
+    if not night:
+        return json.dumps([])
+    night_start, night_end = night
+
+    coords = SkyCoord(ra=df["RA"].values, dec=df["Dec"].values, unit=(u.hourangle, u.deg))
+    df["peak_alt"] = v.get_peak_altitudes(_observer, coords, (night_start, night_end))
+
+    visible = df[df["peak_alt"] > min_alt].copy()
+    if visible.empty:
+        return json.dumps([])
+
+    maj = pd.to_numeric(visible["MajAx"], errors="coerce")
+    minr = pd.to_numeric(visible["MinAx"], errors="coerce")
+    visible["size_maj"] = maj.fillna(2.0)
+    visible["size_min"] = minr.fillna(visible["size_maj"])
+
+    oss_rel, aqs_abs = s.calculate_oss_vectorized(
+        visible, _profile, min_alt, bortle_scale=_location.bortle_scale
+    )
+    visible["oss"] = np.round(oss_rel, 1)
+    visible["aqs"] = np.round(aqs_abs, 1)
+    visible["peak_alt"] = np.round(visible["peak_alt"], 1)
+
+    top = visible.nlargest(15, "aqs")
+    cols = ["Name", "Type", "Const", "RA", "Dec", "V-Mag", "MajAx", "M", "Common names", "oss", "aqs", "peak_alt"]
+    return top[cols].to_json(orient="records")
 
 set_location(${selectedLocation.latitude}, ${selectedLocation.longitude}, ${selectedLocation.elevation_m}, ${selectedLocation.bortle_scale}, "${selectedLocation.timezone}")
 set_profile("${telescopeProfile.name}", ${telescopeProfile.aperture_mm}, ${telescopeProfile.focal_length_mm}, ${telescopeProfile.sensor_x}, ${telescopeProfile.sensor_y}, ${telescopeProfile.pixel_pitch_um})
@@ -819,57 +883,177 @@ set_profile("${telescopeProfile.name}", ${telescopeProfile.aperture_mm}, ${teles
         return div.innerHTML;
       }
 
-      function renderTargets(rows) {
+      // OpenNGC's Type codes, translated for a non-specialist reader.
+      const TYPE_INFO = {
+        G: {
+          label: "Galaxy",
+          desc: "A separate island universe of stars, typically millions of light-years away.",
+        },
+        GPair: {
+          label: "Galaxy Pair",
+          desc: "Two galaxies close enough to be gravitationally interacting.",
+        },
+        GTrpl: {
+          label: "Galaxy Triplet",
+          desc: "Three galaxies close enough to be gravitationally interacting.",
+        },
+        GGroup: {
+          label: "Galaxy Group",
+          desc: "A small, gravitationally bound collection of galaxies.",
+        },
+        OCl: {
+          label: "Open Cluster",
+          desc: "A loose group of young stars born from the same cloud, still loosely associated.",
+        },
+        GCl: {
+          label: "Globular Cluster",
+          desc: "A dense, ancient ball of hundreds of thousands of stars orbiting the outskirts of the galaxy.",
+        },
+        "*Ass": {
+          label: "Stellar Association",
+          desc: "A sprawling, loosely bound group of young stars.",
+        },
+        PN: {
+          label: "Planetary Nebula",
+          desc: "The glowing shell of gas shed by a dying Sun-like star, lit up by its exposed core.",
+        },
+        SNR: {
+          label: "Supernova Remnant",
+          desc: "The expanding, shock-heated debris from a massive star's explosive death.",
+        },
+        EmN: {
+          label: "Emission Nebula",
+          desc: "A cloud of gas ionized by nearby hot young stars - a stellar nursery.",
+        },
+        RfN: {
+          label: "Reflection Nebula",
+          desc: "A dust cloud that shines by scattering a nearby star's light rather than emitting its own.",
+        },
+        HII: {
+          label: "HII Region",
+          desc: "A large cloud of ionized hydrogen gas marking an active star-forming region.",
+        },
+        Neb: { label: "Nebula", desc: "A cloud of interstellar gas and dust." },
+        "Cl+N": {
+          label: "Cluster + Nebula",
+          desc: "A young star cluster still embedded in the gas cloud it formed from.",
+        },
+        Nova: {
+          label: "Nova",
+          desc: "A star system that underwent a sudden, temporary brightening from a thermonuclear flash.",
+        },
+        Other: {
+          label: "Other",
+          desc: "An object that doesn't fit the standard catalog classes.",
+        },
+      };
+      function typeLabel(code) {
+        return TYPE_INFO[code]?.label || code || "Unknown";
+      }
+      function typeDesc(code) {
+        return TYPE_INFO[code]?.desc || "";
+      }
+      function commonNameOf(row) {
+        const raw = row["Common names"];
+        if (!raw) return null;
+        return String(raw).split(",")[0].trim();
+      }
+      function messierOf(row) {
+        const m = row.M;
+        if (!m || String(m).trim() === "") return null;
+        return "M" + String(m).trim().replace(/^0+/, "");
+      }
+
+      function renderTargets(rows, opts = {}) {
         loadingStateEl.style.display = "none";
         if (rows.length === 0) {
           targetListEl.style.display = "none";
           emptyStateEl.style.display = "block";
+          emptyStateEl.textContent =
+            opts.emptyMessage || "No targets match your search.";
           return;
         }
         emptyStateEl.style.display = "none";
         targetListEl.style.display = "block";
         targetListEl.innerHTML = "";
         for (const r of rows) {
+          const common = commonNameOf(r);
+          const messier = messierOf(r);
+          const idBadge = [messier, r.Name].filter(Boolean).join(" · ");
           const row = document.createElement("div");
           row.className = "target-row";
+          const rightValue = opts.scored ? r.aqs : r["V-Mag"] ?? "?";
           row.innerHTML = `
             <div>
-              <div class="name">${escapeHtml(r.Name)}</div>
-              <div class="type">${escapeHtml(r.Type)} &middot; ${escapeHtml(
+              <div class="name">${escapeHtml(common || r.Name)}</div>
+              <div class="type">${
+                common ? escapeHtml(idBadge) + " &middot; " : ""
+              }${escapeHtml(typeLabel(r.Type))} &middot; ${escapeHtml(
                 r.Const,
               )}</div>
             </div>
-            <div class="mag">${r["V-Mag"] ?? "?"}</div>
+            <div class="mag">${rightValue}</div>
           `;
           row.addEventListener("click", () => showDetail(r));
           targetListEl.appendChild(row);
         }
       }
 
-      async function runDefaultQuery() {
-        const result = await conn.query(`
-          SELECT Name, Type, Const, RA, "Dec", "V-Mag", MajAx
-          FROM catalog
-          WHERE Type NOT IN ('*', '**', 'NonEx', 'Dup')
-            AND "V-Mag" IS NOT NULL AND RA IS NOT NULL AND "Dec" IS NOT NULL
-          ORDER BY CAST("V-Mag" AS DOUBLE) ASC
-          LIMIT 40
-        `);
-        renderTargets(result.toArray().map((r) => r.toJSON()));
+      const CATALOG_COLUMNS = `Name, Type, Const, RA, "Dec", "V-Mag", MajAx, MinAx, M, "Common names"`;
+
+      async function runTopPicks() {
+        loadingStateEl.style.display = "block";
+        loadingStateEl.textContent = `Scoring tonight's targets for ${selectedLocation.name}…`;
+        targetListEl.style.display = "none";
+        emptyStateEl.style.display = "none";
+        try {
+          const result = await conn.query(`
+            SELECT ${CATALOG_COLUMNS}
+            FROM catalog
+            WHERE Type NOT IN ('*', '**', 'NonEx', 'Dup')
+              AND "V-Mag" IS NOT NULL AND RA IS NOT NULL AND "Dec" IS NOT NULL
+          `);
+          const candidates = result.toArray().map((r) => r.toJSON());
+          pyodide.globals.set(
+            "_candidates_json",
+            JSON.stringify(candidates, (key, value) =>
+              typeof value === "bigint" ? value.toString() : value,
+            ),
+          );
+          const scoredJson = await pyodide.runPythonAsync(
+            "score_candidates(_candidates_json)",
+          );
+          const scored = JSON.parse(scoredJson);
+          loadingStateEl.style.display = "none";
+          renderTargets(scored, {
+            scored: true,
+            emptyMessage:
+              "No targets are above 30° from this location right now - try a different location, or check back later tonight.",
+          });
+        } catch (e) {
+          loadingStateEl.style.display = "none";
+          targetListEl.style.display = "none";
+          emptyStateEl.style.display = "block";
+          emptyStateEl.textContent =
+            "Couldn't compute tonight's picks: " + e.message;
+        }
       }
 
       async function runSearchQuery(term) {
         const escaped = term.replace(/'/g, "''").toUpperCase();
         const result = await conn.query(`
-          SELECT Name, Type, Const, RA, "Dec", "V-Mag", MajAx
+          SELECT ${CATALOG_COLUMNS}
           FROM catalog
           WHERE Type NOT IN ('*', '**', 'NonEx', 'Dup')
             AND "V-Mag" IS NOT NULL AND RA IS NOT NULL AND "Dec" IS NOT NULL
-            AND (UPPER(Name) LIKE '%${escaped}%' OR UPPER(Type) LIKE '%${escaped}%')
+            AND (UPPER(Name) LIKE '%${escaped}%' OR UPPER(Type) LIKE '%${escaped}%' OR UPPER("Common names") LIKE '%${escaped}%')
           ORDER BY CAST("V-Mag" AS DOUBLE) ASC
           LIMIT 40
         `);
-        renderTargets(result.toArray().map((r) => r.toJSON()));
+        renderTargets(
+          result.toArray().map((r) => r.toJSON()),
+          { scored: false },
+        );
       }
 
       let searchDebounce;
@@ -878,7 +1062,7 @@ set_profile("${telescopeProfile.name}", ${telescopeProfile.aperture_mm}, ${teles
         const term = e.target.value.trim();
         searchDebounce = setTimeout(() => {
           const query =
-            term.length === 0 ? runDefaultQuery() : runSearchQuery(term);
+            term.length === 0 ? runTopPicks() : runSearchQuery(term);
           query.catch((err) => {
             console.error("search query failed:", err);
             renderTargets([]);
@@ -888,11 +1072,18 @@ set_profile("${telescopeProfile.name}", ${telescopeProfile.aperture_mm}, ${teles
 
       async function showDetail(target) {
         detailOverlay.classList.add("open");
+        const common = commonNameOf(target);
+        const messier = messierOf(target);
+        const idLine = [messier, target.Name].filter(Boolean).join(" · ");
+        const desc = typeDesc(target.Type);
         detailSheet.innerHTML = `
-          <h2>${escapeHtml(target.Name)}</h2>
-          <div class="detail-sub">${escapeHtml(target.Type)} in ${escapeHtml(
+          <h2>${escapeHtml(common || target.Name)}</h2>
+          <div class="detail-sub">${
+            common ? escapeHtml(idLine) + " &middot; " : ""
+          }${escapeHtml(typeLabel(target.Type))} in ${escapeHtml(
             target.Const,
           )} &middot; magnitude ${target["V-Mag"]}</div>
+          ${desc ? `<div class="type-desc">${escapeHtml(desc)}</div>` : ""}
           <div class="spinner-line">Computing real visibility + score for right now…</div>
         `;
 
@@ -1227,6 +1418,8 @@ json.dumps([
           `set_location(${loc.latitude}, ${loc.longitude}, ${loc.elevation_m}, ${loc.bortle_scale}, "${loc.timezone}")`,
         );
         if (calendarPanel.style.display !== "none") runCalendar();
+        if (targetsPanel.style.display !== "none" && !searchInput.value.trim())
+          runTopPicks();
       }
 
       locationSelect.addEventListener("change", (e) => {
@@ -1505,6 +1698,7 @@ json.dumps([
           );
           renderProfileSummary();
           detailOverlay.classList.remove("open");
+          if (!searchInput.value.trim()) runTopPicks();
         });
       }
 
@@ -1514,7 +1708,7 @@ json.dumps([
         setStatus("Ready", true);
         searchInput.disabled = false;
         locationSelect.disabled = false;
-        await runDefaultQuery();
+        await runTopPicks();
       })();
     </script>
   </body>
