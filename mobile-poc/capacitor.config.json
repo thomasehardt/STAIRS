@@ -1,0 +1,8 @@
+{
+  "appId": "com.stairs.mobilepoc",
+  "appName": "STAIRS POC",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

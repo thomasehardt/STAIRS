@@ -1,0 +1,239 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>STAIRS Mobile Feasibility POC</title>
+    <script src="https://cdn.jsdelivr.net/pyodide/v314.0.2/full/pyodide.js"></script>
+    <style>
+      body {
+        font-family: -apple-system, system-ui, sans-serif;
+        background: #0d0d0d;
+        color: #eee;
+        margin: 0;
+        padding: 1.25rem;
+      }
+      h1 {
+        font-size: 1.3rem;
+        margin: 0 0 0.25rem;
+      }
+      p.sub {
+        color: #999;
+        margin: 0 0 1rem;
+        font-size: 0.9rem;
+      }
+      .step {
+        background: #1a1a1a;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        padding: 0.8rem 1rem;
+        margin-bottom: 0.7rem;
+      }
+      .step .label {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .step .detail {
+        color: #aaa;
+        font-size: 0.85rem;
+        margin-top: 0.3rem;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .pending {
+        border-left: 3px solid #666;
+      }
+      .ok {
+        border-left: 3px solid #4caf50;
+      }
+      .fail {
+        border-left: 3px solid #e05555;
+      }
+      .icon {
+        margin-right: 0.4rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>STAIRS Mobile Feasibility POC</h1>
+    <p class="sub">
+      Real astropy calculation + real catalog query, running entirely on-device
+      via Pyodide (Python/WASM) and duckdb-wasm. No server, no network calls
+      after initial load of these libraries.
+    </p>
+    <div id="steps"></div>
+
+    <script type="module">
+      import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.32.0/+esm";
+
+      const stepsEl = document.getElementById("steps");
+      const stepEls = {};
+
+      function step(id, label) {
+        const el = document.createElement("div");
+        el.className = "step pending";
+        el.innerHTML = `<div class="label"><span class="icon">&#9203;</span>${label}</div><div class="detail"></div>`;
+        stepsEl.appendChild(el);
+        stepEls[id] = el;
+        return el;
+      }
+
+      function stepOk(id, detail) {
+        const el = stepEls[id];
+        el.className = "step ok";
+        el.querySelector(".icon").innerHTML = "&#9989;";
+        el.querySelector(".detail").textContent = detail;
+      }
+
+      function stepFail(id, detail) {
+        const el = stepEls[id];
+        el.className = "step fail";
+        el.querySelector(".icon").innerHTML = "&#10060;";
+        el.querySelector(".detail").textContent = detail;
+      }
+
+      (async () => {
+        step("pyodide-load", "Load Pyodide (Python 3.14 runtime, WASM)");
+        const t0 = performance.now();
+        let pyodide;
+        try {
+          pyodide = await loadPyodide();
+          stepOk(
+            "pyodide-load",
+            `Loaded in ${Math.round(performance.now() - t0)}ms`,
+          );
+        } catch (e) {
+          stepFail("pyodide-load", e.message);
+          return;
+        }
+
+        step(
+          "astropy-install",
+          "Install astropy 7.2.0 (real STAIRS dependency)",
+        );
+        try {
+          const t1 = performance.now();
+          await pyodide.loadPackage(["numpy", "micropip"]);
+          const micropip = pyodide.pyimport("micropip");
+          await micropip.install(["astropy==7.2.0"]);
+          stepOk(
+            "astropy-install",
+            `Installed in ${Math.round(performance.now() - t1)}ms`,
+          );
+        } catch (e) {
+          stepFail("astropy-install", e.message);
+          return;
+        }
+
+        step(
+          "astropy-calc",
+          "Run real SkyCoord/AltAz calculation (M42 from Nashville, TN)",
+        );
+        try {
+          const t2 = performance.now();
+          const calcResult = await pyodide.runPythonAsync(`
+from astropy.utils import iers
+iers.conf.auto_max_age = None
+iers.conf.auto_download = False
+
+from astropy.coordinates import SkyCoord, AltAz, EarthLocation
+from astropy.time import Time
+import astropy.units as u
+
+target = SkyCoord(ra=83.822*u.deg, dec=-5.391*u.deg, frame='icrs')
+location = EarthLocation(lat=36.16*u.deg, lon=-86.78*u.deg, height=180*u.m)
+obstime = Time("2026-04-15T04:00:00")
+altaz = target.transform_to(AltAz(obstime=obstime, location=location))
+
+import json
+json.dumps({
+    "target_altitude_deg": round(float(altaz.alt.deg), 3),
+    "target_azimuth_deg": round(float(altaz.az.deg), 3),
+})
+`);
+          stepOk(
+            "astropy-calc",
+            `Computed in ${Math.round(
+              performance.now() - t2,
+            )}ms: ${calcResult}`,
+          );
+        } catch (e) {
+          stepFail("astropy-calc", e.message);
+          return;
+        }
+
+        step("duckdb-init", "Initialize duckdb-wasm");
+        let db, conn;
+        try {
+          const t3 = performance.now();
+          const bundle = await duckdb.selectBundle(duckdb.getJsDelivrBundles());
+          const workerUrl = URL.createObjectURL(
+            new Blob([`importScripts("${bundle.mainWorker}");`], {
+              type: "text/javascript",
+            }),
+          );
+          const worker = new Worker(workerUrl);
+          const logger = new duckdb.ConsoleLogger(duckdb.LogLevel.WARNING);
+          db = new duckdb.AsyncDuckDB(logger, worker);
+          await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+          stepOk(
+            "duckdb-init",
+            `Initialized in ${Math.round(performance.now() - t3)}ms`,
+          );
+        } catch (e) {
+          stepFail("duckdb-init", e.message);
+          return;
+        }
+
+        step(
+          "duckdb-catalog",
+          "Load bundled STAIRS catalog (OpenNGC, ~14k objects) and query it",
+        );
+        try {
+          const t4 = performance.now();
+          const csvResp = await fetch("NGC.csv");
+          const csvBuf = await csvResp.arrayBuffer();
+          await db.registerFileBuffer("NGC.csv", new Uint8Array(csvBuf));
+
+          conn = await db.connect();
+          await conn.query(`
+            CREATE TABLE catalog AS
+            SELECT * FROM read_csv('NGC.csv', delim=';', header=true, ignore_errors=true)
+          `);
+          const loadMs = Math.round(performance.now() - t4);
+
+          const t5 = performance.now();
+          const queryResult = await conn.query(`
+            SELECT Name, Type, "V-Mag"
+            FROM catalog
+            WHERE Type = 'PN' AND "V-Mag" IS NOT NULL
+            ORDER BY CAST("V-Mag" AS DOUBLE) ASC
+            LIMIT 5
+          `);
+          const queryMs = Math.round(performance.now() - t5);
+
+          const rowCountResult = await conn.query(
+            `SELECT COUNT(*)::INT AS n FROM catalog`,
+          );
+          const rowCount = rowCountResult.toArray()[0].n;
+
+          const rows = queryResult.toArray().map((r) => {
+            const o = r.toJSON();
+            return `${o.Name} (${o.Type}) mag ${o["V-Mag"]}`;
+          });
+
+          stepOk(
+            "duckdb-catalog",
+            `Loaded ${rowCount} rows in ${loadMs}ms, queried in ${queryMs}ms.\nBrightest planetary nebulae:\n` +
+              rows.join("\n"),
+          );
+        } catch (e) {
+          stepFail("duckdb-catalog", e.message);
+        }
+      })();
+    </script>
+  </body>
+</html>
