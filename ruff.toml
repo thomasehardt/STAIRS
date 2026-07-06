@@ -2,6 +2,10 @@
 line-length = 88
 target-version = "py313"
 
+extend-exclude = [
+    "mobile-poc/www/vendor", # vendored third-party source, not ours to restyle
+]
+
 # Selection of rules to enable/disable
 [lint]
 select = [

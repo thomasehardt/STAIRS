@@ -116,7 +116,7 @@
         );
         try {
           const t1 = performance.now();
-          await pyodide.loadPackage(["numpy", "micropip"]);
+          await pyodide.loadPackage(["numpy", "micropip", "six", "pytz"]);
           const micropip = pyodide.pyimport("micropip");
           await micropip.install(["astropy==7.2.0"]);
           stepOk(
@@ -129,36 +129,87 @@
         }
 
         step(
+          "astroplan-vendor",
+          "Load real astroplan 0.10.1 source (same version as STAIRS's venv)",
+        );
+        try {
+          const t2a = performance.now();
+          const manifestResp = await fetch("vendor/manifest.txt");
+          const manifestText = await manifestResp.text();
+          const files = manifestText.trim().split("\n").filter(Boolean);
+
+          for (const rel of files) {
+            const resp = await fetch(`vendor/${rel}`);
+            const text = await resp.text();
+            const destPath =
+              rel === "visibility.py"
+                ? `/home/${rel}`
+                : `/lib/python3.14/site-packages/${rel}`;
+            const destDir = destPath.substring(0, destPath.lastIndexOf("/"));
+            pyodide.FS.mkdirTree(destDir);
+            pyodide.FS.writeFile(destPath, text);
+          }
+          stepOk(
+            "astroplan-vendor",
+            `Copied ${files.length} files in ${Math.round(
+              performance.now() - t2a,
+            )}ms`,
+          );
+        } catch (e) {
+          stepFail("astroplan-vendor", e.message);
+          return;
+        }
+
+        step(
           "astropy-calc",
-          "Run real SkyCoord/AltAz calculation (M42 from Nashville, TN)",
+          "Run STAIRS's real, unmodified visibility.py (night window + visibility + moon quality)",
         );
         try {
           const t2 = performance.now();
           const calcResult = await pyodide.runPythonAsync(`
+import sys
+sys.path.insert(0, "/home")
+
 from astropy.utils import iers
 iers.conf.auto_max_age = None
 iers.conf.auto_download = False
 
-from astropy.coordinates import SkyCoord, AltAz, EarthLocation
+import visibility as v
+from astroplan import Observer
+from astropy.coordinates import SkyCoord, EarthLocation
 from astropy.time import Time
 import astropy.units as u
 
-target = SkyCoord(ra=83.822*u.deg, dec=-5.391*u.deg, frame='icrs')
+# NGC7293 (Helix Nebula) - brightest planetary nebula in the bundled catalog
+target = SkyCoord("22:29:38.55", "-20:50:13.6", unit=(u.hourangle, u.deg), frame='icrs')
 location = EarthLocation(lat=36.16*u.deg, lon=-86.78*u.deg, height=180*u.m)
-obstime = Time("2026-04-15T04:00:00")
-altaz = target.transform_to(AltAz(obstime=obstime, location=location))
+observer = Observer(location=location, name="Nashville")
+
+start_time = Time("2026-04-15T00:00:00")
+night = v.get_astronomical_night(observer, start_time, date_window_days=14)
+
+result = {"night_found": night is not None}
+if night:
+    night_start, night_end = night
+    result["night_start_utc"] = night_start.iso
+    result["night_end_utc"] = night_end.iso
+
+    window = v.find_visible_window(observer, target, (night_start, night_end), min_alt=30.0)
+    result["visible_window_found"] = window is not None
+    if window:
+        result["rise_utc"] = window[0].iso
+        result["set_utc"] = window[1].iso
+
+    result["moon_quality"] = round(v.get_moon_quality(observer, night_start), 3)
 
 import json
-json.dumps({
-    "target_altitude_deg": round(float(altaz.alt.deg), 3),
-    "target_azimuth_deg": round(float(altaz.az.deg), 3),
-})
+json.dumps(result, indent=2)
 `);
           stepOk(
             "astropy-calc",
             `Computed in ${Math.round(
               performance.now() - t2,
-            )}ms: ${calcResult}`,
+            )}ms (target: NGC7293, Nashville TN):\n${calcResult}`,
           );
         } catch (e) {
           stepFail("astropy-calc", e.message);
