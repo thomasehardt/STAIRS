@@ -105,6 +105,13 @@
         padding: 0.4rem 0.5rem;
         font-size: 0.88rem;
       }
+      .weather-status {
+        padding: 0.4rem 1.25rem;
+        font-size: 0.8rem;
+        color: #999;
+        border-bottom: 1px solid #2a2a2a;
+        min-height: 1.2em;
+      }
       .tab-bar {
         display: flex;
         border-bottom: 1px solid #2a2a2a;
@@ -462,6 +469,7 @@
       📍
       <select id="location-select" disabled></select>
     </div>
+    <div class="weather-status" id="weather-status"></div>
 
     <div class="tab-bar">
       <button class="tab-btn active" id="tab-targets">Targets</button>
@@ -776,6 +784,25 @@ def set_profile(name, aperture_mm, focal_length_mm, sensor_x, sensor_y, pixel_pi
         name=name, aperture_mm=aperture_mm, focal_length_mm=focal_length_mm,
         sensor_x=sensor_x, sensor_y=sensor_y, pixel_pitch_um=pixel_pitch_um,
     )
+
+_weather_range = []
+
+def set_weather_range(weather_json):
+    global _weather_range
+    import json
+    _weather_range = json.loads(weather_json)
+
+def current_weather():
+    """
+    Mirrors WeatherService.get_forecast's "most recent point at or before
+    now" lookup (services/api/src/utils/weather.py), against the
+    JS-fetched _weather_range instead of that class's own cached lookup.
+    """
+    if not _weather_range:
+        return None
+    now_iso = Time.now().isot[:13] + ":00Z"
+    past = [w for w in _weather_range if w["timestamp"] <= now_iso]
+    return past[-1] if past else _weather_range[0]
 
 def score_candidates(candidates_json, min_alt=30.0):
     """
@@ -1151,13 +1178,17 @@ if night:
     oss_rel, aqs_abs = s.calculate_oss(
         target_data, _profile, max_altitude=peak_alt, min_target_altitude=30.0, bortle_scale=_location.bortle_scale,
     )
+    weather_now = current_weather()
     final_rel, final_abs = s.calculate_final_score(
         target_data, _profile, max_altitude=peak_alt, min_target_altitude=30.0,
-        weather_data=None, bortle_scale=_location.bortle_scale, moon_multiplier=moon_q,
+        weather_data=weather_now, bortle_scale=_location.bortle_scale, moon_multiplier=moon_q,
     )
     out["oss"] = oss_rel
     out["aqs"] = aqs_abs
     out["final_score"] = final_abs
+    if weather_now:
+        out["cloud_cover_pct"] = round(weather_now.get("cloud_cover_pct") or 0, 0)
+        out["humidity_pct"] = round(weather_now.get("humidity_pct") or 0, 0)
 
 json.dumps(out)
 `);
@@ -1224,6 +1255,11 @@ json.dumps(out)
             <div class="fact-row"><span class="k">Moon quality</span><span>${
               r.moon_quality
             } (1.0 = no interference)</span></div>
+            ${
+              r.cloud_cover_pct !== undefined
+                ? `<div class="fact-row"><span class="k">Current sky (Open-Meteo)</span><span>${r.cloud_cover_pct}% clouds &middot; ${r.humidity_pct}% humidity</span></div>`
+                : ""
+            }
           `;
         }
         const closeBtn = document.createElement("button");
@@ -1376,7 +1412,7 @@ from astropy.time import Time
 import json
 
 planner = MultiNightPlanner(_location)
-forecast = planner.generate_forecast(days=14, start_time=Time.now())
+forecast = planner.generate_forecast(days=14, start_time=Time.now(), weather_range=_weather_range)
 json.dumps([
     {
         "date": d.date, "dark_hrs": d.total_dark_hours, "eff_hrs": d.effective_hours,
@@ -1411,12 +1447,87 @@ json.dumps([
       tabCalendarBtn.addEventListener("click", () => showTab("calendar"));
       tabSettingsBtn.addEventListener("click", () => showTab("settings"));
 
-      function applyLocationChange(loc) {
+      const weatherStatusEl = document.getElementById("weather-status");
+
+      // Re-implements OpenMeteoWeatherApiClient.fetch_forecast (a plain,
+      // keyless GET - see services/api/src/utils/open_meteo_client.py) in JS
+      // instead of Python, since httpx doesn't run in Pyodide and every other
+      // network call in this app already goes through fetch(). The
+      // "pessimistic cloud cover = max of all layers" choice and the field
+      // shape (cloud_cover_pct/humidity_pct/seeing/timestamp) match that file
+      // exactly, so calculate_weather_score_vectorized downstream sees the
+      // same shape it always has.
+      async function fetchWeatherRange(lat, lon) {
+        const url =
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+          `&hourly=cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,relative_humidity_2m,precipitation,wind_speed_10m,wind_direction_10m` +
+          `&timezone=UTC&forecast_days=14`;
+        const resp = await fetch(url);
+        if (!resp.ok)
+          throw new Error(`Open-Meteo request failed: ${resp.status}`);
+        const data = await resp.json();
+        const h = data.hourly || {};
+        const times = h.time || [];
+        const range = [];
+        for (let i = 0; i < times.length; i++) {
+          const layers = [
+            h.cloud_cover?.[i] ?? 0,
+            h.cloud_cover_low?.[i] ?? 0,
+            h.cloud_cover_mid?.[i] ?? 0,
+            h.cloud_cover_high?.[i] ?? 0,
+          ];
+          range.push({
+            timestamp: times[i] + ":00Z",
+            cloud_cover_pct: Math.max(...layers),
+            humidity_pct: h.relative_humidity_2m?.[i] ?? null,
+            seeing: null,
+          });
+        }
+        return range;
+      }
+
+      let weatherRange = [];
+
+      async function refreshWeather() {
+        try {
+          weatherStatusEl.textContent = "Fetching weather…";
+          weatherRange = await fetchWeatherRange(
+            selectedLocation.latitude,
+            selectedLocation.longitude,
+          );
+          pyodide.globals.set(
+            "_weather_range_json",
+            JSON.stringify(weatherRange),
+          );
+          pyodide.runPython("set_weather_range(_weather_range_json)");
+
+          const nowIso = new Date().toISOString().slice(0, 13) + ":00Z";
+          const current =
+            weatherRange.filter((w) => w.timestamp <= nowIso).pop() ||
+            weatherRange[0];
+          if (current) {
+            weatherStatusEl.textContent = `☁️ ${Math.round(
+              current.cloud_cover_pct,
+            )}% clouds · 💧 ${Math.round(current.humidity_pct)}% humidity`;
+          } else {
+            weatherStatusEl.textContent = "";
+          }
+        } catch (e) {
+          console.error("weather fetch failed:", e);
+          weatherRange = [];
+          pyodide.runPython("set_weather_range('[]')");
+          weatherStatusEl.textContent =
+            "Weather unavailable (offline?) - scoring without it";
+        }
+      }
+
+      async function applyLocationChange(loc) {
         selectedLocation = loc;
         localStorage.setItem("stairs_selected_location", loc.name);
         pyodide.runPython(
           `set_location(${loc.latitude}, ${loc.longitude}, ${loc.elevation_m}, ${loc.bortle_scale}, "${loc.timezone}")`,
         );
+        await refreshWeather();
         if (calendarPanel.style.display !== "none") runCalendar();
         if (targetsPanel.style.display !== "none" && !searchInput.value.trim())
           runTopPicks();
@@ -1708,6 +1819,7 @@ json.dumps([
         setStatus("Ready", true);
         searchInput.disabled = false;
         locationSelect.disabled = false;
+        await refreshWeather();
         await runTopPicks();
       })();
     </script>

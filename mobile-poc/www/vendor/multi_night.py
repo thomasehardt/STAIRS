@@ -123,13 +123,20 @@ class MultiNightPlanner:
         self,
         days: int = 14,
         start_time: Time | None = None,
-        weather_service: Any | None = None,
+        weather_range: list | None = None,
     ) -> list[ForecastDay]:
         """
         generates visibility forecasts for the given number of days
+
+        Mobile port note: takes an already-fetched weather_range list directly
+        instead of a weather_service object to call - the real WeatherService
+        exists to cache/wrap an httpx call to Open-Meteo, neither of which
+        applies here (fetch() happens in JS, see fetchWeatherRange() in
+        index.html; there's no server-side cache to wrap). The actual per-slot
+        weather math in calculate_night_score below is untouched.
         :param days:
         :param start_time:
-        :param weather_service:
+        :param weather_range:
         :return:
         """
         if start_time is None:
@@ -142,18 +149,7 @@ class MultiNightPlanner:
         except (ValueError, AttributeError):
             current_search_time = start_time
 
-        full_weather_range = []
-        if weather_service:
-            try:
-                range_end = current_search_time + TimeDelta((days + 1) * u.day)
-                full_weather_range = weather_service.get_forecast_range(
-                    latitude=self.location.latitude,
-                    longitude=self.location.longitude,
-                    start_dt=current_search_time.to_datetime(timezone=UTC),
-                    end_dt=range_end.to_datetime(timezone=UTC),
-                )
-            except Exception as e:
-                logger.error(f"error fetching multi-night weather forecast: {e}")
+        full_weather_range = weather_range or []
 
         forecast = []
         loop_time = current_search_time
