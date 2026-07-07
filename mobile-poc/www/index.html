@@ -205,6 +205,58 @@
         font-weight: 700;
         color: #ffc966;
       }
+      .tonight-window {
+        padding: 0.85rem 1.25rem 0.3rem;
+        color: #999;
+        font-size: 0.85rem;
+      }
+      .timeline-list {
+        padding: 0.5rem 1.25rem 0.5rem;
+      }
+      .timeline-block {
+        background: #161616;
+        border: 1px solid #262626;
+        border-left-width: 4px;
+        border-radius: 8px;
+        padding: 0.6rem 0.9rem;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+      }
+      .timeline-block:active {
+        background: #1d1d1d;
+      }
+      .tb-time {
+        color: #888;
+        font-size: 0.75rem;
+        margin-bottom: 0.3rem;
+      }
+      .tb-main {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .timeline-block .name {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .timeline-block .type {
+        color: #888;
+        font-size: 0.8rem;
+      }
+      .timeline-block .mag {
+        color: #ffc966;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+      .tonight-recs-header {
+        padding: 1rem 1.25rem 0.4rem;
+        color: #ccc;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      #tonight-recs {
+        padding: 0 1.25rem 1.5rem;
+      }
       .settings-section {
         padding: 1rem 1.25rem;
       }
@@ -473,6 +525,7 @@
 
     <div class="tab-bar">
       <button class="tab-btn active" id="tab-targets">Targets</button>
+      <button class="tab-btn" id="tab-tonight">Tonight</button>
       <button class="tab-btn" id="tab-calendar">Calendar</button>
       <button class="tab-btn" id="tab-settings">Settings</button>
     </div>
@@ -494,6 +547,10 @@
       <div id="empty-state" style="display: none">
         No targets match your search.
       </div>
+    </div>
+
+    <div id="tonight-panel" style="display: none">
+      <div id="tonight-content"></div>
     </div>
 
     <div id="calendar-panel" style="display: none">
@@ -638,9 +695,11 @@
       const statusText = document.getElementById("status-text");
       const locationSelect = document.getElementById("location-select");
       const tabTargetsBtn = document.getElementById("tab-targets");
+      const tabTonightBtn = document.getElementById("tab-tonight");
       const tabCalendarBtn = document.getElementById("tab-calendar");
       const tabSettingsBtn = document.getElementById("tab-settings");
       const targetsPanel = document.getElementById("targets-panel");
+      const tonightPanel = document.getElementById("tonight-panel");
       const calendarPanel = document.getElementById("calendar-panel");
       const settingsPanel = document.getElementById("settings-panel");
       const calendarListEl = document.getElementById("calendar-list");
@@ -856,6 +915,197 @@ def score_candidates(candidates_json, min_alt=30.0):
     cols = ["Name", "Type", "Const", "RA", "Dec", "V-Mag", "MajAx", "M", "Common names", "oss", "aqs", "peak_alt"]
     return top[cols].to_json(orient="records")
 
+def _clean(val):
+    import pandas as pd
+    try:
+        if pd.isna(val):
+            return None
+    except (TypeError, ValueError):
+        pass
+    return val
+
+def build_night_timeline(candidates_json, min_alt=30.0, block_size_minutes=60):
+    """
+    Mobile port of NightScheduler.build_timeline (services/api/src/planner/scheduler.py):
+    same greedy highest-priority-per-block algorithm with hysteresis (stay on
+    the current target while it's still >= 80% as good as the best option,
+    to avoid thrashing between near-equal targets), run against our own raw
+    catalog DataFrame instead of the server's normalized "targets" SQL table
+    (Name/RA/Dec/etc instead of identifier/ra_deg/dec_deg/etc - the math is
+    identical). Weather comes from the already-fetched _weather_range global
+    instead of a WeatherService object, and the EphemerisManager peak-altitude
+    cache is dropped - always computed directly, same as the real code's
+    cache-miss path. Since our pool never reorders mid-loop, the hysteresis
+    check tracks the previous block's winning row index directly instead of
+    re-finding it by identifier every block.
+    """
+    import json
+    import numpy as np
+    import pandas as pd
+    from astropy.coordinates import SkyCoord, AltAz
+
+    empty = {"night_found": False, "night_start": None, "night_end": None, "timeline": [], "recommendations": []}
+
+    rows = json.loads(candidates_json)
+    if not rows:
+        return json.dumps(empty)
+
+    df = pd.DataFrame(rows)
+    df["magnitude"] = pd.to_numeric(df["V-Mag"], errors="coerce")
+    df = df.dropna(subset=["magnitude"])
+    if df.empty:
+        return json.dumps(empty)
+
+    night = v.get_astronomical_night(_observer, Time.now(), date_window_days=14)
+    if not night:
+        return json.dumps(empty)
+    night_start, night_end = night
+
+    coords = SkyCoord(ra=df["RA"].values, dec=df["Dec"].values, unit=(u.hourangle, u.deg))
+    df["peak_alt"] = v.get_peak_altitudes(_observer, coords, (night_start, night_end))
+    pool = df[df["peak_alt"] > min_alt].copy()
+    if pool.empty:
+        return json.dumps({**empty, "night_found": True, "night_start": night_start.iso, "night_end": night_end.iso})
+
+    maj = pd.to_numeric(pool["MajAx"], errors="coerce")
+    minr = pd.to_numeric(pool["MinAx"], errors="coerce")
+    pool["size_maj"] = maj.fillna(2.0)
+    pool["size_min"] = minr.fillna(pool["size_maj"])
+
+    static_oss, static_aqs = s.calculate_oss_vectorized(
+        pool, _profile, min_alt, bortle_scale=_location.bortle_scale
+    )
+    pool["static_oss"] = static_oss
+    pool["static_aqs"] = static_aqs
+    pool = pool.reset_index(drop=True)
+
+    pool_coords = SkyCoord(ra=pool["RA"].values, dec=pool["Dec"].values, unit=(u.hourangle, u.deg))
+
+    blocks = []
+    current_time = night_start
+    block_delta = block_size_minutes * u.minute
+    while current_time < night_end:
+        block_end = min(current_time + block_delta, night_end)
+        blocks.append((current_time, block_end))
+        current_time = block_end
+
+    def row_payload(idx):
+        row = pool.iloc[idx]
+        return {
+            "Name": row["Name"], "Type": _clean(row["Type"]), "Const": _clean(row["Const"]),
+            "RA": row["RA"], "Dec": row["Dec"], "V-Mag": _clean(row["V-Mag"]),
+            "MajAx": _clean(row.get("MajAx")), "M": _clean(row.get("M")),
+            "Common names": _clean(row.get("Common names")),
+        }
+
+    timeline = []
+    current_target_idx = None
+    target_best = {}
+
+    for b_start, b_end in blocks:
+        midpoint = b_start + (b_end - b_start) / 2
+        mid_iso = midpoint.isot[:13] + ":00Z"
+
+        w_mult = 1.0
+        if _weather_range:
+            past = [w for w in _weather_range if w["timestamp"] <= mid_iso]
+            weather_point = past[-1] if past else _weather_range[0]
+            w_mult = float(s.calculate_weather_score_vectorized(
+                weather_point.get("cloud_cover_pct", 0),
+                weather_point.get("humidity_pct", 0),
+                weather_point.get("seeing"),
+            )[0])
+
+        m_mult = v.get_moon_quality(_observer, midpoint)
+
+        altaz_frame = AltAz(obstime=midpoint, location=_observer.location)
+        current_altaz = pool_coords.transform_to(altaz_frame)
+        current_alts = current_altaz.alt.deg
+        current_azs = current_altaz.az.deg
+
+        sqs_scores = s.calculate_sqs_vectorized(current_alts, current_azs, w_mult, m_mult)
+
+        final_scores = pool["static_oss"].values * (sqs_scores / 100.0)
+        final_aqs = pool["static_aqs"].values * (sqs_scores / 100.0)
+
+        priority = final_scores.copy()
+        blocked = _location.is_blocked_vectorized(current_azs, current_alts)
+        low = current_alts < min_alt
+        priority[low | blocked] = 0
+        final_scores[low | blocked] = 0
+        final_aqs[low | blocked] = 0
+
+        if priority.size == 0 or not np.any(priority > 0):
+            current_target_idx = None
+            continue
+
+        best_idx = int(np.argmax(priority))
+        best_score = priority[best_idx]
+
+        selected_idx = best_idx
+        if current_target_idx is not None and priority[current_target_idx] >= 0.8 * best_score:
+            selected_idx = current_target_idx
+
+        current_target_idx = selected_idx
+        entry = row_payload(selected_idx)
+        entry.update({
+            "start_time": b_start.iso,
+            "end_time": b_end.iso,
+            "oss": v.safe_round(final_scores[selected_idx]),
+            "aqs": v.safe_round(final_aqs[selected_idx]),
+        })
+        timeline.append(entry)
+
+        top_idx = np.argsort(final_scores)[-30:][::-1]
+        for idx in top_idx:
+            idx = int(idx)
+            score = final_scores[idx]
+            if score <= 0:
+                break
+            rid = pool.iloc[idx]["Name"]
+            if rid not in target_best or score > target_best[rid]["aqs"]:
+                payload = row_payload(idx)
+                payload["oss"] = v.safe_round(pool.iloc[idx]["static_oss"])
+                payload["aqs"] = v.safe_round(score)
+                target_best[rid] = payload
+
+    consolidated = []
+    if timeline:
+        cur = dict(timeline[0])
+        cur["_n"] = 1
+        for nxt in timeline[1:]:
+            if nxt["Name"] == cur["Name"]:
+                cur["end_time"] = nxt["end_time"]
+                cur["oss"] += nxt["oss"]
+                cur["aqs"] += nxt["aqs"]
+                cur["_n"] += 1
+            else:
+                cur["oss"] = round(cur["oss"] / cur["_n"], 1)
+                cur["aqs"] = round(cur["aqs"] / cur["_n"], 1)
+                del cur["_n"]
+                consolidated.append(cur)
+                cur = dict(nxt)
+                cur["_n"] = 1
+        cur["oss"] = round(cur["oss"] / cur["_n"], 1)
+        cur["aqs"] = round(cur["aqs"] / cur["_n"], 1)
+        del cur["_n"]
+        consolidated.append(cur)
+
+    scheduled_names = {b["Name"] for b in consolidated}
+    recommendations = sorted(
+        (payload for name, payload in target_best.items() if name not in scheduled_names),
+        key=lambda p: p["aqs"], reverse=True,
+    )[:10]
+
+    result = {
+        "night_found": True,
+        "night_start": night_start.iso,
+        "night_end": night_end.iso,
+        "timeline": consolidated,
+        "recommendations": recommendations,
+    }
+    return json.dumps(result)
+
 set_location(${selectedLocation.latitude}, ${selectedLocation.longitude}, ${selectedLocation.elevation_m}, ${selectedLocation.bortle_scale}, "${selectedLocation.timezone}")
 set_profile("${telescopeProfile.name}", ${telescopeProfile.aperture_mm}, ${telescopeProfile.focal_length_mm}, ${telescopeProfile.sensor_x}, ${telescopeProfile.sensor_y}, ${telescopeProfile.pixel_pitch_um})
 `);
@@ -991,6 +1241,24 @@ set_profile("${telescopeProfile.name}", ${telescopeProfile.aperture_mm}, ${teles
         return "M" + String(m).trim().replace(/^0+/, "");
       }
 
+      function targetRowInnerHtml(r, valueField) {
+        const common = commonNameOf(r);
+        const messier = messierOf(r);
+        const idBadge = [messier, r.Name].filter(Boolean).join(" · ");
+        const rightValue = r[valueField] ?? "?";
+        return `
+          <div>
+            <div class="name">${escapeHtml(common || r.Name)}</div>
+            <div class="type">${
+              common ? escapeHtml(idBadge) + " &middot; " : ""
+            }${escapeHtml(typeLabel(r.Type))} &middot; ${escapeHtml(
+              r.Const,
+            )}</div>
+          </div>
+          <div class="mag">${rightValue}</div>
+        `;
+      }
+
       function renderTargets(rows, opts = {}) {
         loadingStateEl.style.display = "none";
         if (rows.length === 0) {
@@ -1004,29 +1272,32 @@ set_profile("${telescopeProfile.name}", ${telescopeProfile.aperture_mm}, ${teles
         targetListEl.style.display = "block";
         targetListEl.innerHTML = "";
         for (const r of rows) {
-          const common = commonNameOf(r);
-          const messier = messierOf(r);
-          const idBadge = [messier, r.Name].filter(Boolean).join(" · ");
           const row = document.createElement("div");
           row.className = "target-row";
-          const rightValue = opts.scored ? r.aqs : r["V-Mag"] ?? "?";
-          row.innerHTML = `
-            <div>
-              <div class="name">${escapeHtml(common || r.Name)}</div>
-              <div class="type">${
-                common ? escapeHtml(idBadge) + " &middot; " : ""
-              }${escapeHtml(typeLabel(r.Type))} &middot; ${escapeHtml(
-                r.Const,
-              )}</div>
-            </div>
-            <div class="mag">${rightValue}</div>
-          `;
+          row.innerHTML = targetRowInnerHtml(r, opts.scored ? "aqs" : "V-Mag");
           row.addEventListener("click", () => showDetail(r));
           targetListEl.appendChild(row);
         }
       }
 
       const CATALOG_COLUMNS = `Name, Type, Const, RA, "Dec", "V-Mag", MajAx, MinAx, M, "Common names"`;
+      const CATALOG_WHERE = `Type NOT IN ('*', '**', 'NonEx', 'Dup') AND "V-Mag" IS NOT NULL AND RA IS NOT NULL AND "Dec" IS NOT NULL`;
+
+      async function fetchScorableCandidates() {
+        const result = await conn.query(`
+          SELECT ${CATALOG_COLUMNS} FROM catalog WHERE ${CATALOG_WHERE}
+        `);
+        return result.toArray().map((r) => r.toJSON());
+      }
+
+      function setCandidatesGlobal(candidates) {
+        pyodide.globals.set(
+          "_candidates_json",
+          JSON.stringify(candidates, (key, value) =>
+            typeof value === "bigint" ? value.toString() : value,
+          ),
+        );
+      }
 
       async function runTopPicks() {
         loadingStateEl.style.display = "block";
@@ -1034,19 +1305,7 @@ set_profile("${telescopeProfile.name}", ${telescopeProfile.aperture_mm}, ${teles
         targetListEl.style.display = "none";
         emptyStateEl.style.display = "none";
         try {
-          const result = await conn.query(`
-            SELECT ${CATALOG_COLUMNS}
-            FROM catalog
-            WHERE Type NOT IN ('*', '**', 'NonEx', 'Dup')
-              AND "V-Mag" IS NOT NULL AND RA IS NOT NULL AND "Dec" IS NOT NULL
-          `);
-          const candidates = result.toArray().map((r) => r.toJSON());
-          pyodide.globals.set(
-            "_candidates_json",
-            JSON.stringify(candidates, (key, value) =>
-              typeof value === "bigint" ? value.toString() : value,
-            ),
-          );
+          setCandidatesGlobal(await fetchScorableCandidates());
           const scoredJson = await pyodide.runPythonAsync(
             "score_candidates(_candidates_json)",
           );
@@ -1071,8 +1330,7 @@ set_profile("${telescopeProfile.name}", ${telescopeProfile.aperture_mm}, ${teles
         const result = await conn.query(`
           SELECT ${CATALOG_COLUMNS}
           FROM catalog
-          WHERE Type NOT IN ('*', '**', 'NonEx', 'Dup')
-            AND "V-Mag" IS NOT NULL AND RA IS NOT NULL AND "Dec" IS NOT NULL
+          WHERE ${CATALOG_WHERE}
             AND (UPPER(Name) LIKE '%${escaped}%' OR UPPER(Type) LIKE '%${escaped}%' OR UPPER("Common names") LIKE '%${escaped}%')
           ORDER BY CAST("V-Mag" AS DOUBLE) ASC
           LIMIT 40
@@ -1430,13 +1688,91 @@ json.dumps([
         }
       }
 
+      const tonightContentEl = document.getElementById("tonight-content");
+
+      async function runTonight() {
+        tonightContentEl.innerHTML = `<div class="spinner-line" style="padding: 1rem 1.25rem">Building tonight's timeline for ${escapeHtml(
+          selectedLocation.name,
+        )}…</div>`;
+        try {
+          setCandidatesGlobal(await fetchScorableCandidates());
+          const resultJson = await pyodide.runPythonAsync(
+            "build_night_timeline(_candidates_json)",
+          );
+          renderTonight(JSON.parse(resultJson));
+        } catch (e) {
+          tonightContentEl.innerHTML = `<div class="step fail"><div class="detail">${escapeHtml(
+            e.message,
+          )}</div></div>`;
+        }
+      }
+
+      function renderTonight(r) {
+        if (!r.night_found) {
+          tonightContentEl.innerHTML = `<div id="empty-state" style="display: block">No astronomical darkness found in the next 14 days at this location.</div>`;
+          return;
+        }
+        if (r.timeline.length === 0) {
+          tonightContentEl.innerHTML = `<div id="empty-state" style="display: block">No targets clear 30&deg; tonight from this location - try a different location.</div>`;
+          return;
+        }
+
+        const nightLine = `<div class="tonight-window">${utcToLocalTime(
+          r.night_start,
+        )} &ndash; ${utcToLocalTime(r.night_end)} (astronomical night)</div>`;
+
+        let blocksHtml = "";
+        for (const b of r.timeline) {
+          blocksHtml += `
+            <div class="timeline-block" style="border-left-color: ${qualityColor(
+              b.aqs,
+            )}">
+              <div class="tb-time">${utcToLocalTime(
+                b.start_time,
+              )} &ndash; ${utcToLocalTime(b.end_time)}</div>
+              <div class="tb-main">${targetRowInnerHtml(b, "aqs")}</div>
+            </div>
+          `;
+        }
+
+        let recsHtml = "";
+        if (r.recommendations.length > 0) {
+          recsHtml = `<div class="tonight-recs-header">Other strong candidates tonight</div><div id="tonight-recs"></div>`;
+        }
+
+        tonightContentEl.innerHTML =
+          nightLine +
+          `<div class="timeline-list">${blocksHtml}</div>` +
+          recsHtml;
+
+        tonightContentEl
+          .querySelectorAll(".timeline-block")
+          .forEach((el, i) => {
+            el.addEventListener("click", () => showDetail(r.timeline[i]));
+          });
+
+        if (r.recommendations.length > 0) {
+          const recsEl = document.getElementById("tonight-recs");
+          for (const rec of r.recommendations) {
+            const row = document.createElement("div");
+            row.className = "target-row";
+            row.innerHTML = targetRowInnerHtml(rec, "aqs");
+            row.addEventListener("click", () => showDetail(rec));
+            recsEl.appendChild(row);
+          }
+        }
+      }
+
       function showTab(tab) {
         tabTargetsBtn.classList.toggle("active", tab === "targets");
+        tabTonightBtn.classList.toggle("active", tab === "tonight");
         tabCalendarBtn.classList.toggle("active", tab === "calendar");
         tabSettingsBtn.classList.toggle("active", tab === "settings");
         targetsPanel.style.display = tab === "targets" ? "block" : "none";
+        tonightPanel.style.display = tab === "tonight" ? "block" : "none";
         calendarPanel.style.display = tab === "calendar" ? "block" : "none";
         settingsPanel.style.display = tab === "settings" ? "block" : "none";
+        if (tab === "tonight") runTonight();
         if (tab === "calendar") runCalendar();
         if (tab === "settings") {
           renderLocationsList();
@@ -1444,6 +1780,7 @@ json.dumps([
         }
       }
       tabTargetsBtn.addEventListener("click", () => showTab("targets"));
+      tabTonightBtn.addEventListener("click", () => showTab("tonight"));
       tabCalendarBtn.addEventListener("click", () => showTab("calendar"));
       tabSettingsBtn.addEventListener("click", () => showTab("settings"));
 
@@ -1528,6 +1865,7 @@ json.dumps([
           `set_location(${loc.latitude}, ${loc.longitude}, ${loc.elevation_m}, ${loc.bortle_scale}, "${loc.timezone}")`,
         );
         await refreshWeather();
+        if (tonightPanel.style.display !== "none") runTonight();
         if (calendarPanel.style.display !== "none") runCalendar();
         if (targetsPanel.style.display !== "none" && !searchInput.value.trim())
           runTopPicks();
