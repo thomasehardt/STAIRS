@@ -401,6 +401,19 @@
         font-size: 0.9rem;
         font-weight: 600;
       }
+      .logged-badge {
+        display: inline-block;
+        margin-left: 0.4rem;
+        padding: 0.1rem 0.4rem;
+        background: #2a3a2a;
+        color: #7fd17f;
+        font-size: 0.6rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        border-radius: 4px;
+        vertical-align: middle;
+      }
       #empty-state,
       #loading-state {
         color: #777;
@@ -493,6 +506,106 @@
       }
       .fact-row .k {
         color: #999;
+      }
+      .log-toggle-btn {
+        display: block;
+        width: 100%;
+        margin-top: 0.4rem;
+        padding: 0.55rem;
+        background: #1e1e1e;
+        color: #ffc966;
+        border: 1px solid #333;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+      .log-form {
+        margin-top: 0.75rem;
+        padding: 0.75rem;
+        background: #1a1a1a;
+        border-radius: 10px;
+      }
+      .star-row {
+        margin-bottom: 0.6rem;
+      }
+      .star {
+        font-size: 1.4rem;
+        color: #444;
+        cursor: pointer;
+        margin-right: 0.15rem;
+      }
+      .star.on {
+        color: #ffc966;
+      }
+      .log-form textarea {
+        display: block;
+        width: 100%;
+        min-height: 4.5rem;
+        background: #111;
+        color: #eee;
+        border: 1px solid #333;
+        border-radius: 8px;
+        padding: 0.5rem;
+        font-size: 0.85rem;
+        font-family: inherit;
+        resize: vertical;
+        margin-bottom: 0.6rem;
+        box-sizing: border-box;
+      }
+      .save-log-btn {
+        width: 100%;
+        padding: 0.55rem;
+        background: #ffc966;
+        color: #151515;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.85rem;
+      }
+      .log-list {
+        margin-top: 0.75rem;
+      }
+      .log-item {
+        background: #1a1a1a;
+        border-radius: 8px;
+        padding: 0.6rem 0.75rem;
+        margin-bottom: 0.5rem;
+      }
+      .log-item-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.3rem;
+      }
+      .log-date {
+        color: #999;
+        font-size: 0.78rem;
+        font-weight: 600;
+      }
+      .log-stars {
+        color: #ffc966;
+        font-size: 0.8rem;
+      }
+      .log-notes {
+        color: #ccc;
+        font-size: 0.85rem;
+        line-height: 1.4;
+        font-style: italic;
+      }
+      .log-delete-btn {
+        display: block;
+        margin-top: 0.4rem;
+        background: none;
+        border: none;
+        color: #d66;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0;
+      }
+      .log-empty {
+        color: #777;
+        font-size: 0.85rem;
+        padding: 0.5rem 0;
       }
       .close-btn {
         display: block;
@@ -687,6 +800,50 @@
       }
       function saveProfile(p) {
         localStorage.setItem("stairs_profile", JSON.stringify(p));
+      }
+
+      // Client-only mirror of ObservationLogItem (services/api/src/api/schemas.py)
+      // - same shape (target_id/session_date/notes/rating/status/created_at) but
+      // stored in localStorage instead of DuckDB, since this POC has no server.
+      function loadLogs() {
+        try {
+          const raw = localStorage.getItem("stairs_logs");
+          const parsed = raw ? JSON.parse(raw) : [];
+          return Array.isArray(parsed) ? parsed : [];
+        } catch {
+          return [];
+        }
+      }
+      function saveLogs(logs) {
+        localStorage.setItem("stairs_logs", JSON.stringify(logs));
+      }
+      let observationLogs = loadLogs();
+
+      function logsForTarget(targetId) {
+        return observationLogs
+          .filter((l) => l.target_id === targetId)
+          .sort((a, b) => b.session_date.localeCompare(a.session_date));
+      }
+      function isLogged(targetId) {
+        return observationLogs.some((l) => l.target_id === targetId);
+      }
+      function createLog({ target_id, notes, rating, status }) {
+        const log = {
+          id: Date.now(),
+          target_id,
+          session_date: new Date().toISOString().slice(0, 10),
+          notes: notes || null,
+          rating: rating ?? null,
+          status: status || "Captured",
+          created_at: new Date().toISOString(),
+        };
+        observationLogs.push(log);
+        saveLogs(observationLogs);
+        return log;
+      }
+      function deleteLogEntry(id) {
+        observationLogs = observationLogs.filter((l) => l.id !== id);
+        saveLogs(observationLogs);
       }
 
       let locations = loadLocations();
@@ -1256,7 +1413,9 @@ set_profile("${telescopeProfile.name}", ${telescopeProfile.aperture_mm}, ${teles
         const rightValue = r[valueField] ?? "?";
         return `
           <div>
-            <div class="name">${escapeHtml(common || r.Name)}</div>
+            <div class="name">${escapeHtml(common || r.Name)}${
+              isLogged(r.Name) ? '<span class="logged-badge">Logged</span>' : ""
+            }</div>
             <div class="type">${
               common ? escapeHtml(idBadge) + " &middot; " : ""
             }${escapeHtml(typeLabel(r.Type))} &middot; ${escapeHtml(
@@ -1269,6 +1428,15 @@ set_profile("${telescopeProfile.name}", ${telescopeProfile.aperture_mm}, ${teles
 
       function renderTargets(rows, opts = {}) {
         loadingStateEl.style.display = "none";
+        if (opts.scored) {
+          // Deprioritize (not exclude) already-logged targets: a captured
+          // target is still valid to revisit, but shouldn't crowd out
+          // never-shot candidates at the top of tonight's picks. Array#sort
+          // is stable, so relative score order within each group is kept.
+          rows = [...rows].sort(
+            (a, b) => (isLogged(a.Name) ? 1 : 0) - (isLogged(b.Name) ? 1 : 0),
+          );
+        }
         if (rows.length === 0) {
           targetListEl.style.display = "none";
           emptyStateEl.style.display = "block";
@@ -1491,6 +1659,150 @@ json.dumps(out)
             e.message,
           )}</div></div>`;
         }
+
+        // Session log is independent of the astro calc above (works even if
+        // it failed), so it's rendered/close-button-added unconditionally.
+        detailSheet.innerHTML += `<div id="observations-container"></div>`;
+        renderObservationsSection(
+          target.Name,
+          document.getElementById("observations-container"),
+          { adding: false, rating: 3, notes: "" },
+        );
+
+        const closeBtn = document.createElement("button");
+        closeBtn.className = "close-btn";
+        closeBtn.textContent = "Close";
+        closeBtn.addEventListener("click", () =>
+          detailOverlay.classList.remove("open"),
+        );
+        detailSheet.appendChild(closeBtn);
+      }
+
+      // The "Logged" badge and Top Picks deprioritization are computed at
+      // render time from `observationLogs`, so whichever list is currently
+      // visible behind the detail sheet needs a re-render after a log is
+      // added/deleted or it'll look stale until the user next searches/switches
+      // tabs.
+      function refreshAfterLogChange() {
+        if (targetsPanel.style.display !== "none") {
+          const term = searchInput.value.trim();
+          (term.length === 0 ? runTopPicks() : runSearchQuery(term)).catch(
+            (err) => console.error("refresh after log change failed:", err),
+          );
+        }
+        if (tonightPanel.style.display !== "none") {
+          runTonight();
+        }
+      }
+
+      function renderObservationsSection(targetId, containerEl, uiState) {
+        const logs = logsForTarget(targetId);
+        containerEl.innerHTML = `
+          <div class="subsection-title">Observation Log</div>
+          <button class="log-toggle-btn" id="log-toggle-btn">${
+            uiState.adding ? "Cancel" : "+ Log a session"
+          }</button>
+          ${
+            uiState.adding
+              ? `
+            <div class="log-form">
+              <div class="star-row">
+                ${[1, 2, 3, 4, 5]
+                  .map(
+                    (n) =>
+                      `<span class="star${
+                        n <= uiState.rating ? " on" : ""
+                      }" data-star="${n}">&#9733;</span>`,
+                  )
+                  .join("")}
+              </div>
+              <textarea id="log-notes-input" placeholder="Equipment used, conditions, notes…">${escapeHtml(
+                uiState.notes,
+              )}</textarea>
+              <button class="save-log-btn" id="save-log-btn">Save session</button>
+            </div>
+          `
+              : ""
+          }
+          <div class="log-list">
+            ${
+              logs.length === 0
+                ? `<div class="log-empty">No sessions logged yet.</div>`
+                : logs
+                    .map(
+                      (l) => `
+              <div class="log-item">
+                <div class="log-item-top">
+                  <span class="log-date">${new Date(
+                    l.session_date + "T12:00:00",
+                  ).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}</span>
+                  <span class="log-stars">${"&#9733;".repeat(
+                    l.rating || 0,
+                  )}${"&#9734;".repeat(5 - (l.rating || 0))}</span>
+                </div>
+                ${
+                  l.notes
+                    ? `<div class="log-notes">${escapeHtml(l.notes)}</div>`
+                    : ""
+                }
+                <button class="log-delete-btn" data-log-id="${
+                  l.id
+                }">Delete</button>
+              </div>
+            `,
+                    )
+                    .join("")
+            }
+          </div>
+        `;
+
+        containerEl
+          .querySelector("#log-toggle-btn")
+          .addEventListener("click", () => {
+            uiState.adding = !uiState.adding;
+            renderObservationsSection(targetId, containerEl, uiState);
+          });
+
+        if (uiState.adding) {
+          containerEl.querySelectorAll(".star").forEach((el) => {
+            el.addEventListener("click", () => {
+              uiState.rating = parseInt(el.dataset.star, 10);
+              renderObservationsSection(targetId, containerEl, uiState);
+            });
+          });
+          containerEl
+            .querySelector("#log-notes-input")
+            .addEventListener("input", (e) => {
+              uiState.notes = e.target.value;
+            });
+          containerEl
+            .querySelector("#save-log-btn")
+            .addEventListener("click", () => {
+              createLog({
+                target_id: targetId,
+                notes: uiState.notes,
+                rating: uiState.rating,
+                status: "Captured",
+              });
+              uiState.adding = false;
+              uiState.notes = "";
+              uiState.rating = 3;
+              renderObservationsSection(targetId, containerEl, uiState);
+              refreshAfterLogChange();
+            });
+        }
+
+        containerEl.querySelectorAll(".log-delete-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            deleteLogEntry(parseInt(btn.dataset.logId, 10));
+            renderObservationsSection(targetId, containerEl, uiState);
+            refreshAfterLogChange();
+          });
+        });
       }
 
       function utcToLocalTime(iso) {
@@ -1572,13 +1884,6 @@ json.dumps(out)
             }
           `;
         }
-        const closeBtn = document.createElement("button");
-        closeBtn.className = "close-btn";
-        closeBtn.textContent = "Close";
-        closeBtn.addEventListener("click", () =>
-          detailOverlay.classList.remove("open"),
-        );
-        detailSheet.appendChild(closeBtn);
       }
 
       detailOverlay.addEventListener("click", (e) => {
