@@ -11,6 +11,7 @@ astroplan/version.py
 visibility.py
 scoring.py
 optics.py
+exposure.py
 telescope_profile.py
 planner_models.py
 forecast_day.py

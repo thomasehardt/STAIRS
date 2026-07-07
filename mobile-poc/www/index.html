@@ -477,6 +477,13 @@
         text-transform: uppercase;
         letter-spacing: 0.03em;
       }
+      .subsection-title {
+        color: #888;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        margin: 1rem 0 0.3rem;
+      }
       .fact-row {
         display: flex;
         justify-content: space-between;
@@ -825,6 +832,7 @@ from astropy.time import Time
 
 import visibility as v
 import scoring as s
+import exposure as ex
 from telescope_profile import TelescopeProfile
 from planner_models import ObservationLocation
 from multi_night import MultiNightPlanner
@@ -1390,6 +1398,7 @@ set_profile("${telescopeProfile.name}", ${telescopeProfile.aperture_mm}, ${teles
 from astropy.coordinates import SkyCoord
 from astropy.time import Time
 import astropy.units as u
+import numpy as np
 import json
 
 def safe_iso(t):
@@ -1444,6 +1453,31 @@ if night:
     out["oss"] = oss_rel
     out["aqs"] = aqs_abs
     out["final_score"] = final_abs
+
+    # Exposure Time Calculator - ports astro_logic/exposure.py's math exactly
+    # (services/api/src/api/routers/system.py's /calculate-exposure endpoint).
+    # One deliberate difference from that endpoint: it stores the same
+    # mount-clamped value into both optimal_sub_s and practical_sub_s,
+    # discarding the true sky-noise-limited number - here we surface both,
+    # since standing at the eyepiece "what's ideal" and "what your mount can
+    # actually do" are both useful.
+    exp_bortle = _location.bortle_scale if _location.bortle_scale is not None else 5
+    sky_flux = ex.calculate_sky_flux(
+        exp_bortle, _profile.aperture_mm, _profile.focal_length_mm,
+        _profile.pixel_pitch_um, _profile.quantum_efficiency,
+    )
+    sky_lim_sub = ex.calculate_optimal_sub_exposure(sky_flux, _profile.read_noise_e)
+    prac_sub = ex.calculate_practical_sub_exposure(sky_lim_sub, _profile.focal_length_mm, is_alt_az=True)
+    total_s = ex.calculate_total_integration_time(
+        _mag, [_size, _size], exp_bortle, _profile.aperture_mm, _profile.focal_length_mm,
+        _profile.pixel_pitch_um, _profile.quantum_efficiency, _profile.read_noise_e,
+    )
+    out["exposure"] = {
+        "optimal_sub_s": round(float(sky_lim_sub), 1),
+        "practical_sub_s": round(float(prac_sub), 1),
+        "total_integration_h": round(float(np.clip(total_s / 3600.0, 0.1, 12.0)), 1),
+    }
+
     if weather_now:
         out["cloud_cover_pct"] = round(weather_now.get("cloud_cover_pct") or 0, 0)
         out["humidity_pct"] = round(weather_now.get("humidity_pct") or 0, 0)
@@ -1516,6 +1550,24 @@ json.dumps(out)
             ${
               r.cloud_cover_pct !== undefined
                 ? `<div class="fact-row"><span class="k">Current sky (Open-Meteo)</span><span>${r.cloud_cover_pct}% clouds &middot; ${r.humidity_pct}% humidity</span></div>`
+                : ""
+            }
+            ${
+              r.exposure
+                ? `
+              <div class="subsection-title">Exposure recommendation &middot; ${escapeHtml(
+                telescopeProfile.name,
+              )}</div>
+              <div class="fact-row"><span class="k">Sky-limited optimal sub-exposure</span><span>${
+                r.exposure.optimal_sub_s
+              }s</span></div>
+              <div class="fact-row"><span class="k">Practical sub-exposure (mount-limited)</span><span>${
+                r.exposure.practical_sub_s
+              }s</span></div>
+              <div class="fact-row"><span class="k">Est. integration time (SNR 10)</span><span>${
+                r.exposure.total_integration_h
+              }h</span></div>
+            `
                 : ""
             }
           `;
