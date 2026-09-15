@@ -19,6 +19,9 @@ services:
       - LOG_DIR=/app_data/logs
       - CACHE_DIR=/app_data/cache
       - HOME=/tmp
+      # astropy caches the IERS table here (see astro_logic/visibility.py);
+      # keep it in the mounted ./cache so it survives container restarts.
+      - XDG_CACHE_HOME=/app_data/cache
     command:
       [
         "uvicorn",
