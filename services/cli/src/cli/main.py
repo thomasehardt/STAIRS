@@ -220,7 +220,7 @@ def weather(
                         "[bold red]Error:[/bold red] No locations configured "
                         "in settings."
                     )
-                    raise type.Exit(code=1)
+                    raise typer.Exit(code=1)
 
         latitude = target_loc["latitude"]
         longitude = target_loc["longitude"]
