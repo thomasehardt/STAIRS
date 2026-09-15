@@ -219,3 +219,13 @@ mockups/
 stairs.db
 **/stairs.db
 *.db
+
+# Editor / tooling
+.idea/
+.code-graph/
+.codesight/
+repomix-output.xml*
+
+# Ad-hoc backups
+*.bak
+*.bak-*
