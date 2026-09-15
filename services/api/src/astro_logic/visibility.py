@@ -15,7 +15,30 @@ contains logic related to the viewer at a point in time (i.e., a location + time
 """
 
 logger = logging.getLogger(__name__)
-iers.conf.auto_download = False
+
+
+def ensure_iers_table() -> None:
+    """
+    Makes sure astropy has an IERS Earth-rotation table that covers today.
+
+    The IERS-A table bundled with the astropy wheel only predicts about a year
+    past its release; once "now" is >30 days beyond that, every alt/az transform
+    raises and the planner endpoints 500. Probing ``Time.now()`` here triggers
+    astropy's own stale-table download (~3 MB, cached under XDG_CACHE_HOME) at
+    startup rather than in the middle of a request. If the download fails (e.g.
+    offline) we fall back to extrapolating the table we have: sub-second UT1
+    error, which is irrelevant for session planning.
+    """
+    iers.conf.auto_download = True
+    try:
+        iers.IERS_Auto.open().ut1_utc(Time.now())
+        logger.info("IERS table covers the current date")
+    except Exception as e:
+        logger.warning(
+            f"IERS table unavailable ({e.__class__.__name__}); "
+            "extrapolating the bundled table instead"
+        )
+        iers.conf.auto_max_age = None
 
 
 def safe_round(val: Any, decimals: int = 1) -> float:

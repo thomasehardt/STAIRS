@@ -17,6 +17,7 @@ from src.api.routers import (
     targets,
     weather,
 )
+from src.astro_logic.visibility import ensure_iers_table
 from src.db.parquet_loader import load_data_to_parquet
 from src.utils.ephemeris_manager import EphemerisManager
 from src.utils.logging_config import setup_logging
@@ -28,6 +29,8 @@ logger = logging.getLogger("uvicorn.error")
 async def lifespan(_app: FastAPI) -> AsyncGenerator:
     """Lifespan event handler to initialize the data lakehouse on startup."""
     setup_logging()
+    logger.info("Lifespan startup: checking IERS Earth-rotation table")
+    ensure_iers_table()
     logger.info("Lifespan startup: loading data to parquet")
     load_data_to_parquet()
 
