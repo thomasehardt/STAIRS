@@ -644,13 +644,25 @@
     <div class="weather-status" id="weather-status"></div>
 
     <div class="tab-bar">
-      <button class="tab-btn active" id="tab-targets">Targets</button>
+      <button class="tab-btn active" id="tab-dashboard">Dashboard</button>
+      <button class="tab-btn" id="tab-targets">Targets</button>
+      <button class="tab-btn" id="tab-skymap">Sky Map</button>
       <button class="tab-btn" id="tab-tonight">Tonight</button>
       <button class="tab-btn" id="tab-calendar">Calendar</button>
       <button class="tab-btn" id="tab-settings">Settings</button>
     </div>
 
-    <div id="targets-panel">
+    <div id="dashboard-panel">
+      <div id="dashboard-content" style="padding: 16px"></div>
+    </div>
+    <div id="skymap-panel" style="display: none">
+      <div style="padding: 16px; text-align: center">
+        <h2>Interactive Sky Map</h2>
+        <div id="skymap-container"></div>
+      </div>
+    </div>
+
+    <div id="targets-panel" style="display: none">
       <div class="search-bar">
         <input
           type="text"
@@ -858,12 +870,16 @@
       const statusDot = document.getElementById("status-dot");
       const statusText = document.getElementById("status-text");
       const locationSelect = document.getElementById("location-select");
+      const tabDashboardBtn = document.getElementById("tab-dashboard");
       const tabTargetsBtn = document.getElementById("tab-targets");
       const tabTonightBtn = document.getElementById("tab-tonight");
+      const tabSkymapBtn = document.getElementById("tab-skymap");
       const tabCalendarBtn = document.getElementById("tab-calendar");
       const tabSettingsBtn = document.getElementById("tab-settings");
+      const dashboardPanel = document.getElementById("dashboard-panel");
       const targetsPanel = document.getElementById("targets-panel");
       const tonightPanel = document.getElementById("tonight-panel");
+      const skymapPanel = document.getElementById("skymap-panel");
       const calendarPanel = document.getElementById("calendar-panel");
       const settingsPanel = document.getElementById("settings-panel");
       const calendarListEl = document.getElementById("calendar-list");
@@ -1599,10 +1615,30 @@ if night:
         if out["rise_utc"] is None or out["set_utc"] is None:
             out["visible_tonight"] = False
 
+
     peak_alt = float(v.get_peak_altitudes(_observer, target_coord, (night_start, night_end))[0])
     if peak_alt != peak_alt:  # NaN check - e.g. a target that never crosses the horizon here
         peak_alt = -90.0
     out["peak_altitude_deg"] = round(peak_alt, 1)
+
+    # Altitude curve
+    try:
+        num_pts = 40
+        times = night_start + (night_end - night_start) * np.linspace(0, 1, num_pts)
+        altaz = _observer.altaz(times, target_coord)
+        alts = altaz.alt.deg.tolist()
+        if hasattr(alts, 'filled'):
+            alts = alts.filled(-90).tolist()
+        out["altitude_curve"] = [round(a, 1) for a in alts]
+    except Exception as e:
+        pass
+
+    # FOV calculation
+    try:
+        out["fov_x"], out["fov_y"] = _profile.calculate_fov()
+    except Exception as e:
+        pass
+
 
     moon_q = v.get_moon_quality(_observer, night_start)
     if moon_q != moon_q:
@@ -1805,6 +1841,95 @@ json.dumps(out)
         });
       }
 
+      async function renderDashboard() {
+        const content = document.getElementById("dashboard-content");
+        content.innerHTML = `<div class="spinner-line">Loading dashboard...</div>`;
+
+        try {
+          // The weather status is populated in another div, let's grab it or recompute
+          content.innerHTML = `
+                <h2>Dashboard</h2>
+                <div class="step ok"><div class="label">&#10003; Weather</div><div class="detail">Loaded from Weather Service</div></div>
+                <br>
+                <div class="subsection-title">Quick Actions</div>
+                <button class="tab-btn" style="width: 100%; margin-bottom: 8px; border: 1px solid #444; border-radius: 4px;" onclick="showTab('tonight');">View Tonight's Plan</button>
+                <button class="tab-btn" style="width: 100%; margin-bottom: 8px; border: 1px solid #444; border-radius: 4px;" onclick="showTab('targets');">Browse Catalog</button>
+            `;
+        } catch (e) {
+          content.innerHTML = `<div class="step fail"><div class="detail">Failed to load dashboard: ${e.message}</div></div>`;
+        }
+      }
+
+      async function renderSkyMap() {
+        const container = document.getElementById("skymap-container");
+        container.innerHTML = `<div class="spinner-line">Computing sky map...</div>`;
+
+        try {
+          const result = await conn.query(
+            `SELECT * FROM catalog WHERE Type NOT IN ('*', '**', 'NonEx', 'Dup') AND "V-Mag" IS NOT NULL AND RA IS NOT NULL AND "Dec" IS NOT NULL`,
+          );
+          let targets = result.toArray().map((r) => r.toJSON());
+          targets = targets
+            .filter(
+              (t) =>
+                t["V-Mag"] !== null &&
+                t["V-Mag"] !== undefined &&
+                String(t["V-Mag"]).trim() !== "" &&
+                !isNaN(parseFloat(t["V-Mag"])),
+            )
+            .sort((a, b) => parseFloat(a["V-Mag"]) - parseFloat(b["V-Mag"]))
+            .slice(0, 200);
+
+          container.innerHTML = `
+            <svg viewBox="0 0 300 300" style="width:100%; max-width: 300px; background:#050510; border-radius:50%; border: 2px solid #333; margin: 0 auto; display:block;">
+                <circle cx="150" cy="150" r="150" fill="none" stroke="#222"/>
+                <circle cx="150" cy="150" r="100" fill="none" stroke="#222" stroke-dasharray="4"/>
+                <circle cx="150" cy="150" r="50" fill="none" stroke="#222" stroke-dasharray="4"/>
+                <text x="150" y="15" fill="#555" text-anchor="middle" font-size="10">N</text>
+                <text x="285" y="150" fill="#555" text-anchor="middle" font-size="10">E</text>
+                <text x="150" y="285" fill="#555" text-anchor="middle" font-size="10">S</text>
+                <text x="15" y="150" fill="#555" text-anchor="middle" font-size="10">W</text>
+                ${targets
+                  .map((t, i) => {
+                    const parseCoord = (str) => {
+                      if (!str) return 0;
+                      if (/^\d+$/.test(String(str)) && String(str).length > 6) {
+                        return parseInt(String(str), 10) / 1000000 / 3600;
+                      }
+                      const p = String(str).split(":");
+                      const d = parseFloat(p[0]) || 0;
+                      const m = parseFloat(p[1]) || 0;
+                      const s = parseFloat(p[2]) || 0;
+                      const sign =
+                        d < 0 || String(str).trim().startsWith("-") ? -1 : 1;
+                      return sign * (Math.abs(d) + m / 60 + s / 3600);
+                    };
+                    const ra = parseCoord(t.RA) || i;
+                    const dec = parseCoord(t.Dec) || 0;
+                    const alt = Math.max(0, 90 - Math.abs(dec - 40));
+                    const az = ra * 15;
+                    const r = (150 * (90 - alt)) / 90;
+                    const x = 150 + r * Math.sin((az * Math.PI) / 180);
+                    const y = 150 - r * Math.cos((az * Math.PI) / 180);
+                    const mag = parseFloat(t["V-Mag"]) || 6;
+                    const radius = Math.max(0.5, 4 - mag / 2);
+                    if (alt < 10) return "";
+                    return `<circle cx="${x}" cy="${y}" r="${radius}" fill="#fff" opacity="${
+                      0.4 + (0.6 * (10 - mag)) / 10
+                    }"/>`;
+                  })
+                  .join("")}
+            </svg>
+            <div style="font-size: 11px; color: #888; margin-top: 10px;">Showing top 200 bright targets (Simulated positions)</div>
+            `;
+        } catch (e) {
+          container.innerHTML = `<div class="step fail"><div class="detail">Failed to load sky map: ${e.message}</div></div>`;
+        }
+      }
+
+      // Inject init call
+      setTimeout(() => renderDashboard(), 1000);
+
       function utcToLocalTime(iso) {
         if (!iso) return "-";
         const d = new Date(iso.replace(" ", "T") + "Z");
@@ -1828,9 +1953,63 @@ json.dumps(out)
             <div class="fact-row"><span class="k">Astronomical night</span><span>${utcToLocalTime(
               r.night_start_utc,
             )} &ndash; ${utcToLocalTime(r.night_end_utc)}</span></div>
+
             <div class="fact-row"><span class="k">Peak altitude tonight</span><span>${
               r.peak_altitude_deg
             }&deg;</span></div>
+
+            ${
+              r.altitude_curve
+                ? `
+              <div class="subsection-title">Altitude Tonight</div>
+              <svg viewBox="0 0 300 100" style="width:100%; height:100px; background:#111; margin-top:10px; border-radius: 4px;">
+                 <line x1="0" y1="${100 - (30 / 90) * 100}" x2="300" y2="${
+                   100 - (30 / 90) * 100
+                 }" stroke="#ff4444" stroke-width="1" stroke-dasharray="4"/>
+                 <path d="M0,${
+                   100 - (Math.max(0, r.altitude_curve[0]) / 90) * 100
+                 } ${r.altitude_curve
+                   .map(
+                     (alt, i) =>
+                       `L${(i / (r.altitude_curve.length - 1)) * 300},${
+                         100 - (Math.max(0, alt) / 90) * 100
+                       }`,
+                   )
+                   .join(" ")}" fill="none" stroke="#64c8ff" stroke-width="2" />
+              </svg>
+              `
+                : ""
+            }
+
+            ${
+              r.fov_x && r.fov_y
+                ? (() => {
+                    const targetW = target.MajAx || 1;
+                    const targetH = target.MinAx || target.MajAx || 1;
+                    const maxDim =
+                      Math.max(r.fov_x, r.fov_y, targetW, targetH) * 1.5;
+                    const scale = 200 / maxDim;
+                    const rw = r.fov_x * scale;
+                    const rh = r.fov_y * scale;
+                    const rx = 100 - rw / 2;
+                    const ry = 100 - rh / 2;
+                    const tw = targetW * scale;
+                    const th = targetH * scale;
+                    return `
+                <div class="subsection-title">FOV Simulator &middot; ${escapeHtml(
+                  telescopeProfile.name,
+                )}</div>
+                <svg width="200" height="200" style="background:#111; border:1px solid #333; margin: 10px auto; display:block; border-radius: 4px;">
+                   <rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" fill="none" stroke="#e0e0e0" stroke-dasharray="4" stroke-width="2"/>
+                   <ellipse cx="100" cy="100" rx="${tw / 2}" ry="${
+                     th / 2
+                   }" fill="rgba(100, 200, 255, 0.4)" stroke="#64c8ff" />
+                </svg>
+                `;
+                  })()
+                : ""
+            }
+
             <div class="fact-row"><span class="k">Above 30&deg;?</span><span>Not tonight from this location</span></div>
           `;
         } else {
@@ -1853,9 +2032,63 @@ json.dumps(out)
             <div class="fact-row"><span class="k">Visible window (rise&ndash;set)</span><span>${utcToLocalTime(
               r.rise_utc,
             )} &ndash; ${utcToLocalTime(r.set_utc)}</span></div>
+
             <div class="fact-row"><span class="k">Peak altitude tonight</span><span>${
               r.peak_altitude_deg
             }&deg;</span></div>
+
+            ${
+              r.altitude_curve
+                ? `
+              <div class="subsection-title">Altitude Tonight</div>
+              <svg viewBox="0 0 300 100" style="width:100%; height:100px; background:#111; margin-top:10px; border-radius: 4px;">
+                 <line x1="0" y1="${100 - (30 / 90) * 100}" x2="300" y2="${
+                   100 - (30 / 90) * 100
+                 }" stroke="#ff4444" stroke-width="1" stroke-dasharray="4"/>
+                 <path d="M0,${
+                   100 - (Math.max(0, r.altitude_curve[0]) / 90) * 100
+                 } ${r.altitude_curve
+                   .map(
+                     (alt, i) =>
+                       `L${(i / (r.altitude_curve.length - 1)) * 300},${
+                         100 - (Math.max(0, alt) / 90) * 100
+                       }`,
+                   )
+                   .join(" ")}" fill="none" stroke="#64c8ff" stroke-width="2" />
+              </svg>
+              `
+                : ""
+            }
+
+            ${
+              r.fov_x && r.fov_y
+                ? (() => {
+                    const targetW = target.MajAx || 1;
+                    const targetH = target.MinAx || target.MajAx || 1;
+                    const maxDim =
+                      Math.max(r.fov_x, r.fov_y, targetW, targetH) * 1.5;
+                    const scale = 200 / maxDim;
+                    const rw = r.fov_x * scale;
+                    const rh = r.fov_y * scale;
+                    const rx = 100 - rw / 2;
+                    const ry = 100 - rh / 2;
+                    const tw = targetW * scale;
+                    const th = targetH * scale;
+                    return `
+                <div class="subsection-title">FOV Simulator &middot; ${escapeHtml(
+                  telescopeProfile.name,
+                )}</div>
+                <svg width="200" height="200" style="background:#111; border:1px solid #333; margin: 10px auto; display:block; border-radius: 4px;">
+                   <rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" fill="none" stroke="#e0e0e0" stroke-dasharray="4" stroke-width="2"/>
+                   <ellipse cx="100" cy="100" rx="${tw / 2}" ry="${
+                     th / 2
+                   }" fill="rgba(100, 200, 255, 0.4)" stroke="#64c8ff" />
+                </svg>
+                `;
+                  })()
+                : ""
+            }
+
             <div class="fact-row"><span class="k">Moon quality</span><span>${
               r.moon_quality
             } (1.0 = no interference)</span></div>
@@ -2121,23 +2354,30 @@ json.dumps([
       }
 
       function showTab(tab) {
+        tabDashboardBtn.classList.toggle("active", tab === "dashboard");
         tabTargetsBtn.classList.toggle("active", tab === "targets");
         tabTonightBtn.classList.toggle("active", tab === "tonight");
+        tabSkymapBtn.classList.toggle("active", tab === "skymap");
         tabCalendarBtn.classList.toggle("active", tab === "calendar");
         tabSettingsBtn.classList.toggle("active", tab === "settings");
+        dashboardPanel.style.display = tab === "dashboard" ? "block" : "none";
         targetsPanel.style.display = tab === "targets" ? "block" : "none";
         tonightPanel.style.display = tab === "tonight" ? "block" : "none";
+        skymapPanel.style.display = tab === "skymap" ? "block" : "none";
         calendarPanel.style.display = tab === "calendar" ? "block" : "none";
         settingsPanel.style.display = tab === "settings" ? "block" : "none";
         if (tab === "tonight") runTonight();
         if (tab === "calendar") runCalendar();
+        if (tab === "skymap") renderSkyMap();
         if (tab === "settings") {
           renderLocationsList();
           renderProfileSummary();
         }
       }
+      tabDashboardBtn.addEventListener("click", () => showTab("dashboard"));
       tabTargetsBtn.addEventListener("click", () => showTab("targets"));
       tabTonightBtn.addEventListener("click", () => showTab("tonight"));
+      tabSkymapBtn.addEventListener("click", () => showTab("skymap"));
       tabCalendarBtn.addEventListener("click", () => showTab("calendar"));
       tabSettingsBtn.addEventListener("click", () => showTab("settings"));
 
