@@ -8,7 +8,33 @@ from astropy.coordinates import AltAz, SkyCoord
 from astropy.time import Time
 from fastapi import APIRouter, Depends, HTTPException, Response
 from src.api.deps import get_weather_service
-from src.api.schemas import (
+from src.catalog.duck_service import DuckCatalogService
+from src.db.duck_session import get_duck_db
+from src.planner.location_service import resolve_location
+from src.utils.cache import FileCache
+from src.utils.ephemeris_manager import EphemerisManager
+from src.utils.export import CsvExporter, SkySafariExporter
+from src.utils.weather import WeatherService
+from stairs_core.astro_logic.exposure import (
+    calculate_optimal_sub_exposure,
+    calculate_sky_flux,
+    calculate_total_integration_time,
+)
+from stairs_core.astro_logic.scoring import (
+    calculate_oss_vectorized,
+    calculate_sqs_vectorized,
+    calculate_weather_score_vectorized,
+)
+from stairs_core.astro_logic.visibility import (
+    find_visible_window,
+    get_astronomical_night,
+    get_moon_quality,
+    get_peak_altitudes,
+    safe_round,
+)
+from stairs_core.planner.multi_night import MultiNightPlanner
+from stairs_core.planner.scheduler import NightScheduler
+from stairs_core.schemas import (
     ExposureRecommendation,
     ForecastResponse,
     ObservationBlock,
@@ -22,30 +48,6 @@ from src.api.schemas import (
     TargetOpportunitySeries,
     TargetRecommendation,
 )
-from src.astro_logic.exposure import (
-    calculate_optimal_sub_exposure,
-    calculate_sky_flux,
-    calculate_total_integration_time,
-)
-from src.astro_logic.scoring import (
-    calculate_oss_vectorized,
-    calculate_sqs_vectorized,
-    calculate_weather_score_vectorized,
-)
-from src.astro_logic.visibility import (
-    find_visible_window,
-    get_astronomical_night,
-    get_moon_quality,
-    get_peak_altitudes,
-    safe_round,
-)
-from src.catalog.duck_service import DuckCatalogService
-from src.db.duck_session import get_duck_db
-from src.planner.location_service import resolve_location
-from src.planner.multi_night import MultiNightPlanner
-from src.planner.scheduler import NightScheduler
-from src.utils.export import CsvExporter, SkySafariExporter
-from src.utils.weather import WeatherService
 
 router = APIRouter()
 
@@ -79,7 +81,9 @@ def _build_plan_context(
         bortle_scale=request.bortle_scale,
     )
 
-    scheduler = NightScheduler(location=loc, catalog_service=catalog_service)
+    scheduler = NightScheduler(
+        location=loc, target_source=catalog_service, peak_alt_cache=EphemerisManager()
+    )
     start_time = Time(request.start_time) if request.start_time else Time.now()
 
     plan = scheduler.build_timeline(
@@ -187,7 +191,9 @@ async def get_multi_night_forecast(
         name=location_name,
     )
 
-    planner = MultiNightPlanner(location=loc)
+    planner = MultiNightPlanner(
+        location=loc, moon_cache=EphemerisManager(), forecast_cache=FileCache()
+    )
 
     t_start = None
     if start_date:
@@ -271,14 +277,14 @@ async def get_target_opportunity_series(
             end_dt=n_end.to_datetime(timezone=UTC),
         )
 
-    from src.astro_logic.scoring import (
+    from stairs_core.astro_logic.scoring import (
         calculate_oss_vectorized,
         calculate_sqs_vectorized,
     )
 
     # 3. Calculate Scores
     # We need peak_alt for calculate_oss_vectorized
-    from src.astro_logic.visibility import get_peak_altitudes
+    from stairs_core.astro_logic.visibility import get_peak_altitudes
 
     peak_alt = get_peak_altitudes(observer, target_coord, night_window)
 
@@ -307,7 +313,7 @@ async def get_target_opportunity_series(
                 weather_point.get("seeing"),
             )[0]
 
-        from src.astro_logic.visibility import get_moon_quality
+        from stairs_core.astro_logic.visibility import get_moon_quality
 
         m_mult = get_moon_quality(observer, t)
 
@@ -444,7 +450,7 @@ async def recommend_targets(
             else [10.0]
         )
 
-        from src.astro_logic.exposure import calculate_practical_sub_exposure
+        from stairs_core.astro_logic.exposure import calculate_practical_sub_exposure
 
         sky_flux = calculate_sky_flux(
             loc.bortle_scale or 5,
@@ -541,7 +547,7 @@ async def get_quality_series(
             end_dt=n_end.to_datetime(timezone=UTC),
         )
 
-    from src.astro_logic.visibility import get_moon_quality
+    from stairs_core.astro_logic.visibility import get_moon_quality
 
     points = []
     for t in times:
@@ -596,7 +602,7 @@ async def get_sky_view(
     weather_service: WeatherService | None = Depends(get_weather_service),
 ) -> SkyViewResponse:
     """Provides Moon and Target positions for animation throughout the night."""
-    from src.catalog.catalog_models import TargetRecord
+    from stairs_core.catalog.catalog_models import TargetRecord
 
     loc = resolve_location(
         db=db, latitude=latitude, longitude=longitude, name=location_name

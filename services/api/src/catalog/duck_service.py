@@ -1,11 +1,17 @@
 import pandas as pd
 from duckdb import DuckDBPyConnection
-from src.catalog.catalog_models import TelescopeProfile
+from stairs_core.catalog.catalog_models import TelescopeProfile
 
 
 class DuckCatalogService:
     def __init__(self, conn: DuckDBPyConnection):
         self.conn = conn
+
+    def load_targets(self) -> pd.DataFrame:
+        """
+        every catalog target, for the scheduler (stairs_core.providers.TargetSource)
+        """
+        return self.conn.execute("SELECT * FROM targets").df()
 
     def list_catalogs(self) -> pd.DataFrame:
         sql = """

@@ -1,5 +1,5 @@
 from astropy.time import Time
-from src.planner.planner_models import ObservationLocation
+from stairs_core.planner.planner_models import ObservationLocation
 
 
 def test_timezone_resolution():

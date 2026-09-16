@@ -20,6 +20,11 @@
         },
         {
           "type": "toml",
+          "path": "services/core/pyproject.toml",
+          "jsonpath": "$.project.version"
+        },
+        {
+          "type": "toml",
           "path": "services/cli/pyproject.toml",
           "jsonpath": "$.project.version"
         },

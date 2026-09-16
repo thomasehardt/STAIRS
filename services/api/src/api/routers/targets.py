@@ -6,7 +6,17 @@ from astropy import units as u
 from astropy.time import Time
 from duckdb import DuckDBPyConnection
 from fastapi import APIRouter, Depends, HTTPException
-from src.api.schemas import (
+from src.catalog.duck_service import DuckCatalogService
+from src.db.duck_session import get_duck_db
+from stairs_core.astro_logic.exposure import (
+    calculate_optimal_sub_exposure,
+    calculate_sky_flux,
+    calculate_total_integration_time,
+)
+from stairs_core.astro_logic.visibility import safe_round
+from stairs_core.catalog.catalog_models import TargetRecord
+from stairs_core.planner.planner_models import ObservationLocation
+from stairs_core.schemas import (
     ExposureRecommendation,
     FovFit,
     PositionPoint,
@@ -15,16 +25,6 @@ from src.api.schemas import (
     TargetSearchItem,
     TargetSearchResponse,
 )
-from src.astro_logic.exposure import (
-    calculate_optimal_sub_exposure,
-    calculate_sky_flux,
-    calculate_total_integration_time,
-)
-from src.astro_logic.visibility import safe_round
-from src.catalog.catalog_models import TargetRecord
-from src.catalog.duck_service import DuckCatalogService
-from src.db.duck_session import get_duck_db
-from src.planner.planner_models import ObservationLocation
 
 router = APIRouter()
 
@@ -116,7 +116,7 @@ async def get_target_detail(
             fov_x, fov_y = profile.calculate_fov()
             img_fov_deg = (max(fov_x, fov_y) / 60.0) * 1.5  # 50% padding
 
-            from src.astro_logic.scoring import (
+            from stairs_core.astro_logic.scoring import (
                 calculate_oss,
                 get_target_size_fov,
             )
@@ -176,7 +176,9 @@ async def get_target_detail(
                 else [10.0]
             )
 
-            from src.astro_logic.exposure import calculate_practical_sub_exposure
+            from stairs_core.astro_logic.exposure import (
+                calculate_practical_sub_exposure,
+            )
 
             sky_lim_sub = calculate_optimal_sub_exposure(sky_flux, profile.read_noise_e)
             prac_sub = calculate_practical_sub_exposure(

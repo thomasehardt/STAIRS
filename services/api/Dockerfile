@@ -6,6 +6,10 @@ WORKDIR /app
 RUN groupadd -g 1000 stairs && \
     useradd -u 1000 -g stairs -m stairs
 
+# The planning engine is its own package (shared with the mobile app).
+COPY services/core/ /app/core/
+RUN pip install --no-cache-dir /app/core
+
 COPY services/api/pyproject.toml .
 RUN pip install --no-cache-dir .
 
@@ -21,7 +25,7 @@ RUN mkdir -p /app_data/cache /app_data/logs && \
 EXPOSE 8000
 
 ENV PYTHONUNBUFFERED=1
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app:/app/core
 ENV DATA_DIR=/app/data
 ENV CONFIG_FILE=/app/config.yaml
 ENV HOME=/home/stairs

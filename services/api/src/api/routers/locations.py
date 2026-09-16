@@ -1,8 +1,8 @@
 import duckdb
 import pandas as pd
 from fastapi import APIRouter, Depends
-from src.api.schemas import LocationItem, LocationListResponse
 from src.db.duck_session import get_duck_db
+from stairs_core.schemas import LocationItem, LocationListResponse
 
 router = APIRouter()
 

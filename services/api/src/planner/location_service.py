@@ -4,7 +4,7 @@ import logging
 import pandas as pd
 from duckdb import DuckDBPyConnection
 from fastapi import HTTPException
-from src.planner.planner_models import ObservationLocation
+from stairs_core.planner.planner_models import ObservationLocation
 
 logger = logging.getLogger(__name__)
 

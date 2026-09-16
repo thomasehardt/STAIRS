@@ -2,9 +2,9 @@ import logging
 from datetime import UTC, datetime
 
 import pandas as pd
-from src.api.schemas import ForecastData
 from src.utils.geo_cache import GeoCacheService
 from src.utils.weather_api_protocol import WeatherApiProtocol
+from stairs_core.schemas import ForecastData
 
 logger = logging.getLogger(__name__)
 

@@ -12,7 +12,8 @@ from astroplan import Observer
 from astropy.coordinates import EarthLocation
 from astropy.time import Time
 from pydantic import BaseModel, Field, field_validator, model_validator
-from src.utils.geo import get_tz_name
+
+from stairs_core.geo import get_tz_name
 
 logger = logging.getLogger(__name__)
 

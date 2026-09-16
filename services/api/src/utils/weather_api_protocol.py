@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 from typing import Protocol, runtime_checkable
 
-from src.api.schemas import ForecastData
+from stairs_core.schemas import ForecastData
 
 logger = logging.getLogger(__name__)
 

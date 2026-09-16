@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
-from src.api.schemas import AppConfig, SettingsUpdate
 from src.db.parquet_loader import load_data_to_parquet
 from src.utils.config_manager import ConfigManager
+from stairs_core.schemas import AppConfig, SettingsUpdate
 
 router = APIRouter()
 

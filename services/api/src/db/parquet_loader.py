@@ -8,8 +8,8 @@ import pandas as pd
 import yaml
 from astropy import units as u
 from astropy.coordinates import SkyCoord
-from src.catalog.catalog_models import TelescopeProfile
-from src.planner.planner_models import ObservationLocation
+from stairs_core.catalog.catalog_models import TelescopeProfile
+from stairs_core.planner.planner_models import ObservationLocation
 
 logger = logging.getLogger(__name__)
 

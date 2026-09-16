@@ -6,24 +6,37 @@ import numpy as np
 import pandas as pd
 from astropy.coordinates import AltAz, get_body
 from astropy.time import Time, TimeDelta
-from src.api.schemas import ForecastDay
-from src.astro_logic.scoring import (
+
+from stairs_core.astro_logic.scoring import (
     calculate_bortle_multiplier,
     calculate_weather_score_vectorized,
 )
-from src.astro_logic.visibility import get_astronomical_night
-from src.planner.planner_models import ObservationLocation
-from src.utils.cache import FileCache
-from src.utils.ephemeris_manager import EphemerisManager
-from src.utils.geo_cache import GeoCacheService
-from src.utils.weather import WeatherService
+from stairs_core.astro_logic.visibility import get_astronomical_night
+from stairs_core.geo import location_key
+from stairs_core.planner.planner_models import ObservationLocation
+from stairs_core.providers import ForecastCache, MoonQualityCache, WeatherProvider
+from stairs_core.schemas import ForecastDay
 
 logger = logging.getLogger(__name__)
 
 
 class MultiNightPlanner:
-    def __init__(self, location: ObservationLocation):
+    def __init__(
+        self,
+        location: ObservationLocation,
+        moon_cache: MoonQualityCache | None = None,
+        forecast_cache: ForecastCache | None = None,
+    ) -> None:
+        """
+        :param location:
+        :param moon_cache: optional precomputed moon-quality slots (the API passes
+            its EphemerisManager); without it moon quality is computed directly
+        :param forecast_cache: optional 1-hour result cache for generate_forecast
+            (the API passes its FileCache); without it every call recomputes
+        """
         self.location = location
+        self.moon_cache = moon_cache
+        self.forecast_cache = forecast_cache
 
     def calculate_night_score(
         self,
@@ -49,11 +62,14 @@ class MultiNightPlanner:
 
         times = night_start + np.arange(num_slots) * TimeDelta(15 * u.minute)
 
-        ephemeris_manager = EphemerisManager()
-        cached_moon_df = ephemeris_manager.get_cached_moon_qualities(
-            latitude=self.location.latitude,
-            longitude=self.location.longitude,
-            night_start=night_start,
+        cached_moon_df = (
+            self.moon_cache.get_cached_moon_qualities(
+                latitude=self.location.latitude,
+                longitude=self.location.longitude,
+                night_start=night_start,
+            )
+            if self.moon_cache
+            else None
         )
 
         if cached_moon_df is not None and len(cached_moon_df) == num_slots:
@@ -126,7 +142,7 @@ class MultiNightPlanner:
         self,
         days: int = 14,
         start_time: Time | None = None,
-        weather_service: WeatherService | None = None,
+        weather_service: WeatherProvider | None = None,
     ) -> list[ForecastDay]:
         """
         generates visibility forecasts for the given number of days
@@ -145,16 +161,14 @@ class MultiNightPlanner:
         except (ValueError, AttributeError):
             current_search_time = start_time
 
-        loc_key = GeoCacheService.get_location_key(
-            latitude=self.location.latitude, longitude=self.location.longitude
-        )
+        loc_key = location_key(self.location.latitude, self.location.longitude)
         date_str = current_search_time.to_datetime(timezone=UTC).date().isoformat()
         cache_key = f"forecast_v2_{loc_key}_{date_str}_{days}"
 
-        cache = FileCache()
-        cached_data = cache.get(cache_key, ttl_seconds=3600)
-        if cached_data:
-            return [ForecastDay(**day) for day in cached_data]
+        if self.forecast_cache:
+            cached_data = self.forecast_cache.get(cache_key, ttl_seconds=3600)
+            if cached_data:
+                return [ForecastDay(**day) for day in cached_data]
 
         full_weather_range = []
         if weather_service:
@@ -206,6 +220,9 @@ class MultiNightPlanner:
                 )
                 loop_time += TimeDelta(1 * u.day)
 
-        cache.set(cache_key, [day.model_dump(mode="json") for day in forecast])
+        if self.forecast_cache:
+            self.forecast_cache.set(
+                cache_key, [day.model_dump(mode="json") for day in forecast]
+            )
 
         return forecast

@@ -1,12 +1,12 @@
 import logging
 
-from src.api.schemas import WeatherSettings
 from src.utils.config_manager import ConfigManager
 from src.utils.dummy_weather_api_client import DummyWeatherApiClient
 from src.utils.geo_cache import GeoCacheService
 from src.utils.open_meteo_client import OpenMeteoWeatherApiClient
 from src.utils.weather import WeatherService
 from src.utils.weather_api_protocol import WeatherApiProtocol
+from stairs_core.schemas import WeatherSettings
 
 logger = logging.getLogger(__name__)
 _weather_service: WeatherService | None = None

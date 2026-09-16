@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from src.astro_logic.optics import calculate_fov_rectangle
+from stairs_core.astro_logic.optics import calculate_fov_rectangle
 
 
 def fov_for_sensor(sensor_params: dict) -> tuple[float, float]:

@@ -6,7 +6,8 @@ from datetime import date, timedelta
 from pathlib import Path
 
 import pandas as pd
-from src.api.schemas import ForecastData
+from stairs_core.geo import location_key
+from stairs_core.schemas import ForecastData
 
 logger = logging.getLogger(__name__)
 CACHE_ROOT = Path(os.getenv("CACHE_DIR", "cache"))
@@ -26,7 +27,7 @@ class GeoCacheService:
         :param longitude:
         :return:
         """
-        return f"lat_{round(latitude, 2):.2f}_lon_{round(longitude, 2):.2f}"
+        return location_key(latitude, longitude)
 
     def get_ephemeris_path(self, latitude: float, longitude: float, dt: date) -> Path:
         """

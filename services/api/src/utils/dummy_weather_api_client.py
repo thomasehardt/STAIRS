@@ -2,7 +2,7 @@ import logging
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from src.api.schemas import ForecastData
+from stairs_core.schemas import ForecastData
 
 logger = logging.getLogger(__name__)
 

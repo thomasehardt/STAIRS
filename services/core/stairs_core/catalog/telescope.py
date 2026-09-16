@@ -3,7 +3,7 @@ import logging
 import os
 from pathlib import Path
 
-from src.catalog.catalog_models import TelescopeProfile
+from stairs_core.catalog.catalog_models import TelescopeProfile
 
 logger = logging.getLogger(__name__)
 DATA_DIR = Path(os.getenv("DATA_DIR", "data"))

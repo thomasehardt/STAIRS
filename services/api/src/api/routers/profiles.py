@@ -1,8 +1,8 @@
 import duckdb
 from fastapi import APIRouter, Depends
-from src.api.schemas import ProfileListResponse
 from src.catalog.duck_service import DuckCatalogService
 from src.db.duck_session import get_duck_db
+from stairs_core.schemas import ProfileListResponse
 
 router = APIRouter()
 
