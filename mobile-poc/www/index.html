@@ -191,6 +191,57 @@
         padding: 0.4rem 0.5rem;
         font-size: 0.88rem;
       }
+      /* Self-update banner (Android only; hidden in the browser) */
+      #update-banner {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 1.25rem;
+        background: #1f1a0f;
+        border-bottom: 1px solid #4a3a14;
+        font-size: 0.85rem;
+        color: #ffd27a;
+      }
+      #update-banner .text {
+        flex: 1;
+      }
+      #update-banner .text .sub {
+        display: block;
+        color: #a08a55;
+        font-size: 0.75rem;
+        margin-top: 0.1rem;
+      }
+      #update-banner .boot-bar {
+        margin-top: 0.4rem;
+        background: #33290f;
+      }
+      #update-banner .boot-bar-fill {
+        background: #ffc966;
+      }
+      #update-banner button {
+        background: #ffc966;
+        color: #1a1200;
+        border: none;
+        border-radius: 6px;
+        padding: 0.45rem 0.9rem;
+        font-size: 0.82rem;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      #update-banner button.dismiss {
+        background: none;
+        color: #a08a55;
+        font-weight: 400;
+        padding: 0.45rem 0.4rem;
+      }
+      .app-info {
+        color: #888;
+        font-size: 0.82rem;
+        line-height: 1.5;
+      }
+      .app-info .status {
+        color: #bbb;
+      }
       .weather-status {
         padding: 0.4rem 1.25rem;
         font-size: 0.8rem;
@@ -737,6 +788,18 @@
       <h1>STAIRS</h1>
     </header>
 
+    <div id="update-banner" hidden>
+      <div class="text">
+        <span id="update-banner-text"></span>
+        <span class="sub" id="update-banner-sub"></span>
+        <div class="boot-bar" id="update-bar" hidden>
+          <div class="boot-bar-fill" id="update-bar-fill"></div>
+        </div>
+      </div>
+      <button id="update-install-btn">Install</button>
+      <button class="dismiss" id="update-dismiss-btn">Later</button>
+    </div>
+
     <div class="location-bar">
       📍
       <select id="location-select" disabled></select>
@@ -811,6 +874,15 @@
           <h3>Telescope</h3>
         </div>
         <div id="profile-summary" class="profile-card"></div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-header">
+          <h3>App</h3>
+          <button class="add-btn" id="check-update-btn">
+            Check for updates
+          </button>
+        </div>
+        <div class="app-info" id="app-info"></div>
       </div>
     </div>
 
@@ -2703,6 +2775,7 @@ json.dumps([
         if (tab === "settings") {
           renderLocationsList();
           renderProfileSummary();
+          renderAppInfo();
         }
       }
       tabDashboardBtn.addEventListener("click", () => showTab("dashboard"));
@@ -3079,6 +3152,171 @@ json.dumps([
         });
       }
 
+      // ---- Self-update (Android build only) ------------------------------
+      // The CI workflow publishes latest.json next to the APK on the rolling
+      // mobile-poc-latest release. AppUpdaterPlugin (android/.../AppUpdaterPlugin
+      // .java) does the fetch + download natively - GitHub release assets have
+      // no CORS headers - and hands the APK to the system installer, which
+      // asks the user to confirm. In the browser there is no plugin and all of
+      // this is inert.
+      const UPDATE_MANIFEST_URL =
+        "https://github.com/thomasehardt/STAIRS/releases/download/mobile-poc-latest/latest.json";
+      const UPDATE_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000;
+      const UPDATE_LAST_CHECK_KEY = "stairs:update-last-check";
+      const updater = window.Capacitor?.Plugins?.AppUpdater ?? null;
+
+      const updateBanner = document.getElementById("update-banner");
+      const updateBannerText = document.getElementById("update-banner-text");
+      const updateBannerSub = document.getElementById("update-banner-sub");
+      const updateBar = document.getElementById("update-bar");
+      const updateBarFill = document.getElementById("update-bar-fill");
+      const updateInstallBtn = document.getElementById("update-install-btn");
+      const updateDismissBtn = document.getElementById("update-dismiss-btn");
+      const appInfoEl = document.getElementById("app-info");
+
+      let installedInfo = null; // { versionCode, versionName, canInstall }
+      let availableUpdate = null; // latest.json contents when newer
+      let updateStatus = ""; // last check result, for the Settings tab
+      let updateDismissed = false;
+
+      async function getInstalledInfo() {
+        if (!updater) return null;
+        if (!installedInfo) installedInfo = await updater.getInfo();
+        return installedInfo;
+      }
+
+      async function checkForUpdate({ manual = false } = {}) {
+        if (!updater) return;
+        if (!manual) {
+          let last = 0;
+          try {
+            last = Number(localStorage.getItem(UPDATE_LAST_CHECK_KEY)) || 0;
+          } catch {
+            // ignore
+          }
+          if (Date.now() - last < UPDATE_CHECK_INTERVAL_MS) return;
+        }
+        updateStatus = "Checking…";
+        renderAppInfo();
+        try {
+          const [info, latest] = await Promise.all([
+            getInstalledInfo(),
+            updater.check({ url: UPDATE_MANIFEST_URL }),
+          ]);
+          try {
+            localStorage.setItem(UPDATE_LAST_CHECK_KEY, String(Date.now()));
+          } catch {
+            // ignore
+          }
+          if (Number(latest.versionCode) > Number(info.versionCode)) {
+            availableUpdate = latest;
+            updateStatus = `Build ${latest.versionName} available`;
+            if (!updateDismissed || manual) showUpdateBanner();
+          } else {
+            availableUpdate = null;
+            updateStatus = `Up to date (checked ${new Date().toLocaleTimeString(
+              [],
+              { hour: "2-digit", minute: "2-digit" },
+            )})`;
+          }
+        } catch (e) {
+          updateStatus = `Check failed: ${e.message || e}`;
+        }
+        renderAppInfo();
+      }
+
+      function showUpdateBanner() {
+        const u = availableUpdate;
+        if (!u) return;
+        updateBannerText.textContent = `Update available: build ${u.versionName}`;
+        updateBannerSub.textContent = `${(u.size / 1048576).toFixed(
+          1,
+        )} MB · installed ${installedInfo?.versionName ?? "?"}`;
+        updateBar.hidden = true;
+        updateBarFill.style.width = "0%";
+        updateInstallBtn.disabled = false;
+        updateInstallBtn.textContent = "Install";
+        updateInstallBtn.hidden = false;
+        updateDismissBtn.hidden = false;
+        updateBanner.hidden = false;
+      }
+
+      async function installUpdate() {
+        const u = availableUpdate;
+        if (!u || !updater) return;
+        const info = await getInstalledInfo();
+        if (!info.canInstall) {
+          // One-time Android 8+ toggle: "allow installs from this app". After
+          // the user flips it and comes back, tapping Install again proceeds.
+          updateBannerSub.textContent =
+            "Allow installs from STAIRS in the settings screen that opens, then tap Install again.";
+          installedInfo = null;
+          await updater.requestInstallPermission();
+          return;
+        }
+        updateInstallBtn.disabled = true;
+        updateInstallBtn.textContent = "Downloading…";
+        updateDismissBtn.hidden = true;
+        updateBar.hidden = false;
+        const sub = await updater.addListener(
+          "downloadProgress",
+          ({ received, total }) => {
+            const pct = total > 0 ? (100 * received) / total : 0;
+            updateBarFill.style.width = `${pct.toFixed(1)}%`;
+            updateBannerSub.textContent = `${(received / 1048576).toFixed(
+              1,
+            )} / ${(total / 1048576).toFixed(1)} MB`;
+          },
+        );
+        try {
+          await updater.downloadAndInstall({ url: u.apkUrl, sha256: u.sha256 });
+          updateBannerSub.textContent =
+            "Downloaded - confirm the install in the Android prompt.";
+          updateInstallBtn.textContent = "Install";
+          updateInstallBtn.disabled = false;
+        } catch (e) {
+          updateBannerSub.textContent = `Update failed: ${e.message || e}`;
+          updateInstallBtn.textContent = "Retry";
+          updateInstallBtn.disabled = false;
+          updateDismissBtn.hidden = false;
+        } finally {
+          sub.remove();
+        }
+      }
+
+      function renderAppInfo() {
+        if (!updater) {
+          appInfoEl.innerHTML = `Running in a browser - self-update is only available in the Android build.`;
+          document.getElementById("check-update-btn").hidden = true;
+          return;
+        }
+        const v = installedInfo
+          ? `Version ${escapeHtml(installedInfo.versionName)} (code ${
+              installedInfo.versionCode
+            })`
+          : "Version …";
+        appInfoEl.innerHTML = `${v}<br /><span class="status">${escapeHtml(
+          updateStatus || "Not checked yet",
+        )}</span>`;
+      }
+
+      updateInstallBtn.addEventListener("click", installUpdate);
+      updateDismissBtn.addEventListener("click", () => {
+        updateDismissed = true;
+        updateBanner.hidden = true;
+      });
+      document
+        .getElementById("check-update-btn")
+        .addEventListener("click", () => {
+          checkForUpdate({ manual: true });
+        });
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          installedInfo = null; // canInstall may have changed in Settings
+          checkForUpdate();
+        }
+      });
+
       (async () => {
         const ok = await initEngine();
         if (!ok) return; // overlay is showing the failed step + Retry
@@ -3099,6 +3337,11 @@ json.dumps([
         stepOk("scoring", `Top picks for ${selectedLocation.name}`);
 
         boot.finish();
+
+        getInstalledInfo()
+          .then(renderAppInfo)
+          .catch(() => {});
+        checkForUpdate();
       })();
     </script>
   </body>
