@@ -55,7 +55,14 @@ populates them from pinned sources and verifies every file's sha256:
 - Pyodide runtime + wheels: Pyodide `314.0.2` on the jsDelivr Pyodide CDN
 - duckdb-wasm: `@duckdb/duckdb-wasm` from `node_modules` (version pinned by
   `package-lock.json`), plus an esbuild bundle of its browser entry point
+- `stairs_core-*.whl`: built with pip from `../services/core` - the **same**
+  planning engine the API imports, so there is nothing to keep in sync
+- `astroplan-*.whl`: built with pip from the hash-pinned PyPI sdist
 - `NGC.csv`: copied from `../data/catalogs/openngc/NGC.csv`
+
+Building the wheels needs a `python3` with pip; set `PYTHON=/path/to/python3`
+if the default one lacks it. The wheel filenames are written to
+`www/pyodide/local-wheels.json`, which `index.html` reads at startup.
 
 ## CI signing
 
@@ -73,10 +80,10 @@ This is a self-signed sideload key, not a Play Store key. If it is ever lost,
 generate a new one; phones with an old build must uninstall before installing
 a build signed with the new key.
 
-## Vendored STAIRS modules
+## Engine
 
-`www/vendor/` holds copies of `services/api/src/astro_logic/*` and parts of
-`services/api/src/planner/*`, lightly adapted for Pyodide (server-only cache
-layers removed, API-package imports aliased). The math is unchanged, but the
-copies are not synced automatically - see the "Mobile port note" comments at
-the top of each adapted file.
+The astronomy runs on-device via `stairs_core` (see `services/core`), installed
+into Pyodide from the wheel above. Host concerns the engine leaves to its
+caller (`stairs_core/providers.py`) are supplied in `index.html`: catalog rows
+come from duckdb-wasm, weather from a direct Open-Meteo fetch wrapped in a tiny
+`WeatherProvider`, and no caches are passed - the engine computes everything.

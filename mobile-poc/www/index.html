@@ -1141,11 +1141,19 @@
         function fraction(ph, now) {
           if (ph.finished) return 1;
           if (!ph.started) return 0;
-          if (ph.total > 0) return Math.min(ph.done / ph.total, 0.98);
-          // indeterminate: 1 - e^(-t/expected), i.e. ~63% at the expected
-          // duration and asymptotic to 95% if it runs long
-          const t = (now - ph.started) / ph.expected;
-          return 0.95 * (1 - Math.exp(-t));
+          let f;
+          if (ph.total > 0) {
+            f = Math.min(ph.done / ph.total, 0.98);
+          } else {
+            // indeterminate: 1 - e^(-t/expected), i.e. ~63% at the expected
+            // duration and asymptotic to 95% if it runs long
+            const t = (now - ph.started) / ph.expected;
+            f = 0.95 * (1 - Math.exp(-t));
+          }
+          // never move backwards, e.g. when a phase switches from eased to
+          // real progress and the first real value is lower
+          ph.shown = Math.max(ph.shown || 0, f);
+          return ph.shown;
         }
 
         function render() {
@@ -1331,26 +1339,23 @@
 
         step(
           "astroplan-vendor",
-          "Load real astroplan 0.10.1 + STAIRS's visibility/scoring/planner modules",
+          "Install stairs-core (STAIRS planning engine) + astroplan wheels",
         );
         try {
-          const manifestText = await (
-            await fetch("vendor/manifest.txt")
-          ).text();
-          const files = manifestText.trim().split("\n").filter(Boolean);
-          for (const rel of files) {
-            const text = await (await fetch(`vendor/${rel}`)).text();
-            const destPath = rel.includes("/")
-              ? `/lib/python3.14/site-packages/${rel}`
-              : `/home/${rel}`;
-            pyodide.FS.mkdirTree(
-              destPath.substring(0, destPath.lastIndexOf("/")),
-            );
-            pyodide.FS.writeFile(destPath, text);
+          // Built by scripts/fetch-vendor.mjs: the same stairs_core package the
+          // API imports, plus astroplan. Dependencies (astropy, numpy, pandas,
+          // pydantic, pytz, six) were loaded from the Pyodide lock above, so a
+          // plain unpack into site-packages is all that's needed - no micropip.
+          const wheels = await (
+            await fetch("pyodide/local-wheels.json")
+          ).json();
+          for (const name of ["astroplan", "stairs_core"]) {
+            const buf = await (
+              await fetch(`pyodide/${wheels[name]}`)
+            ).arrayBuffer();
+            pyodide.unpackArchive(buf, "wheel");
           }
           pyodide.runPython(`
-import sys
-sys.path.insert(0, "/home")
 from astropy.utils import iers
 iers.conf.auto_max_age = None
 iers.conf.auto_download = False
@@ -1359,12 +1364,12 @@ import astropy.units as u
 import numpy as np
 from astropy.time import Time
 
-import visibility as v
-import scoring as s
-import exposure as ex
-from telescope_profile import TelescopeProfile
-from planner_models import ObservationLocation
-from multi_night import MultiNightPlanner
+from stairs_core.astro_logic import exposure as ex
+from stairs_core.astro_logic import scoring as s
+from stairs_core.astro_logic import visibility as v
+from stairs_core.catalog.catalog_models import TelescopeProfile
+from stairs_core.planner.multi_night import MultiNightPlanner
+from stairs_core.planner.planner_models import ObservationLocation
 
 def set_location(lat, lon, elev, bortle, tz):
     global _location, _observer
@@ -1387,6 +1392,15 @@ def set_weather_range(weather_json):
     global _weather_range
     import json
     _weather_range = json.loads(weather_json)
+
+class _JsWeather:
+    """
+    stairs_core.providers.WeatherProvider over the range JS already fetched
+    from Open-Meteo for the current location (fetchWeatherRange in index.html).
+    The API's WeatherService does the same job with httpx + a disk cache.
+    """
+    def get_forecast_range(self, latitude, longitude, start_dt, end_dt):
+        return _weather_range
 
 def current_weather():
     """
@@ -1671,7 +1685,10 @@ def build_night_timeline(candidates_json, min_alt=30.0, block_size_minutes=60):
 set_location(${selectedLocation.latitude}, ${selectedLocation.longitude}, ${selectedLocation.elevation_m}, ${selectedLocation.bortle_scale}, "${selectedLocation.timezone}")
 set_profile("${telescopeProfile.name}", ${telescopeProfile.aperture_mm}, ${telescopeProfile.focal_length_mm}, ${telescopeProfile.sensor_x}, ${telescopeProfile.sensor_y}, ${telescopeProfile.pixel_pitch_um})
 `);
-          stepOk("astroplan-vendor", `Loaded ${files.length} files`);
+          stepOk(
+            "astroplan-vendor",
+            `${wheels.stairs_core} + ${wheels.astroplan}`,
+          );
         } catch (e) {
           stepFail("astroplan-vendor", e.message);
           return false;
@@ -2662,8 +2679,8 @@ json.dumps(out)
 from astropy.time import Time
 import json
 
-planner = MultiNightPlanner(_location)
-forecast = planner.generate_forecast(days=14, start_time=Time.now(), weather_range=_weather_range)
+planner = MultiNightPlanner(_location)  # no caches: computes every night directly
+forecast = planner.generate_forecast(days=14, start_time=Time.now(), weather_service=_JsWeather())
 json.dumps([
     {
         "date": d.date, "dark_hrs": d.total_dark_hours, "eff_hrs": d.effective_hours,

@@ -13,6 +13,7 @@ on:
     branches: [feature/mobile-poc, main]
     paths:
       - "mobile-poc/**"
+      - "services/core/**" # the engine ships inside the APK as a wheel
       - "data/catalogs/openngc/NGC.csv"
       - ".github/workflows/android-poc.yml"
   workflow_dispatch:
@@ -42,6 +43,11 @@ jobs:
           cache: npm
           cache-dependency-path: mobile-poc/package-lock.json
 
+      # fetch-vendor builds the stairs_core + astroplan wheels with pip
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -50,7 +56,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v5
 
       # postinstall runs scripts/fetch-vendor.mjs: Pyodide + wheels from the
-      # Pyodide CDN, duckdb-wasm from node_modules, NGC.csv from data/.
+      # Pyodide CDN, duckdb-wasm from node_modules, stairs_core + astroplan
+      # wheels via pip, NGC.csv from data/.
       - name: Install web deps and fetch runtime binaries
         run: npm ci
 

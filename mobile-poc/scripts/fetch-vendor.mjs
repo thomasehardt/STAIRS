@@ -9,6 +9,11 @@
 //                  jsDelivr's import rewriting, so it must be bundled to work
 //                  from a file:// / capacitor:// origin)
 //   www/NGC.csv    the OpenNGC catalog, copied from the repo's data/ directory
+//   www/pyodide/   also: stairs_core-*.whl built from ../services/core (the same
+//                  planning engine the API runs) and astroplan-*.whl built from
+//                  the hash-pinned PyPI sdist; index.html installs both with
+//                  pyodide.unpackArchive. Needs a python3 with pip (set PYTHON=
+//                  to pick one).
 //
 // None of this is checked in; run `npm run fetch-vendor` after cloning. Files that
 // already exist with the right hash are skipped, so re-running is cheap.
@@ -16,7 +21,7 @@
 import { createHash } from "node:crypto";
 import { copyFile, mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -63,6 +68,15 @@ const DUCKDB_DIST = join(
   "dist",
 );
 const DUCKDB_COPY = ["duckdb-eh.wasm", "duckdb-browser-eh.worker.js"];
+
+// -- Python wheels -----------------------------------------------------------
+const CORE_SRC = join(REPO, "services", "core");
+// astroplan publishes only an sdist; pip builds the (pure Python) wheel.
+const ASTROPLAN_VERSION = "0.10.1";
+const ASTROPLAN_SDIST_SHA256 =
+  "39d97c3377e1630abff3a94d8c956980f77a3e809e27a0376dd7d30abe3b6959";
+// index.html reads this to learn the wheel filenames (they carry versions).
+const WHEELS_MANIFEST = join(WWW, "pyodide", "local-wheels.json");
 
 // -- Catalog -----------------------------------------------------------------
 const NGC_SRC = join(REPO, "data", "catalogs", "openngc", "NGC.csv");
@@ -174,6 +188,85 @@ async function buildDuckdb() {
   console.log(`  bundled  www/duckdb/duckdb-browser.bundle.mjs`);
 }
 
+function findPython() {
+  for (const cand of [process.env.PYTHON, "python3", "python"].filter(
+    Boolean,
+  )) {
+    const r = spawnSync(cand, ["-m", "pip", "--version"], { stdio: "ignore" });
+    if (r.status === 0) return cand;
+  }
+  throw new Error(
+    "no python with pip found - set PYTHON=/path/to/python3 (needed to build the stairs_core and astroplan wheels)",
+  );
+}
+
+async function buildWheels() {
+  const python = findPython();
+  console.log(`Python wheels (${python})`);
+  const dir = join(WWW, "pyodide");
+  const tmp = join(ROOT, "node_modules", ".cache", "wheels");
+  await mkdir(tmp, { recursive: true });
+  const pip = (args) =>
+    execFileSync(
+      python,
+      [
+        "-m",
+        "pip",
+        "wheel",
+        "--quiet",
+        "--no-deps",
+        "--wheel-dir",
+        tmp,
+        ...args,
+      ],
+      {
+        stdio: ["ignore", "ignore", "inherit"],
+      },
+    );
+
+  // astroplan: hash-checked sdist -> wheel (pip refuses anything else in
+  // --require-hashes mode)
+  const req = join(tmp, "astroplan.txt");
+  await writeFile(
+    req,
+    `astroplan==${ASTROPLAN_VERSION} --hash=sha256:${ASTROPLAN_SDIST_SHA256}\n`,
+  );
+  pip(["--require-hashes", "-r", req]);
+
+  // stairs_core: from the monorepo checkout, always the current source
+  pip([CORE_SRC]);
+
+  const { readdir, rm } = await import("node:fs/promises");
+  const built = (await readdir(tmp)).filter((f) => f.endsWith(".whl"));
+  const pick = (prefix) => {
+    const m = built
+      .filter((f) => f.startsWith(prefix))
+      .sort()
+      .at(-1);
+    if (!m) throw new Error(`pip did not produce a ${prefix}*.whl`);
+    return m;
+  };
+  const wheels = {
+    astroplan: pick("astroplan-"),
+    stairs_core: pick("stairs_core-"),
+  };
+
+  // Replace any previous versions of these two wheels in www/pyodide.
+  for (const f of await readdir(dir)) {
+    if (
+      (f.startsWith("astroplan-") || f.startsWith("stairs_core-")) &&
+      !Object.values(wheels).includes(f)
+    ) {
+      await rm(join(dir, f));
+    }
+  }
+  for (const f of Object.values(wheels)) {
+    await copyFile(join(tmp, f), join(dir, f));
+    console.log(`  built    www/pyodide/${f}`);
+  }
+  await writeFile(WHEELS_MANIFEST, JSON.stringify(wheels, null, 2) + "\n");
+}
+
 async function copyCatalog() {
   console.log("OpenNGC catalog");
   const dest = join(WWW, "NGC.csv");
@@ -188,6 +281,7 @@ async function copyCatalog() {
 try {
   await fetchPyodide();
   await buildDuckdb();
+  await buildWheels();
   await copyCatalog();
   console.log("done");
 } catch (err) {
