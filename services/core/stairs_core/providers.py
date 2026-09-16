@@ -17,7 +17,6 @@ from astropy.time import Time
 class TargetSource(Protocol):
     def load_targets(self) -> pd.DataFrame:
         """Every catalog target as a DataFrame (identifier, ra_deg, dec_deg, ...)."""
-        ...
 
 
 class WeatherProvider(Protocol):
@@ -29,7 +28,6 @@ class WeatherProvider(Protocol):
         end_dt: datetime | None,
     ) -> list[Any]:
         """Hourly ForecastData points (see stairs_core.schemas) for the window."""
-        ...
 
 
 class MoonQualityCache(Protocol):
@@ -37,7 +35,6 @@ class MoonQualityCache(Protocol):
         self, latitude: float, longitude: float, night_start: Time
     ) -> pd.DataFrame | None:
         """Precomputed 15-minute moon-quality slots for the night, if available."""
-        ...
 
 
 class PeakAltitudeCache(Protocol):
@@ -45,10 +42,11 @@ class PeakAltitudeCache(Protocol):
         self, latitude: float, longitude: float, night_start: Time
     ) -> dict[str, float] | None:
         """Precomputed peak altitude per target identifier for the night, if any."""
-        ...
 
 
 class ForecastCache(Protocol):
-    def get(self, key: str, ttl_seconds: int | None = None) -> Any | None: ...
+    def get(self, key: str, ttl_seconds: int | None = None) -> Any | None:
+        """Cached value for key if present and younger than ttl_seconds."""
 
-    def set(self, key: str, data: Any) -> None: ...
+    def set(self, key: str, data: Any) -> None:
+        """Store a JSON-serializable value under key."""
