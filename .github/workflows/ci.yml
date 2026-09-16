@@ -2,8 +2,10 @@ name: CI
 
 on:
   push:
+    # "**" rather than "*": a single star does not match "/", so feature/...
+    # branches never ran CI.
     branches:
-      - "*"
+      - "**"
   pull_request:
     branches:
       - main
