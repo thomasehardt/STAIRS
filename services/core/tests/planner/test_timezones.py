@@ -1,5 +1,11 @@
+import pytest
 from astropy.time import Time
 from stairs_core.planner.planner_models import ObservationLocation
+
+# Coordinate -> timezone resolution needs the optional "tz" extra
+# (timezonefinder), which Pyodide does not have; without it the engine
+# falls back to UTC and these assertions are meaningless.
+pytest.importorskip("timezonefinder")
 
 
 def test_timezone_resolution():
