@@ -1,1 +1,7 @@
 node_modules
+
+# Fetched/built by `npm run fetch-vendor` (scripts/fetch-vendor.mjs) - pinned
+# and hash-verified there, ~70 MB, never committed.
+www/pyodide/
+www/duckdb/
+www/NGC.csv

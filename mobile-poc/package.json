@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "fetch-vendor": "node scripts/fetch-vendor.mjs",
+    "postinstall": "node scripts/fetch-vendor.mjs"
   },
   "keywords": [],
   "author": "",
