@@ -89,6 +89,20 @@ jobs:
             echo "signed=false" >> "$GITHUB_OUTPUT"
           fi
           echo "path=$PWD/stairs-poc.apk" >> "$GITHUB_OUTPUT"
+          # Manifest the app's self-updater polls (AppUpdaterPlugin + index.html).
+          cat > latest.json <<EOF
+          {
+            "versionCode": ${{ github.run_number }},
+            "versionName": "${{ github.run_number }}-${GITHUB_SHA::7}",
+            "apkUrl": "https://github.com/${{ github.repository }}/releases/download/mobile-poc-latest/stairs-poc.apk",
+            "sha256": "$(sha256sum stairs-poc.apk | cut -d' ' -f1)",
+            "size": $(stat -c %s stairs-poc.apk),
+            "commit": "${GITHUB_SHA::7}",
+            "builtAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          cat latest.json
+          echo "manifest=$PWD/latest.json" >> "$GITHUB_OUTPUT"
 
       - uses: actions/upload-artifact@v6
         with:
@@ -96,8 +110,9 @@ jobs:
           path: ${{ steps.apk.outputs.path }}
           retention-days: 14
 
-      # Rolling pre-release: move the tag to this commit and replace the asset,
-      # so the download URL above never changes.
+      # Rolling pre-release: move the tag to this commit and replace the assets,
+      # so the download URLs never change. APK before manifest, so a client that
+      # reads latest.json never gets a hash for an APK that isn't there yet.
       - name: Publish to mobile-poc-latest release
         if: steps.apk.outputs.signed == 'true'
         working-directory: ${{ github.workspace }}
@@ -115,3 +130,4 @@ jobs:
             gh release create "$TAG" --prerelease --title "Mobile POC (latest)" --notes "$NOTES" --target "$GITHUB_SHA"
           fi
           gh release upload "$TAG" "${{ steps.apk.outputs.path }}" --clobber
+          gh release upload "$TAG" "${{ steps.apk.outputs.manifest }}" --clobber

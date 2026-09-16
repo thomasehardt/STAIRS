@@ -16,6 +16,16 @@ Tap the downloaded file; the first time, Android asks to allow installs from
 your browser. Later builds install over the previous one (same signing key,
 increasing version code).
 
+## Self-update
+
+After startup the app fetches `latest.json` from the same release (via the
+native `AppUpdaterPlugin` - GitHub assets have no CORS headers) and, if the
+published `versionCode` is newer than the installed one, shows an **Update
+available** banner. Tapping **Install** downloads the APK, verifies its sha256,
+and hands it to the Android package installer, which asks for confirmation.
+The first time, Android also asks to allow installs from STAIRS (one toggle).
+Manual check: Settings → App → **Check for updates**.
+
 ## Build locally
 
 ```bash
