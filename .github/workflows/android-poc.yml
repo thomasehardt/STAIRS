@@ -1,0 +1,117 @@
+name: Android POC
+
+# Builds the mobile-poc Android APK and publishes it to the rolling
+# `mobile-poc-latest` pre-release, so the newest build is always at
+#   https://github.com/thomasehardt/STAIRS/releases/download/mobile-poc-latest/stairs-poc.apk
+#
+# Signing uses the ANDROID_* repo secrets (see mobile-poc/README.md). If they
+# are absent the build still runs and uploads an unsigned APK as a workflow
+# artifact, but nothing is published.
+
+on:
+  push:
+    branches: [feature/mobile-poc, main]
+    paths:
+      - "mobile-poc/**"
+      - "data/catalogs/openngc/NGC.csv"
+      - ".github/workflows/android-poc.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: android-poc
+  cancel-in-progress: true
+
+permissions:
+  contents: write # create/update the rolling release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # `secrets` isn't usable in step-level `if:`, so surface presence here.
+      HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_B64 != '' }}
+    defaults:
+      run:
+        working-directory: mobile-poc
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: mobile-poc/package-lock.json
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      # postinstall runs scripts/fetch-vendor.mjs: Pyodide + wheels from the
+      # Pyodide CDN, duckdb-wasm from node_modules, NGC.csv from data/.
+      - name: Install web deps and fetch runtime binaries
+        run: npm ci
+
+      - name: Sync web assets into the Android project
+        run: npx cap sync android
+
+      - name: Decode release keystore
+        if: env.HAS_KEYSTORE == 'true'
+        env:
+          ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: |
+          echo "$ANDROID_KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/release.jks" >> "$GITHUB_ENV"
+
+      - name: Build release APK
+        working-directory: mobile-poc/android
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          ./gradlew --no-daemon assembleRelease \
+            -PversionCode=${{ github.run_number }} \
+            -PversionName=${{ github.run_number }}-${GITHUB_SHA::7}
+          ls -la app/build/outputs/apk/release/
+
+      - name: Stage APK
+        id: apk
+        working-directory: mobile-poc/android/app/build/outputs/apk/release
+        run: |
+          if [ -f app-release.apk ]; then
+            cp app-release.apk stairs-poc.apk
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          else
+            cp app-release-unsigned.apk stairs-poc.apk
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "path=$PWD/stairs-poc.apk" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: stairs-poc-apk-${{ github.run_number }}
+          path: ${{ steps.apk.outputs.path }}
+          retention-days: 14
+
+      # Rolling pre-release: move the tag to this commit and replace the asset,
+      # so the download URL above never changes.
+      - name: Publish to mobile-poc-latest release
+        if: steps.apk.outputs.signed == 'true'
+        working-directory: ${{ github.workspace }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: mobile-poc-latest
+        run: |
+          git tag -f "$TAG" "$GITHUB_SHA"
+          git push -f origin "refs/tags/$TAG"
+          NOTES=$(printf 'Rolling build of the STAIRS mobile POC from `%s` @ %s (run #%s).\n\nDownload `stairs-poc.apk` below and open it on an Android phone (Android 7.0+). Each build installs over the previous one.' \
+            "$GITHUB_REF_NAME" "${GITHUB_SHA::7}" "${{ github.run_number }}")
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --prerelease --title "Mobile POC (latest)" --notes "$NOTES" --target "$GITHUB_SHA"
+          else
+            gh release create "$TAG" --prerelease --title "Mobile POC (latest)" --notes "$NOTES" --target "$GITHUB_SHA"
+          fi
+          gh release upload "$TAG" "${{ steps.apk.outputs.path }}" --clobber
