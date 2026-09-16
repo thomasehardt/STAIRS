@@ -3,8 +3,8 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from src.api.deps import get_weather_service
-from src.api.schemas import ForecastData
 from src.utils.weather import WeatherService
+from stairs_core.schemas import ForecastData
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

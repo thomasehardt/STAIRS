@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
+from src.api.examples import install_schema_examples
 from src.api.routers import (
     catalogs,
     locations,
@@ -17,10 +18,10 @@ from src.api.routers import (
     targets,
     weather,
 )
-from src.astro_logic.visibility import ensure_iers_table
 from src.db.parquet_loader import load_data_to_parquet
 from src.utils.ephemeris_manager import EphemerisManager
 from src.utils.logging_config import setup_logging
+from stairs_core.astro_logic.visibility import ensure_iers_table
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -41,6 +42,8 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator:
 
     yield  # No cleanup needed on shutdown
 
+
+install_schema_examples()
 
 app = FastAPI(
     title="STAIRS API",

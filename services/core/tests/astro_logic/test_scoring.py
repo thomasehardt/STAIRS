@@ -52,7 +52,7 @@ class MockTarget:
         return getattr(self, key, default)
 
 
-import src.astro_logic.scoring as scoring
+import stairs_core.astro_logic.scoring as scoring
 
 
 class TestScoring(TestCase):

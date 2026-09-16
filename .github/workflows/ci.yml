@@ -2,8 +2,10 @@ name: CI
 
 on:
   push:
+    # "**" rather than "*": a single star does not match "/", so feature/...
+    # branches never ran CI.
     branches:
-      - "*"
+      - "**"
   pull_request:
     branches:
       - main
@@ -17,3 +19,21 @@ jobs:
         with:
           python-version: "3.14"
       - uses: pre-commit/action@v3.0.1
+
+  core:
+    # The planning engine must test and package standalone - it is shipped
+    # into Pyodide for the mobile app as well as imported by the API.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+          cache: pip
+      - run: pip install build "./services/core[test,tz]"
+      - run: pytest services/core -q
+      - run: python -m build --wheel --outdir dist services/core
+      - uses: actions/upload-artifact@v6
+        with:
+          name: stairs-core-wheel
+          path: dist/*.whl

@@ -22,6 +22,7 @@ classifiers = [
     "Framework :: FastAPI",
 ]
 dependencies = [
+    "stairs-core[tz]",
     "timezonefinder>=6.0.0",
     "astroplan>=0.10.0",
     "astropy>=6.0.0",

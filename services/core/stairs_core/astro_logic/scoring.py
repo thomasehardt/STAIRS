@@ -4,8 +4,9 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from numpy import typing as npt
-from src.api.schemas import ForecastData
-from src.catalog.telescope import TelescopeProfile
+
+from stairs_core.catalog.telescope import TelescopeProfile
+from stairs_core.schemas import ForecastData
 
 TARGET_CLASS_FALLBACKS = {
     "Asterism": 15.0,

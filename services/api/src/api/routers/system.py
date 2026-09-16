@@ -1,16 +1,16 @@
 import numpy as np
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel
-from src.astro_logic.exposure import (
+from src.catalog.duck_service import DuckCatalogService
+from src.db.duck_session import get_duck_db
+from src.utils.ephemeris_manager import EphemerisManager
+from stairs_core.astro_logic.exposure import (
     calculate_optimal_sub_exposure,
     calculate_practical_sub_exposure,
     calculate_sky_flux,
     calculate_total_integration_time,
 )
-from src.astro_logic.visibility import safe_round
-from src.catalog.duck_service import DuckCatalogService
-from src.db.duck_session import get_duck_db
-from src.utils.ephemeris_manager import EphemerisManager
+from stairs_core.astro_logic.visibility import safe_round
 
 router = APIRouter()
 

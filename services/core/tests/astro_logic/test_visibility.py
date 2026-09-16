@@ -5,7 +5,7 @@ import numpy as np
 from astroplan import Observer
 from astropy.coordinates import SkyCoord
 from astropy.time import Time
-from src.astro_logic.visibility import (
+from stairs_core.astro_logic.visibility import (
     find_visible_window,
     get_moon_quality,
     get_peak_altitudes,

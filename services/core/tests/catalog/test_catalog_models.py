@@ -2,7 +2,7 @@ import os
 from unittest import TestCase
 
 from pydantic import ValidationError
-from src.catalog import ObjectCatalog, TargetRecord
+from stairs_core.catalog import ObjectCatalog, TargetRecord
 
 # Get the directory where this test file is located
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))

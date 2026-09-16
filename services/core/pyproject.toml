@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stairs-core"
+version = "0.3.1" # x-release-please-version
+description = "STAIRS planning engine: visibility, scoring, exposure and scheduling logic shared by the API and the on-device mobile app"
+authors = [{ name = "Thomas Ehardt", email = "thomas.ehardt@gmail.com" }]
+license = { text = "MIT" }
+requires-python = ">=3.12"
+# Keep this list Pyodide-installable: pure Python or packages Pyodide ships.
+# No FastAPI, DuckDB, file caches or config loading - those stay in services/api.
+dependencies = [
+    "astroplan>=0.10.0",
+    "astropy>=6.0.0",
+    "numpy>=2.0.0",
+    "pandas>=2.0.0",
+    "pydantic>=2.7.0",
+    "pytz>=2024.1",
+]
+
+[project.optional-dependencies]
+# Timezone lookup from coordinates (ObservationLocation without an explicit
+# timezone). Optional because timezonefinder is not available in Pyodide; the
+# mobile app always supplies the timezone explicitly.
+tz = ["timezonefinder>=6.0.0"]
+test = ["pytest>=8.0.0"]
+
+[project.urls]
+Homepage = "https://github.com/thomasehardt/STAIRS"
+
+[tool.setuptools.packages.find]
+include = ["stairs_core*"]

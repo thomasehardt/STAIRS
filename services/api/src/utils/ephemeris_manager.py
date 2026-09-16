@@ -9,10 +9,10 @@ import numpy as np
 import pandas as pd
 from astropy.coordinates import AltAz, SkyCoord, get_body
 from astropy.time import Time, TimeDelta
-from src.astro_logic.visibility import get_astronomical_night
 from src.db.duck_session import get_duck_db
-from src.planner.planner_models import ObservationLocation
 from src.utils.geo_cache import GeoCacheService
+from stairs_core.astro_logic.visibility import get_astronomical_night
+from stairs_core.planner.planner_models import ObservationLocation
 
 logger = logging.getLogger(__name__)
 CACHE_ROOT = Path(os.getenv("CACHE_DIR", "cache"))

@@ -3,7 +3,7 @@ from datetime import datetime
 import astropy.units as u
 from astroplan import Observer
 from astropy.time import Time
-from src.astro_logic.visibility import (
+from stairs_core.astro_logic.visibility import (
     does_day_have_astronomical_day,
     does_day_have_astronomical_night,
     find_horizon_crossings,

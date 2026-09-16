@@ -4,22 +4,37 @@ from datetime import UTC
 import astropy.units as u
 import numpy as np
 import pandas as pd
+from astropy.coordinates import SkyCoord
 from astropy.time import Time, TimeDelta
-from src.astro_logic.visibility import get_astronomical_night, get_peak_altitudes
-from src.catalog.catalog_models import TelescopeProfile
-from src.catalog.duck_service import DuckCatalogService
-from src.planner.planner_models import ObservationLocation
-from src.utils.weather import WeatherService
+
+from stairs_core.astro_logic.visibility import (
+    get_astronomical_night,
+    get_peak_altitudes,
+)
+from stairs_core.catalog.catalog_models import TelescopeProfile
+from stairs_core.planner.planner_models import ObservationLocation
+from stairs_core.providers import PeakAltitudeCache, TargetSource, WeatherProvider
 
 logger = logging.getLogger(__name__)
 
 
 class NightScheduler:
     def __init__(
-        self, location: ObservationLocation, catalog_service: DuckCatalogService
+        self,
+        location: ObservationLocation,
+        target_source: TargetSource,
+        peak_alt_cache: PeakAltitudeCache | None = None,
     ) -> None:
+        """
+        :param location:
+        :param target_source: where the catalog comes from (DuckDB in the API,
+            duckdb-wasm on-device)
+        :param peak_alt_cache: optional precomputed per-target peak altitudes
+            (the API passes its EphemerisManager); without it they are computed
+        """
         self.location = location
-        self.catalog_service = catalog_service
+        self.target_source = target_source
+        self.peak_alt_cache = peak_alt_cache
 
     def build_timeline(
         self,
@@ -27,7 +42,7 @@ class NightScheduler:
         start_time: Time,
         min_alt: float = 30.0,
         block_size_minutes: int = 60,
-        weather_service: WeatherService | None = None,
+        weather_service: WeatherProvider | None = None,
         include_targets: list[str] | None = None,
     ) -> dict:
         """
@@ -53,7 +68,7 @@ class NightScheduler:
         night_start, night_end = night_window
 
         # 1. fetch all targets
-        targets_df = self.catalog_service.conn.execute("SELECT * FROM targets").df()
+        targets_df = self.target_source.load_targets()
 
         latitude = self.location.latitude
         targets_df["theoretical_max_alt"] = 90.0 - np.abs(
@@ -78,20 +93,19 @@ class NightScheduler:
                 "recommendations": [],
             }
 
-        from src.utils.ephemeris_manager import EphemerisManager
-
-        ephem_manager = EphemerisManager()
-        cached_alts = ephem_manager.get_cached_peak_altitude(
-            latitude=self.location.latitude,
-            longitude=self.location.longitude,
-            night_start=night_start,
+        cached_alts = (
+            self.peak_alt_cache.get_cached_peak_altitude(
+                latitude=self.location.latitude,
+                longitude=self.location.longitude,
+                night_start=night_start,
+            )
+            if self.peak_alt_cache
+            else None
         )
 
         if cached_alts:
             targets_df["peak_alt"] = targets_df["identifier"].map(cached_alts)
         else:
-            from astropy.coordinates import SkyCoord
-
             coords = SkyCoord(
                 ra=targets_df["ra_deg"].values,
                 dec=targets_df["dec_deg"].values,
@@ -100,8 +114,6 @@ class NightScheduler:
             targets_df["peak_alt"] = get_peak_altitudes(observer, coords, night_window)
 
         candidates_pool = targets_df[targets_df["peak_alt"] > (min_alt - 5.0)].copy()
-        from astropy.coordinates import SkyCoord
-
         pool_coords = SkyCoord(
             ra=candidates_pool["ra_deg"].values,
             dec=candidates_pool["dec_deg"].values,
@@ -118,7 +130,7 @@ class NightScheduler:
             )
 
         # 4. Pre-calculate Static OSS for all candidates
-        from src.astro_logic.scoring import (
+        from stairs_core.astro_logic.scoring import (
             calculate_oss_vectorized,
             calculate_sqs_vectorized,
             calculate_weather_score_vectorized,
@@ -179,7 +191,7 @@ class NightScheduler:
                     weather_point.get("seeing"),
                 )[0]
 
-            from src.astro_logic.visibility import get_moon_quality
+            from stairs_core.astro_logic.visibility import get_moon_quality
 
             m_mult = get_moon_quality(observer, midpoint)
 
@@ -348,7 +360,7 @@ class NightScheduler:
         sorted_recs = sorted(
             target_best_stats.items(), key=lambda x: x[1]["final"], reverse=True
         )[:20]
-        from src.astro_logic.visibility import find_visible_window
+        from stairs_core.astro_logic.visibility import find_visible_window
 
         for tid, data in sorted_recs:
             idx = data["idx"]

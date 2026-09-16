@@ -2,32 +2,6 @@ from datetime import date, datetime
 from typing import TypedDict
 
 from pydantic import BaseModel, ConfigDict
-from src.utils.config_manager import ConfigManager
-
-
-def get_plan_example() -> dict:
-    """
-    returns a dynamic example of a plan for Swagger
-    :return:
-    """
-    config = ConfigManager.get_raw_config()
-    default_loc = next(
-        (loc for loc in config.get("locations", []) if loc.get("default")), {}
-    )
-    default_telescope = config.get("planning", {}).get(
-        "default_telescope", "Seestar S50"
-    )
-
-    return {
-        "latitude": default_loc.get("latitude"),
-        "longitude": default_loc.get("longitude"),
-        "elevation_m": default_loc.get("elevation_m", 0.0),
-        "telescope_profile_name": default_telescope,
-        "start_time": datetime.now().isoformat(),
-        "min_alt": 30.0,
-        "location_name": default_loc.get("name"),
-        "bortle_scale": default_loc.get("bortle_scale"),
-    }
 
 
 class PlanRequest(BaseModel):
@@ -41,7 +15,9 @@ class PlanRequest(BaseModel):
     bortle_scale: int | None = None
     include_targets: list[str] = []
 
-    model_config = ConfigDict(json_schema_extra={"example": get_plan_example()})
+    # services/api/src/api/examples.py attaches a config-derived Swagger
+    # example at startup; the engine itself has no access to config.yaml.
+    model_config = ConfigDict()
 
 
 class ObservationBlock(BaseModel):

@@ -14,8 +14,9 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-from src.astro_logic.optics import calculate_fov_rectangle
-from src.catalog.units import Degrees, Hours, LightYears
+
+from stairs_core.astro_logic.optics import calculate_fov_rectangle
+from stairs_core.catalog.units import Degrees, Hours, LightYears
 
 logger = logging.getLogger(__name__)
 

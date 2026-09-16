@@ -3,12 +3,12 @@ from datetime import date
 import duckdb
 import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException
-from src.api.schemas import (
+from src.db.duck_session import get_duck_db
+from stairs_core.schemas import (
     ObservationLogCreate,
     ObservationLogItem,
     ObservationLogListResponse,
 )
-from src.db.duck_session import get_duck_db
 
 router = APIRouter()
 

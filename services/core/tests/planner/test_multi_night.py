@@ -1,6 +1,6 @@
 from astropy.time import Time
-from src.planner.multi_night import MultiNightPlanner
-from src.planner.planner_models import ObservationLocation
+from stairs_core.planner.multi_night import MultiNightPlanner
+from stairs_core.planner.planner_models import ObservationLocation
 
 
 def test_multi_night_forecast():

@@ -9,13 +9,14 @@ services:
       - "8000:8000"
     volumes:
       - ./services/api/src:/app/src
+      - ./services/core:/app/core
       - ./data:/app/data:ro
       - ./cache:/app_data/cache
       - ./logs:/app_data/logs
       - ./config.yaml:/app/config.yaml
     environment:
       - PYTHONUNBUFFERED=1
-      - PYTHONPATH=/app
+      - PYTHONPATH=/app:/app/core
       - LOG_DIR=/app_data/logs
       - CACHE_DIR=/app_data/cache
       - HOME=/tmp
