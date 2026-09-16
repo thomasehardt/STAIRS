@@ -42,12 +42,11 @@ const RUNTIME_HASHES = {
   "pyodide-lock.json":
     "c963d22858f6bcb8f41586a2142f03905ab370c88ea22a86a2736e95fac2a8f3",
 };
-// What index.html asks for (pyodide.loadPackage + micropip.install). Their
+// What index.html passes to pyodide.loadPackage. Their
 // transitive dependencies are resolved from the lock file below.
 const PYODIDE_ROOT_PACKAGES = [
   "numpy",
   "pandas",
-  "micropip",
   "six",
   "pytz",
   "pydantic",
