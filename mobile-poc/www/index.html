@@ -31,33 +31,119 @@
         font-size: 1.2rem;
         margin: 0 0 0.5rem;
       }
-      .status-line {
+      /* Full-screen boot overlay: owns the screen until the first scored
+         target list is on screen. Progress is weighted-by-phase and
+         self-calibrating (see BootProgress). */
+      #boot-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        background: #0d0d0d;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        justify-content: center;
+        padding: calc(1.5rem + env(safe-area-inset-top)) 1.5rem
+          calc(1.5rem + env(safe-area-inset-bottom));
+        transition: opacity 0.4s ease;
+      }
+      #boot-overlay.done {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .boot-card {
+        width: 100%;
+        max-width: 420px;
+        display: flex;
+        flex-direction: column;
+        max-height: 100%;
+      }
+      .boot-title {
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-align: center;
+      }
+      .boot-sub {
+        color: #888;
         font-size: 0.85rem;
-        color: #999;
+        text-align: center;
+        margin: 0.25rem 0 2rem;
       }
-      .status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #666;
-        flex-shrink: 0;
+      .boot-bar {
+        height: 6px;
+        background: #222;
+        border-radius: 3px;
+        overflow: hidden;
       }
-      .status-dot.ready {
+      .boot-bar-fill {
+        height: 100%;
+        width: 0;
         background: #4caf50;
+        border-radius: 3px;
+        transition: width 0.25s ease-out;
       }
-      .status-dot.error {
+      #boot-overlay.failed .boot-bar-fill {
         background: #e05555;
       }
-      details.diagnostics {
+      .boot-line {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 0.75rem;
+        font-size: 0.9rem;
+        color: #bbb;
+      }
+      .boot-line #boot-elapsed {
+        color: #666;
+        font-variant-numeric: tabular-nums;
+        flex-shrink: 0;
+      }
+      .boot-details-toggle {
+        align-self: center;
+        margin-top: 1.5rem;
+        background: none;
+        border: none;
+        color: #666;
+        font-size: 0.8rem;
+        text-decoration: underline;
+        padding: 0.5rem;
+      }
+      #steps {
+        overflow-y: auto;
         margin-top: 0.5rem;
       }
-      details.diagnostics summary {
-        font-size: 0.8rem;
-        color: #888;
-        cursor: pointer;
+      #steps .step {
+        margin: 0.4rem 0;
+      }
+      #steps .step .timing {
+        float: right;
+        color: #666;
+        font-weight: 400;
+        font-variant-numeric: tabular-nums;
+      }
+      #boot-error {
+        margin-top: 1.25rem;
+        background: #1a1a1a;
+        border: 1px solid #e05555;
+        border-radius: 8px;
+        padding: 0.8rem 1rem;
+      }
+      #boot-error-text {
+        color: #eaa;
+        font-size: 0.85rem;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      #boot-retry {
+        display: block;
+        width: 100%;
+        margin-top: 0.75rem;
+        padding: 0.7rem;
+        background: #262626;
+        color: #eee;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
       }
       .step {
         background: #1a1a1a;
@@ -625,16 +711,30 @@
     </style>
   </head>
   <body>
+    <div id="boot-overlay">
+      <div class="boot-card">
+        <div class="boot-title">STAIRS</div>
+        <div class="boot-sub">Astro Imaging Run Scheduler</div>
+        <div class="boot-bar">
+          <div class="boot-bar-fill" id="boot-bar-fill"></div>
+        </div>
+        <div class="boot-line">
+          <span id="boot-label">Starting…</span>
+          <span id="boot-elapsed">0.0 s</span>
+        </div>
+        <button class="boot-details-toggle" id="boot-details-toggle">
+          Details
+        </button>
+        <div id="steps" hidden></div>
+        <div id="boot-error" hidden>
+          <div id="boot-error-text"></div>
+          <button id="boot-retry">Retry</button>
+        </div>
+      </div>
+    </div>
+
     <header>
       <h1>STAIRS</h1>
-      <div class="status-line">
-        <span class="status-dot" id="status-dot"></span>
-        <span id="status-text">Starting engine…</span>
-      </div>
-      <details class="diagnostics">
-        <summary>Engine diagnostics</summary>
-        <div id="steps"></div>
-      </details>
     </header>
 
     <div class="location-bar">
@@ -867,8 +967,6 @@
 
       const stepsEl = document.getElementById("steps");
       const stepEls = {};
-      const statusDot = document.getElementById("status-dot");
-      const statusText = document.getElementById("status-text");
       const locationSelect = document.getElementById("location-select");
       const tabDashboardBtn = document.getElementById("tab-dashboard");
       const tabTargetsBtn = document.getElementById("tab-targets");
@@ -911,39 +1009,224 @@
 
       let pyodide, db, conn;
 
+      // ---- Boot progress -------------------------------------------------
+      // One bar for the whole startup. Progress = sum(weight_i * frac_i) /
+      // sum(weights): done phases count fully, a running indeterminate phase
+      // eases toward (never reaches) completion on a curve scaled by how long
+      // that phase took last launch, and a determinate phase (scoring)
+      // reports real done/total. Phases may overlap (Pyodide and duckdb-wasm
+      // initialize in parallel). Measured durations are saved to localStorage
+      // so the weights converge on this device's real timings.
+      const BOOT_TIMINGS_KEY = "stairs:boot-timings-ms";
+      const BOOT_PHASES = [
+        { id: "pyodide-load", label: "Loading Python runtime…", ms: 2500 },
+        {
+          id: "astropy-install",
+          label: "Loading astronomy libraries…",
+          ms: 4000,
+        },
+        {
+          id: "astroplan-vendor",
+          label: "Loading STAIRS planning engine…",
+          ms: 2500,
+        },
+        { id: "duckdb-init", label: "Loading deep-sky catalog…", ms: 3000 },
+        { id: "weather", label: "Fetching tonight's weather…", ms: 800 },
+        { id: "scoring", label: "Scoring tonight's targets…", ms: 3000 },
+      ];
+
+      const boot = (() => {
+        const overlay = document.getElementById("boot-overlay");
+        const fill = document.getElementById("boot-bar-fill");
+        const label = document.getElementById("boot-label");
+        const elapsedEl = document.getElementById("boot-elapsed");
+        const errorBox = document.getElementById("boot-error");
+        const errorText = document.getElementById("boot-error-text");
+        const t0 = performance.now();
+
+        let saved = {};
+        try {
+          saved = JSON.parse(localStorage.getItem(BOOT_TIMINGS_KEY)) || {};
+        } catch {
+          // ignore - first run or storage unavailable
+        }
+        const phases = new Map(
+          BOOT_PHASES.map((p) => [
+            p.id,
+            {
+              ...p,
+              expected: saved[p.id] || p.ms,
+              started: null,
+              finished: null,
+              done: 0,
+              total: 0,
+            },
+          ]),
+        );
+        let active = true;
+        let failed = false;
+
+        function fraction(ph, now) {
+          if (ph.finished) return 1;
+          if (!ph.started) return 0;
+          if (ph.total > 0) return Math.min(ph.done / ph.total, 0.98);
+          // indeterminate: 1 - e^(-t/expected), i.e. ~63% at the expected
+          // duration and asymptotic to 95% if it runs long
+          const t = (now - ph.started) / ph.expected;
+          return 0.95 * (1 - Math.exp(-t));
+        }
+
+        function render() {
+          if (!active) return;
+          const now = performance.now();
+          let sum = 0;
+          let wsum = 0;
+          for (const ph of phases.values()) {
+            sum += ph.expected * fraction(ph, now);
+            wsum += ph.expected;
+          }
+          fill.style.width = `${((100 * sum) / wsum).toFixed(1)}%`;
+          elapsedEl.textContent = `${((now - t0) / 1000).toFixed(1)} s`;
+
+          // Label the most recently started phase that is still running.
+          let current = null;
+          for (const ph of phases.values()) {
+            if (
+              ph.started &&
+              !ph.finished &&
+              (!current || ph.started > current.started)
+            ) {
+              current = ph;
+            }
+          }
+          if (current && !failed) {
+            label.textContent =
+              current.total > 0
+                ? `${current.label.replace(
+                    /…$/,
+                    "",
+                  )} — ${current.done.toLocaleString()} / ${current.total.toLocaleString()}`
+                : current.label;
+          }
+          requestAnimationFrame(render);
+        }
+        requestAnimationFrame(render);
+
+        return {
+          begin(id) {
+            const ph = phases.get(id);
+            if (ph) ph.started = performance.now();
+          },
+          progress(id, done, total) {
+            const ph = phases.get(id);
+            if (!ph || !active) return;
+            ph.done = done;
+            ph.total = total;
+          },
+          end(id) {
+            const ph = phases.get(id);
+            if (!ph || !ph.started) return 0;
+            ph.finished = performance.now();
+            return ph.finished - ph.started;
+          },
+          fail(message) {
+            failed = true;
+            overlay.classList.add("failed");
+            label.textContent = "Startup failed";
+            errorText.textContent = message;
+            errorBox.hidden = false;
+            stepsEl.hidden = false;
+          },
+          finish() {
+            const timings = {};
+            for (const ph of phases.values()) {
+              if (ph.started && ph.finished)
+                timings[ph.id] = Math.round(ph.finished - ph.started);
+            }
+            try {
+              localStorage.setItem(BOOT_TIMINGS_KEY, JSON.stringify(timings));
+            } catch {
+              // ignore
+            }
+            fill.style.width = "100%";
+            label.textContent = "Ready";
+            setTimeout(() => {
+              active = false;
+              overlay.classList.add("done");
+              setTimeout(() => overlay.remove(), 450);
+            }, 250);
+          },
+        };
+      })();
+
+      document
+        .getElementById("boot-details-toggle")
+        .addEventListener("click", () => {
+          stepsEl.hidden = !stepsEl.hidden;
+        });
+      document.getElementById("boot-retry").addEventListener("click", () => {
+        window.location.reload();
+      });
+
+      // Per-step rows in the Details list. Each step id doubles as a boot
+      // phase id, so these also drive the progress bar.
       function step(id, label) {
         const el = document.createElement("div");
         el.className = "step pending";
-        el.innerHTML = `<div class="label">&#9203; ${label}</div><div class="detail"></div>`;
+        el.innerHTML = `<div class="label">&#9203; ${label}<span class="timing"></span></div><div class="detail"></div>`;
         stepsEl.appendChild(el);
         stepEls[id] = el;
+        boot.begin(id);
+      }
+      function relabel(el, glyph) {
+        const labelEl = el.querySelector(".label");
+        const timing = labelEl.querySelector(".timing");
+        const text = labelEl.textContent
+          .replace(timing.textContent, "")
+          .replace(/^\W+\s*/, "");
+        labelEl.innerHTML = `${glyph} ${text}`;
+        labelEl.appendChild(timing);
       }
       function stepOk(id, detail) {
         const el = stepEls[id];
+        const ms = boot.end(id);
         el.className = "step ok";
-        el.querySelector(".label").innerHTML =
-          "&#9989; " +
-          el.querySelector(".label").textContent.replace(/^\W+\s*/, "");
+        relabel(el, "&#9989;");
+        el.querySelector(".timing").textContent = ms
+          ? `${(ms / 1000).toFixed(1)} s`
+          : "";
         el.querySelector(".detail").textContent = detail;
       }
       function stepFail(id, detail) {
         const el = stepEls[id];
+        const ms = boot.end(id);
         el.className = "step fail";
-        el.querySelector(".label").innerHTML =
-          "&#10060; " +
-          el.querySelector(".label").textContent.replace(/^\W+\s*/, "");
+        relabel(el, "&#10060;");
+        el.querySelector(".timing").textContent = ms
+          ? `${(ms / 1000).toFixed(1)} s`
+          : "";
         el.querySelector(".detail").textContent = detail;
-        statusDot.className = "status-dot error";
-        statusText.textContent =
-          "Engine failed to start - see diagnostics below";
+        const labelText = [...el.querySelector(".label").childNodes]
+          .filter((n) => n.nodeType === Node.TEXT_NODE)
+          .map((n) => n.textContent)
+          .join("")
+          .replace(/^\W+\s*/, "")
+          .trim();
+        boot.fail(`${labelText}\n${detail}`);
       }
 
-      function setStatus(text, ready) {
-        statusText.textContent = text;
-        if (ready) statusDot.className = "status-dot ready";
-      }
-
+      // Pyodide (+ packages + vendored modules) and duckdb-wasm (+ catalog)
+      // are independent, so they initialize concurrently; the browser overlaps
+      // the two WASM compiles and the network/disk reads.
       async function initEngine() {
+        const [pyOk, catalogOk] = await Promise.all([
+          initPython(),
+          initCatalog(),
+        ]);
+        return pyOk && catalogOk;
+      }
+
+      async function initPython() {
         step("pyodide-load", "Load Pyodide (Python 3.14 runtime, WASM)");
         try {
           pyodide = await loadPyodide({ indexURL: "pyodide/" });
@@ -958,16 +1241,16 @@
           "Load astropy 7.2.0 + numpy + pandas + pydantic",
         );
         try {
+          // astropy is in pyodide-lock.json, so loadPackage resolves it (and
+          // pyerfa, astropy-iers-data, ...) directly - no micropip round-trip.
           await pyodide.loadPackage([
             "numpy",
             "pandas",
-            "micropip",
             "six",
             "pytz",
             "pydantic",
+            "astropy",
           ]);
-          const micropip = pyodide.pyimport("micropip");
-          await micropip.install(["astropy==7.2.0"]);
           stepOk("astropy-install", "Loaded");
         } catch (e) {
           stepFail("astropy-install", e.message);
@@ -1001,6 +1284,7 @@ iers.conf.auto_max_age = None
 iers.conf.auto_download = False
 
 import astropy.units as u
+import numpy as np
 from astropy.time import Time
 
 import visibility as v
@@ -1044,37 +1328,62 @@ def current_weather():
     past = [w for w in _weather_range if w["timestamp"] <= now_iso]
     return past[-1] if past else _weather_range[0]
 
-def score_candidates(candidates_json, min_alt=30.0):
+# Scoring is split into prepare / chunk / finish so the UI can report real
+# progress and repaint between chunks. The math is unchanged from the one-shot
+# version: get_peak_altitudes is vectorized per-row (5 sample times per
+# target) and calculate_oss_vectorized has no cross-row normalization, so
+# chunking the altitude pass produces the identical result to a single call.
+_scoring = {}
+
+def prepare_scoring(candidates_json):
     """
-    Batch version of the per-target detail calculation: scores every
-    candidate against tonight's real astronomical night window at the
-    current location, using the same real visibility.py/scoring.py used
-    for a single target - just vectorized across a few thousand rows via
-    calculate_oss_vectorized (identical to what scheduler.py does
-    server-side to build candidate pools).
+    Parses the candidate pool, finds tonight's astronomical night, and returns
+    the number of rows to score (0 if there is nothing to do).
     """
     import json
-    import numpy as np
     import pandas as pd
-    from astropy.coordinates import SkyCoord
 
+    _scoring.clear()
     rows = json.loads(candidates_json)
     if not rows:
-        return json.dumps([])
+        return 0
 
     df = pd.DataFrame(rows)
     df["magnitude"] = pd.to_numeric(df["V-Mag"], errors="coerce")
-    df = df.dropna(subset=["magnitude"])
+    df = df.dropna(subset=["magnitude"]).reset_index(drop=True)
     if df.empty:
-        return json.dumps([])
+        return 0
 
     night = v.get_astronomical_night(_observer, Time.now(), date_window_days=14)
     if not night:
-        return json.dumps([])
-    night_start, night_end = night
+        return 0
 
+    _scoring["df"] = df
+    _scoring["night"] = night
+    _scoring["peak_alt"] = np.full(len(df), np.nan)
+    return len(df)
+
+def score_chunk(start, end):
+    """Computes peak altitudes for rows [start, end) of the prepared pool."""
+    from astropy.coordinates import SkyCoord
+
+    df = _scoring["df"].iloc[start:end]
     coords = SkyCoord(ra=df["RA"].values, dec=df["Dec"].values, unit=(u.hourangle, u.deg))
-    df["peak_alt"] = v.get_peak_altitudes(_observer, coords, (night_start, night_end))
+    _scoring["peak_alt"][start:end] = v.get_peak_altitudes(_observer, coords, _scoring["night"])
+
+def finish_scoring(min_alt=30.0):
+    """
+    Scores everything above min_alt with the same real scoring.py used for a
+    single target (calculate_oss_vectorized, identical to what scheduler.py
+    does server-side to build candidate pools) and returns the top 15.
+    """
+    import json
+    import pandas as pd
+
+    if not _scoring:
+        return json.dumps([])
+    df = _scoring["df"].copy()
+    df["peak_alt"] = _scoring["peak_alt"]
 
     visible = df[df["peak_alt"] > min_alt].copy()
     if visible.empty:
@@ -1296,6 +1605,10 @@ set_profile("${telescopeProfile.name}", ${telescopeProfile.aperture_mm}, ${teles
           return false;
         }
 
+        return true;
+      }
+
+      async function initCatalog() {
         step("duckdb-init", "Initialize duckdb-wasm + load catalog");
         try {
           const bundle = {
@@ -1491,6 +1804,24 @@ set_profile("${telescopeProfile.name}", ${telescopeProfile.aperture_mm}, ${teles
         );
       }
 
+      // Runs the prepare / chunk / finish scoring pipeline over
+      // _candidates_json, yielding to the event loop between chunks so the
+      // progress callback can actually paint.
+      const SCORING_CHUNK = 250;
+      async function scoreCandidates(onProgress) {
+        const total = await pyodide.runPythonAsync(
+          "prepare_scoring(_candidates_json)",
+        );
+        onProgress(0, total);
+        for (let start = 0; start < total; start += SCORING_CHUNK) {
+          const end = Math.min(start + SCORING_CHUNK, total);
+          await pyodide.runPythonAsync(`score_chunk(${start}, ${end})`);
+          onProgress(end, total);
+          await new Promise((r) => requestAnimationFrame(r));
+        }
+        return JSON.parse(await pyodide.runPythonAsync("finish_scoring()"));
+      }
+
       async function runTopPicks() {
         loadingStateEl.style.display = "block";
         loadingStateEl.textContent = `Scoring tonight's targets for ${selectedLocation.name}…`;
@@ -1498,10 +1829,10 @@ set_profile("${telescopeProfile.name}", ${telescopeProfile.aperture_mm}, ${teles
         emptyStateEl.style.display = "none";
         try {
           setCandidatesGlobal(await fetchScorableCandidates());
-          const scoredJson = await pyodide.runPythonAsync(
-            "score_candidates(_candidates_json)",
-          );
-          const scored = JSON.parse(scoredJson);
+          const scored = await scoreCandidates((done, total) => {
+            loadingStateEl.textContent = `Scoring tonight's targets for ${selectedLocation.name}… ${done} / ${total}`;
+            boot.progress("scoring", done, total);
+          });
           loadingStateEl.style.display = "none";
           renderTargets(scored, {
             scored: true,
@@ -2750,12 +3081,24 @@ json.dumps([
 
       (async () => {
         const ok = await initEngine();
-        if (!ok) return;
-        setStatus("Ready", true);
+        if (!ok) return; // overlay is showing the failed step + Retry
         searchInput.disabled = false;
         locationSelect.disabled = false;
+
+        // Weather is best-effort: refreshWeather() handles its own errors and
+        // scoring works without it, so it never fails the boot.
+        step("weather", "Fetch live weather (Open-Meteo)");
         await refreshWeather();
+        stepOk("weather", weatherStatusEl.textContent || "Unavailable");
+
+        step(
+          "scoring",
+          "Score tonight's candidates against the real night window",
+        );
         await runTopPicks();
+        stepOk("scoring", `Top picks for ${selectedLocation.name}`);
+
+        boot.finish();
       })();
     </script>
   </body>
