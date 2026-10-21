@@ -1,5 +1,4 @@
 import unittest
-from unittest import TestCase
 from unittest.mock import MagicMock
 
 import numpy as np
@@ -55,7 +54,7 @@ class MockTarget:
 import stairs_core.astro_logic.scoring as scoring
 
 
-class TestScoring(TestCase):
+class TestScoring(unittest.TestCase):
     def test_get_target_size_fov(self):
         # Mock target object with angular_size attribute (Pydantic-like)
         mock_target_attr = MockTarget(angular_size=5.0, target_type="Galaxy")

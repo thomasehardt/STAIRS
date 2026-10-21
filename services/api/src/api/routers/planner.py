@@ -104,7 +104,8 @@ async def generate_plan(
     weather_service: WeatherService | None = Depends(get_weather_service),
 ) -> PlanResponse:
     """Generate a chronological observation plan for a single night."""
-    logger.info(f"Generating plan for {request.location_name} at {request.start_time}")
+    safe_loc_name = request.location_name.replace("\r", "").replace("\n", "")
+    logger.info(f"Generating plan for {safe_loc_name} at {request.start_time}")
     loc, plan, start_time = _build_plan_context(request, db, weather_service)
 
     return PlanResponse(

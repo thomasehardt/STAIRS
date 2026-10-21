@@ -54,9 +54,7 @@ class NightScheduler:
         night_window = get_astronomical_night(observer, start_time)
         if not night_window:
             logger.warning(
-                "no night window found for latitude/longitude "
-                f"{self.location.latitude}, {self.location.longitude} "
-                f"at {start_time}"
+                f"no night window found for {self.location.name} at {start_time}"
             )
             return {
                 "astronomical_night_start": None,
@@ -79,11 +77,7 @@ class NightScheduler:
         ].copy()
 
         if targets_df.empty:
-            logger.warning(
-                "no targets found for latitude/longitude "
-                f"{self.location.latitude}, {self.location.longitude} "
-                f"at {start_time}"
-            )
+            logger.warning(f"no targets found for {self.location.name} at {start_time}")
             return {
                 "astronomical_night_start": observer.astropy_time_to_datetime(
                     night_start
