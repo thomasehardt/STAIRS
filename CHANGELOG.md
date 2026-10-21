@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.1](https://github.com/thomasehardt/STAIRS/compare/v0.4.0...v0.4.1) (2026-10-21)
+
+
+### Bug Fixes
+
+* **api:** Avoid log injection in planner by logging validated context ([f6bd9ac](https://github.com/thomasehardt/STAIRS/commit/f6bd9acbf0266d9d0d9ed8d6c7c0f0d296d2747c))
+* **security:** Resolve CodeQL alerts, bump actions to v7, and patch web dependencies ([76627f3](https://github.com/thomasehardt/STAIRS/commit/76627f31978ce43ce14f65702b1c0b31f8d9830a))
+
 ## [0.4.0](https://github.com/thomasehardt/STAIRS/compare/v0.3.1...v0.4.0) (2026-10-21)
 
 

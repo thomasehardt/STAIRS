@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "stairs-core"
-version = "0.4.0" # x-release-please-version
+version = "0.4.1" # x-release-please-version
 description = "STAIRS planning engine: visibility, scoring, exposure and scheduling logic shared by the API and the on-device mobile app"
 authors = [{ name = "Thomas Ehardt", email = "thomas.ehardt@gmail.com" }]
 license = { text = "MIT" }
