@@ -219,3 +219,20 @@ mockups/
 stairs.db
 **/stairs.db
 *.db
+
+# Editor / tooling
+.idea/
+.code-graph/
+.codesight/
+repomix-output.xml*
+
+# Astro (docs site)
+.astro/
+docs/dist/
+
+# Old academy POC (superseded by docs/)
+stairs-academy/
+
+# Ad-hoc backups
+*.bak
+*.bak-*
