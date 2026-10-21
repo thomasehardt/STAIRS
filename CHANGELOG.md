@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.4.0](https://github.com/thomasehardt/STAIRS/compare/v0.3.1...v0.4.0) (2026-10-21)
+
+
+### Features
+
+* **deploy:** Isolate production docker deployment and automate GHCR publishing ([#47](https://github.com/thomasehardt/STAIRS/issues/47)) ([7d5693d](https://github.com/thomasehardt/STAIRS/commit/7d5693d4f51d260b9385fdd27e11e6dd8b345e85))
+* **web:** Same-origin /backend proxy so the SPA works behind Authelia ([9f99010](https://github.com/thomasehardt/STAIRS/commit/9f99010284fbe63dc7a72c12fb48d891eb44e6c1))
+
+
+### Bug Fixes
+
+* **api:** Refresh IERS table at startup instead of pinning the bundled one ([11b3795](https://github.com/thomasehardt/STAIRS/commit/11b3795ce003c6433550b66b1ea1a9b577d0365d))
+* **cli:** Typer.Exit typo in weather command ([53c39ee](https://github.com/thomasehardt/STAIRS/commit/53c39ee5d587993547295bf682cabeb076376a07))
+
 ## [0.3.1](https://github.com/thomasehardt/STAIRS/compare/v0.3.0...v0.3.1) (2026-05-13)
 
 
