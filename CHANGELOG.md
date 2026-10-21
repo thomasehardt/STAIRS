@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/thomasehardt/STAIRS/compare/v0.4.1...v0.4.2) (2026-10-21)
+
+
+### Bug Fixes
+
+* **web:** Remove unused shadcn cli dependency, eliminating braces vulnerability ([ee4b748](https://github.com/thomasehardt/STAIRS/commit/ee4b748bdd671464071e6bdf35f7b6569d068ad1))
+
 ## [0.4.1](https://github.com/thomasehardt/STAIRS/compare/v0.4.0...v0.4.1) (2026-10-21)
 
 
